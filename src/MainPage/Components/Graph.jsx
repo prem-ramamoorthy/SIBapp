@@ -1,4 +1,4 @@
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
 
 const data = [
   { name: 'Week1', uv: 800 , nv : 240, pv: 240},
@@ -16,9 +16,11 @@ export default function RevenueLine() {
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
-          <Line type="monotone" dataKey="uv" stroke="black" strokeWidth={2} dot={false} />
-          <Line type="monotone" dataKey="nv" stroke="red" strokeWidth={2} dot={false} />
-          <Line type="monotone" dataKey="pv" stroke="blue" strokeWidth={2} dot={false} />
+          <Line type="monotone" dataKey="uv" stroke="black" strokeWidth={2} />
+          <Line type="monotone" dataKey="nv" stroke="red" strokeWidth={2} />
+          <Line type="monotone" dataKey="pv" stroke="blue" strokeWidth={2} />
+          <CartesianGrid strokeDasharray="3 3" />
+          <Legend />
         </LineChart>
       </ResponsiveContainer>
     </div>

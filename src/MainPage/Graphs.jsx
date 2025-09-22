@@ -8,8 +8,9 @@ function Graphs() {
                     md:[grid-area:5/4/9/7] 
                     lg:[grid-area:5/5/9/9] 
                     xl:[grid-area:5/5/10/11]
-                    grid place-items-center"
+                    p-4 sm:p-6 lg:p-8"
     >
+      <p className='text-md font-semibold text-gray-600'>Weekly Activity Trends</p>
       <Graph />
     </div>
   )
