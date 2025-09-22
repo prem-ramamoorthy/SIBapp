@@ -23,7 +23,7 @@ function App() {
                     xl:grid-rows-10
                     gap-3 
                     sm:gap-3 
-                    lg:gap-4 
+                    lg:gap-2 
                     bg-gray-200 
                     h-[200vh]
                     sm:min-h-screen 
