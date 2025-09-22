@@ -1,4 +1,4 @@
-import React from 'react'
+import Graph from './Components/Graph'
 
 function Graphs() {
   return (
@@ -7,9 +7,10 @@ function Graphs() {
                     sm:[grid-area:5/3/8/5] 
                     md:[grid-area:5/4/9/7] 
                     lg:[grid-area:5/5/9/9] 
-                    xl:[grid-area:5/5/10/11]"
+                    xl:[grid-area:5/5/10/11]
+                    grid place-items-center"
     >
-      Graphs
+      <Graph />
     </div>
   )
 }
