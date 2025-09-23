@@ -34,7 +34,7 @@ function UpcomingEvents() {
           max-w-full
         "
       >
-        <div className="">
+        <div className="px-3 py-1">
           <Events company="The Future of AI in Everyday Life" date="July 15, 2024" time="3:00 PM - 4:00 PM" vatNumber="FBIOPENUP" />
           <Events company="The Future of AI in Everyday Life" date="July 15, 2024" time="3:00 PM - 4:00 PM" vatNumber="FBIOPENUP" />
         </div>
