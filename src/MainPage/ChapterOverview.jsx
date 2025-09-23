@@ -1,3 +1,5 @@
+import Stat from "./Components/Stat"
+
 function ChapterOverview() {
   return (
     <div className="div3 bg-white rounded-lg sm:rounded-xl lg:rounded-2xl
@@ -5,9 +7,21 @@ function ChapterOverview() {
                     sm:[grid-area:2/1/5/4] 
                     md:[grid-area:2/1/5/5] 
                     lg:[grid-area:2/1/5/6] 
-                    xl:[grid-area:2/1/5/7]"
+                    xl:[grid-area:2/1/5/7]
+                    max-h-4/4 max-w-4/4"
     >
-      Chapter Overview
+      <div>
+        <p className="font-semibold p-4 text-gray-700">Chapter Overview</p>
+        <div className="container flex flex-col gap-4 justify-center items-center pb-2">
+          <h2 className="text-2xl font-bold">Chapter Name</h2>
+          <h3 className="text-lg font-semibold text-gray-600">Next Meeting <span className="text-amber-400">March 15, 2024</span></h3>
+          <div className="stats flex flex-row justify-between text-lg font-semibold w-3/4 pb-4">
+            <Stat value={123} label="Members" />
+            <Stat value={"12cr"} label="Revenue" money={true} />
+            <Stat value={231} label={"Visitors"} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

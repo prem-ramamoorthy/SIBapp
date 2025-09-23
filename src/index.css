@@ -1,9 +1,15 @@
 @import "tailwindcss";
 
+html{
+  scrollbar-color: red rgba(255, 255, 0, 0);
+  scrollbar-width: thin ; 
+}
+
 body {
     scrollbar-color: #9ca3af00 #f3f4f600;
-    scrollbar-width: auto ;
+    scrollbar-width: thin ;
 }
+
 .scrollbar-left {
   direction: rtl;
   overflow: auto;
