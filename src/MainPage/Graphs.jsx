@@ -8,9 +8,9 @@ function Graphs() {
                     md:[grid-area:5/4/9/7] 
                     lg:[grid-area:5/5/9/9] 
                     xl:[grid-area:5/5/10/11]
-                    p-4 sm:p-6 lg:p-8"
+                    py-4 sm:py-6 lg:py-8 "
     >
-      <p className='text-md font-semibold text-gray-600'>Weekly Activity Trends</p>
+      <p className='text-md font-semibold text-gray-600 px-4'>Weekly Activity Trends</p>
       <Graph />
     </div>
   )

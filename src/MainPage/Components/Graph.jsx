@@ -9,7 +9,7 @@ const data = [
 
 export default function RevenueLine() {
   return (
-    <div style={{ width: '100%', height: "100%" }} className='p-4'>
+    <div style={{ width: '100%', height: "100%" }} className='py-4'>
       <ResponsiveContainer>
         <LineChart data={data} margin={{ top: 16, right: 16, bottom: 0, left: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
