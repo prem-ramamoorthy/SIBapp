@@ -6,9 +6,9 @@ export default function Helpful({content = "Helpful tooltip text" , content2 = n
 
   const handleMove = (e) => { // no TS annotation in .jsx [web:36]
     if (!tipRef.current) return;
-    const OFFSET = 12;
-    tipRef.current.style.left = `${e.clientX + OFFSET}px`;
-    tipRef.current.style.top = `${e.clientY + OFFSET}px`;
+    const OFFSET = -30;
+    tipRef.current.style.left = `${e.clientX + OFFSET-100}px`;
+    tipRef.current.style.top = `${e.clientY + OFFSET-10}px`;
   };
 
   return (
