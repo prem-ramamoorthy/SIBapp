@@ -24,3 +24,7 @@ body {
   direction: ltr;
   text-align: left;
 }
+
+body {
+  background-color: rgb(229 231 235);
+}
