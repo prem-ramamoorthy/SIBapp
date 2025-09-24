@@ -1,5 +1,5 @@
 import { HeaderAvatar } from './Components/Avatar'
-import { Bell, Menu} from 'lucide-react'
+import { Bell } from 'lucide-react'
 import Sidebar from './SideBar/SideBar'
 
 function Header() {
@@ -13,7 +13,7 @@ function Header() {
                   flex justify-between align-middle"
     >
       <div className="front flex flex-row">
-        <div className="icon pt-4 pl-5"><Sidebar /></div>
+        <div className="icon pt-5 pl-5"><Sidebar /></div>
         <h1 className='h-[40px] w-[40px] bg-amber-400 rounded-full font-bold py-2 m-3'>
           <span className='relative pl-2 '>SIB</span>
         </h1>

@@ -1,10 +1,10 @@
-import { LogOut, User, Settings, SidebarOpen } from "lucide-react"
+import { LogOut, User, Settings, Menu } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
+import SidebarList from './SidebarList';
 
 export default function HeaderAvatar({
     onProfile,
     onSettings,
-    onLogout,
 }) {
     const [open, setOpen] = useState(false)
     const btnRef = useRef(null)
@@ -44,9 +44,9 @@ export default function HeaderAvatar({
                         setOpen((v) => !v)
                     }
                 }}
-                >
+            >
                 <span>
-                    <SidebarOpen height={"30"} width={"30"}/>
+                    <Menu />
                 </span>
             </button>
 
@@ -57,49 +57,22 @@ export default function HeaderAvatar({
                     tabIndex={-1}
                     className="
             absolute left-0 mt-2 w-56
-            rounded-lg border border-neutral-200 bg-white shadow-lg
+            rounded-lg border border-neutral-300 bg-white shadow-2xl
             overflow-hidden
             max-h-[70vh] overflow-y-auto
           "
                 >
-                    <div className="px-3 py-2 border-b border-neutral-100">
-                        <p className="text-sm font-semibold text-neutral-900">Account</p>
-                        <p className="text-xs text-neutral-500 truncate">user@example.com</p>
-                    </div>
-
                     <ul className="py-1">
-                        <li>
-                            <button
-                                role="menuitem"
-                                onClick={onProfile}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-neutral-50"
-                            >
-                                <User className="h-4 w-4 text-neutral-600" />
-                                <span>Profile</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                role="menuitem"
-                                onClick={onSettings}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-neutral-50"
-                            >
-                                <Settings className="h-4 w-4 text-neutral-600" />
-                                <span>Settings</span>
-                            </button>
-                        </li>
+                        <SidebarList onclick={onProfile} name={"Dashboard"} icon={"House"} />
+                        <SidebarList onclick={onSettings} name={"My Activity"} icon={"TrendingUp"} />
+                        <SidebarList onclick={onSettings} name={"Members Directory"} icon={"users"} />
+                        <SidebarList onclick={onSettings} name={"Meetings"} icon={"calendar"} />
+                        <SidebarList onclick={onSettings} name={"Referral Slips"} icon={"fileText"} />
+                        <SidebarList onclick={onSettings} name={"Analytics"} icon={"chartLine"} />
+                        <SidebarList onclick={onSettings} name={"Chapter Info"} icon={"building2"} />
+                        <SidebarList onclick={onSettings} name={"Visitors"} icon={"userPlus"} />
+                        <SidebarList onclick={onSettings} name={"Substitutes"} icon={"clock4"} />
                     </ul>
-
-                    <div className="border-t border-neutral-100">
-                        <button
-                            role="menuitem"
-                            onClick={onLogout}
-                            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50"
-                        >
-                            <LogOut className="h-4 w-4" />
-                            <span>Sign out</span>
-                        </button>
-                    </div>
                 </div>
             )}
         </div>

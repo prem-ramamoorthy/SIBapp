@@ -1,5 +1,6 @@
-import { LogOut, User, Settings } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
+import SidebarList from "../SideBar/SidebarList"
+import { LogOut } from "lucide-react"
 
 function classNames(...c) { return c.filter(Boolean).join(" ") }
 
@@ -107,26 +108,8 @@ export function HeaderAvatar({
                     </div>
 
                     <ul className="py-1">
-                        <li>
-                            <button
-                                role="menuitem"
-                                onClick={onProfile}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-neutral-50"
-                            >
-                                <User className="h-4 w-4 text-neutral-600" />
-                                <span>Profile</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                role="menuitem"
-                                onClick={onSettings}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-neutral-50"
-                            >
-                                <Settings className="h-4 w-4 text-neutral-600" />
-                                <span>Settings</span>
-                            </button>
-                        </li>
+                        <SidebarList onclick={onProfile} name={"Profile"} icon={"User"} />
+                        <SidebarList onclick={onSettings} name={"Settings"} icon={"Settings"} />
                     </ul>
 
                     <div className="border-t border-neutral-100">
