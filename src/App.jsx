@@ -4,8 +4,8 @@ import Myactivity from "./MyActivity/Myactivity"
 function App() {
   return (
     <>
-        <Dashboard />
-        {/* <Myactivity /> */}
+        {/* <Dashboard /> */}
+        <Myactivity />
     </>
   )
 }
