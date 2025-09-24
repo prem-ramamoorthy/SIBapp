@@ -27,21 +27,14 @@ body {
 
 body {
   background-color: rgb(229 231 235);
-}.radio-inline {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
 }
 
-.radio-inline input[type="radio"] {
-  width: 16px;
-  height: 16px;
-  accent-color: #2563eb; /* modern browsers */
+body {
+    scrollbar-color: #7d1616cd #1c3c7d06;
+    scrollbar-width: thin ;
 }
 
-.radio-inline input[type="radio"]:focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
-  border-radius: 999px;
+.activity-container{
+    scrollbar-color: rgb(255, 0, 0) #1c3c7d06;
+    scrollbar-width: thin ;
 }
