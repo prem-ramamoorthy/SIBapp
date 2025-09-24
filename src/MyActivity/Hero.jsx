@@ -1,7 +1,11 @@
+import { Download } from "lucide-react";
 import React from "react";
+import DateField from "./Components/DateField";
 
 function Hero() {
   const [value, setValue] = React.useState("all");
+  const [startDate, setStartDate] = React.useState("2025-09-25");
+  const [endDate, setendDate] = React.useState("2025-09-25");
 
   const options = [
     { value: "all", label: "All" },
@@ -11,42 +15,48 @@ function Hero() {
   ];
 
   return (
-    <div className="container w-[99%] h-fit bg-white p-4 my-4 ml-2 rounded-2xl">
-      <h2>Activity Type</h2>
-      <fieldset role="radiogroup" aria-label="Activity Type" style={{ border: 0, padding: 0, margin: 0 }}>
-        {options.map(opt => (
-          <label key={opt.value} className="rp-item">
+    <div className="container w-[98%] h-fit bg-white p-4 my-4 ml-2 rounded-2xl flex flex-col justify-start gap-4">
+      <h2 className="font-bold text-md">Activity Type</h2>
+      <fieldset
+        role="radiogroup"
+        aria-label="Activity Type"
+        style={{ border: 0, padding: 0, margin: 0 }}
+        className="flex flex-wrap gap-4 p-4"
+      >
+        {options.map((opt) => (
+          <label key={opt.value} className="rp-item ml-4 flex items-center cursor-pointer select-none">
             <input
               type="radio"
-              className="rp-input"
               name="activity-type"
               value={opt.value}
               checked={value === opt.value}
               onChange={(e) => setValue(e.target.value)}
+              className="sr-only peer"
             />
-            <span className="rp-text">{opt.label}</span>
+            <span
+              className="
+          relative inline-flex h-3 w-3 items-center justify-center rounded-full
+          border-3 border-amber-400 transition
+          peer-focus-visible:ring-2 peer-focus-visible:ring-red-500
+          peer-checked:ring-2 peer-checked:ring-red-500 peer-checked:border-red-500
+        "
+            >
+            </span>
+
+            <span className="rp-text ml-2 font-semibold">{opt.label}</span>
           </label>
         ))}
       </fieldset>
-      <div className="dateselection">
-        <label className="date-item">
-          <span className="rp-text">from</span>
-          <input
-            type="date"
-            className="rp-input"
-            name="activity-type"
-            onChange={(e) => setValue(e.target.value)}
-          />
-        </label>
-        <label className="date-item">
-           <span className="rp-text">To</span>
-          <input
-            type="date"
-            className="rp-input"
-            name="activity-type"
-            onChange={(e) => setValue(e.target.value)}
-          />
-        </label>
+
+      <h2 className="font-bold mt-2">Date Range</h2>
+      <div className="dateselection flex flex-wrap justify-start items-center">
+        <DateField value={startDate} handler={setStartDate}/>
+        <DateField value={endDate} handler={setendDate}/>
+        <button className="border-1 rounded-xl bg-amber-300 py-3 m-4
+        font-bold flex px-5 flex-row gap-4 hover:bg-amber-300/80 justify-center">
+          <Download />
+          <p className="">Download CSV</p>
+        </button>
       </div>
     </div>
   );
