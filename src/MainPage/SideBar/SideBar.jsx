@@ -62,7 +62,7 @@ export default function HeaderAvatar({
             max-h-[70vh] overflow-y-auto
           "
                 >
-                    <ul className="py-1">
+                    <ul className="py-1 m-2">
                         <SidebarList onclick={onProfile} name={"Dashboard"} icon={"House"} />
                         <SidebarList onclick={onSettings} name={"My Activity"} icon={"TrendingUp"} />
                         <SidebarList onclick={onSettings} name={"Members Directory"} icon={"users"} />

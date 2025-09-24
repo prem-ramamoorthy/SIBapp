@@ -13,7 +13,7 @@ function SidebarList({
                 <button
                     role="menuitem"
                     onClick={onclick}
-                    className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-neutral-50"
+                    className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-amber-400 rounded-2xl ml-0.2"
                 >
                     <Icon className="h-4 w-4 text-neutral-600" />
                     <span>{name}</span>
