@@ -31,7 +31,7 @@ export default function HeaderAvatar({
     }, [open])
 
     return (
-        <div className="relative cursor">
+        <div className="relative cursor [z-index:1]">
             <button
                 ref={btnRef}
                 type="button"

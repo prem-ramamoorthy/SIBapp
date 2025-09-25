@@ -31,7 +31,16 @@ function Hero() {
               value={opt.value}
               checked={value === opt.value}
               onChange={(e) => setValue(e.target.value)}
+              className="sr-only peer"
             />
+            <span
+          className="
+            h-4 w-4 rounded-full bg-red-500
+            opacity-0 scale-0 transition
+            peer-checked:opacity-100 peer-checked:scale-100 border-3 border-yellow-400
+          "
+        />
+      
             <span className="rp-text ml-2 font-semibold">{opt.label}</span>
           </label>
         ))}
