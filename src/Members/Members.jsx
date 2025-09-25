@@ -6,7 +6,7 @@ import MemberCard from "./MemberCard/MemberCard"
 function Members() {
   const members = [
     {
-      img: "/src/assets/19.jpg",
+      img: "/assets/19.jpg",
       bg: "O+",
       name: "Yonesh Murugan",
       vertical: "IT professional",
@@ -15,7 +15,7 @@ function Members() {
       region: "Erode"
     },
     {
-      img: "/src/assets/19.jpg",
+      img: "/assets/19.jpg",
       bg: "O+",
       name: "Arun",
       vertical: "IT professional",
@@ -24,7 +24,7 @@ function Members() {
       region: "Erode"
     },
     {
-      img: "/src/assets/19.jpg",
+      img: "/assets/19.jpg",
       bg: "O+",
       name: "Prem",
       vertical: "IT professional",
@@ -33,7 +33,7 @@ function Members() {
       region: "Erode"
     },
     {
-      img: "/src/assets/19.jpg",
+      img: "/assets/19.jpg",
       bg: "O+",
       name: "Lokesh",
       vertical: "IT professional",
@@ -42,7 +42,7 @@ function Members() {
       region: "Erode"
     },
     {
-      img: "/src/assets/19.jpg",
+      img: "/assets/19.jpg",
       bg: "O+",
       name: "Lokesh",
       vertical: "IT professional",
