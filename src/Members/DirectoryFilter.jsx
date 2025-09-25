@@ -61,8 +61,8 @@ export default function DirectoryFilters({
         <Checkbox state={state.myChapterOnly} update={update} content="Show My Chapter Only" />
 
         <div className="flex gap-3 md:justify-end h-[45px] lg:h-[30px] md:h-[60px]">
-          <FilterButton  content="Clear Filter" onclick={clear} bg="bg-white" hover="bg-gray-200"/>
-          <FilterButton content="Export Directory" onclick={onExport} bg="bg-yellow-300" hover="bg-yellow-400"/>
+          <FilterButton  content="Clear Filter" onclick={clear} bg="bg-white" hover="hover:bg-gray-200"/>
+          <FilterButton content="Export Directory" onclick={onExport} bg="bg-yellow-300" hover="hover:bg-yellow-400"/>
         </div>
       </div>
     </section>

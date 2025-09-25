@@ -5,9 +5,9 @@ import Myactivity from "./MyActivity/Myactivity"
 function App() {
   return (
     <>
-        {/* <Dashboard /> */}
+        <Dashboard />
         <Myactivity />
-        {/* <Members /> */}
+        <Members />
     </>
   )
 }
