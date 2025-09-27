@@ -7,11 +7,13 @@ import Members from './Members/Members';
 import Myactivity from './MyActivity/Myactivity';
 
 import './index.css'
+import Meetings from './Meetings/Meetings';
 
 const router = createBrowserRouter([
   { path: '/', element: <Dashboard /> },
   { path: '/members', element: <Members /> },
   { path: '/myactivity', element: <Myactivity /> },
+  { path: '/meetings', element: <Meetings /> }
 ]);
 
 const rootEl = document.getElementById('root');

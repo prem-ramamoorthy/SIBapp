@@ -44,7 +44,7 @@ export default function HeatScale({
               htmlFor={`${name}-${opt.value}`}
               className={[
                 "group relative grid cursor-pointer select-none place-items-center",
-                "rounded-md px-3 py-2",
+                "rounded-md px-1 py-2",
                 active ? "bg-yellow-400" : "bg-transparent",
                 active ? "shadow-sm ring-1 ring-yellow-500/50" : "",
                 "transition-colors",

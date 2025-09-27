@@ -1,18 +1,26 @@
-import Stat from "./Components/Stat"
+import Stat from "./Components/Stat";
 
-function Stats() {
+function Stats({
+    header = "Activity Details",
+    items = [
+        { name: "Referrals Given", value: 23 },
+        { name: "Referrals Given", value: 23 },
+        { name: "Referrals Given", value: 23 },
+        { name: "Referrals Given", value: 23 },
+    ],
+}) {
+    const StatItems = items.map((element, index) => (
+        <Stat name={element.name} value={element.value} key={index} />
+    ));
+
     return (
-        <div className="h-fit w-[98%] bg-white rounded-2xl mx-2 -mt-2
-        border-1 border-gray-600 p-4">
-            <p className="font-bold -mt-2">Activity Details</p>
-            <div className="container flex flex-wrap justify-between">
-                <Stat name="Refrals Given" value={23}/>
-                <Stat name="Refrals Given" value={23}/>
-                <Stat name="Refrals Given" value={23}/>
-                <Stat name="Refrals Given" value={23}/>
+        <div className="h-fit w-[98%] bg-white rounded-2xl mx-2 -mt-2 border border-gray-600 p-4">
+            <p className="font-bold -mt-2">{header}</p>
+            <div className="flex flex-wrap justify-between">
+                {StatItems}
             </div>
         </div>
-    )
+    );
 }
 
-export default Stats
+export default Stats;

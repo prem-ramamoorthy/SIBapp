@@ -11,7 +11,10 @@ function FilterButton({
   className,
   type = 'button',
 }) {
-  const handleClick = onClick ?? onClose ?? (() => {});
+  const handleClick = ()=>{
+    onClick() ; 
+    onClose() ;
+  };
 
   return (
     <button
