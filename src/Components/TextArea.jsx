@@ -1,0 +1,76 @@
+import { useId, useState, useEffect } from "react";
+
+export default function TextArea({
+  label = "Notes",
+  value,
+  onChange,
+  placeholder = "Type here...",
+  rows = 4,
+  maxLength,
+  helperText,
+  disabled = false,
+  required = false,
+}) {
+  const id = useId();
+  const [internal, setInternal] = useState(value ?? "");
+
+  useEffect(() => {
+    if (typeof value === "string") setInternal(value);
+  }, [value]);
+
+  const current = typeof value === "string" ? value : internal;
+
+  const setVal = (v) => {
+    if (typeof value !== "string") setInternal(v);
+    onChange?.(v);
+  };
+
+  return (
+    <div className="w-full">
+      <label
+        htmlFor={id}
+        className="mb-2 block text-sm font-medium text-gray-900"
+      >
+        {label}
+        {required ? <span className="ml-1 text-red-600">*</span> : null}
+      </label>
+
+      <div
+        className={[
+          "relative rounded-md",
+          disabled ? "opacity-60" : "",
+        ].join(" ")}
+      >
+        <textarea
+          id={id}
+          rows={rows}
+          placeholder={placeholder}
+          value={current}
+          onChange={(e) => setVal(e.target.value)}
+          maxLength={maxLength}
+          disabled={disabled}
+          required={required}
+          className={[
+            "block w-full resize-y rounded-md border border-gray-300 bg-white",
+            "px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400",
+            "shadow-sm outline-none",
+            "focus:border-amber-400 focus:ring-2 focus:ring-amber-500/50",
+            "disabled:cursor-not-allowed",
+          ].join(" ")}
+        />
+
+        {maxLength !== undefined && (
+          <div className="pointer-events-none absolute bottom-1 right-2 text-xs text-gray-500">
+            {current.length}/{maxLength}
+          </div>
+        )}
+      </div>
+
+      {helperText && (
+        <p className="mt-1 text-xs text-gray-500">
+          {helperText}
+        </p>
+      )}
+    </div>
+  );
+}

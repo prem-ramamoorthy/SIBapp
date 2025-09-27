@@ -1,6 +1,7 @@
 import Dashboard from "./MainPage/Dashboard"
 import Members from "./Members/Members"
 import Myactivity from "./MyActivity/Myactivity"
+import ButtonPage from "./ButtonPages/visitors"
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
         <Dashboard />
         <Myactivity />
         <Members />
+        <ButtonPage />
     </>
   )
 }

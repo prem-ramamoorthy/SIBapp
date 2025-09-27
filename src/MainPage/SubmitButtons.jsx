@@ -2,9 +2,29 @@ import React from 'react'
 import ButtonUI from './Components/ButtonUI'
 
 function SubmitButtons() {
+
+  const buttonData = [
+    {
+      label : "Submit Referral",
+      discription : "Create new referal slip",
+    },
+    {
+      label : "Submit TYFTB",
+      discription : "Create new referal slip"
+    },
+    {
+      label : "Submit M to M",
+      discription : "Create new referal slip"
+    },
+    {
+      label : "Submit Visitor",
+      discription : "Create new referal slip"
+    },
+  ]
+
   const buttons = () => {
-    return Array.from({ length: 4 }, (_, i) => (
-      <ButtonUI key={i} index={i} label={`Submit TYFTB ${i + 1}`} description="Create new referal slip" />
+    return buttonData.map((button , i) => (
+      <ButtonUI key={i} index={i} label={button.label} description={button.discription} />
     ));
   }
   return (
@@ -27,9 +47,6 @@ function SubmitButtons() {
     >
       {buttons()}
     </div>
-
-
-
   )
 }
 
