@@ -16,7 +16,7 @@ function Filter({
               px-3
               text-sm
               text-gray-900
-              ring-1 ring-gray-200
+              ring-1 ring-gray-800
               focus:outline-none focus:ring-2 focus:ring-amber-400
               appearance-none
               pr-9

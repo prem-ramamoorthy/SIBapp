@@ -24,7 +24,7 @@ function Meeting(
         })
 
         return (
-            <div className="heade flex flex-row justify-around border-b-1 pt-4 px-2 pb-3  bg-gray-200 rounded-t-2xl w-max items-center lg:w-full xl:w-full ">
+            <div className="sticky top-0 heade flex flex-row justify-around border-b-1 pt-4 px-2 pb-3  bg-gray-200 rounded-t-2xl w-max items-center lg:w-full xl:w-full ">
                 {HeaderComponent}
             </div>
         )

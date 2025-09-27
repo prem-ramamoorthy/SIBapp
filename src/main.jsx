@@ -5,15 +5,17 @@ import { StrictMode } from 'react'
 import Dashboard from './MainPage/Dashboard';
 import Members from './Members/Members';
 import Myactivity from './MyActivity/Myactivity';
+import Meetings from './Meetings/Meetings';
+import Mychapter from './ChapterPage/Mychapter';
 
 import './index.css'
-import Meetings from './Meetings/Meetings';
 
 const router = createBrowserRouter([
   { path: '/', element: <Dashboard /> },
   { path: '/members', element: <Members /> },
   { path: '/myactivity', element: <Myactivity /> },
-  { path: '/meetings', element: <Meetings /> }
+  { path: '/meetings', element: <Meetings /> },
+  { path: '/mychapter', element: <Mychapter /> }
 ]);
 
 const rootEl = document.getElementById('root');
