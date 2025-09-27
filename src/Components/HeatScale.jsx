@@ -62,7 +62,7 @@ export default function HeatScale({
               />
               <span
                 className={[
-                  "mb-1 h-2 w-14 rounded-full",
+                  "mb-1 h-2 w-2 rounded-full",
                   opt.bar,
                   active ? "" : "opacity-90",
                 ].join(" ")}

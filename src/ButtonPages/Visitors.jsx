@@ -55,7 +55,7 @@ function ButtonPage({ onClose = () => {} }) {
         <div className="flex w-full gap-4">
           <EntryField type="text" placeholder="" label="City (Optional)" />
           <EntryField type="text" placeholder="" label="State (Optional)" />
-          <EntryField type="text" placeholder="" label="Post Code (Optional)" />
+          <EntryField type="text" placeholder="" label="Post Code" />
         </div>
 
         <div className="header border-b-2 border-gray-300 pb-2 mt-10">

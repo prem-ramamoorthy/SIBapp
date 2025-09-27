@@ -45,26 +45,10 @@ function ButtonUI({ label, description, component }) {
 
           <div className="absolute inset-0 flex items-center justify-center p-4">
             <div className="w-full h-full max-w-[1600px] max-h-[100vh]">
-              <div className="relative w-full h-full bg-white rounded-xl shadow-xl overflow-auto">
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-md bg-white/80 text-gray-700 ring-1 ring-gray-300 hover:bg-white"
-                  aria-label="Close"
-                >
-                  <LogOut />
-                </button>
-
-                <div className="w-full min-h-full max-h-fit
-                              bg-gray-600/50
-                              backdrop-blur-2xl backdrop-saturate-200
-                              border border-white/30
-                              shadow-xl
-                              rounded-xl p-5"
-                >
+              <div className="relative w-full h-full rounded-xl shadow-xl overflow-scroll
+              backdrop-blur-5xl backdrop-saturate-200
+                              border border-white/30 p-5">
                   <Comp onClose={handleClose} />
-                </div>
-
               </div>
             </div>
           </div>
