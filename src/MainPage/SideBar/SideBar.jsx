@@ -63,15 +63,15 @@ export default function HeaderAvatar({
           "
                 >
                     <ul className="py-1 m-2">
-                        <SidebarList onclick={onProfile} name={"Dashboard"} icon={"House"} />
-                        <SidebarList onclick={onSettings} name={"My Activity"} icon={"TrendingUp"} />
-                        <SidebarList onclick={onSettings} name={"Members Directory"} icon={"users"} />
-                        <SidebarList onclick={onSettings} name={"Meetings"} icon={"calendar"} />
+                        <SidebarList onclick={onProfile} name={"Dashboard"} icon={"House"} path="/"/>
+                        <SidebarList onclick={onSettings} name={"My Activity"} icon={"TrendingUp"} path="/myactivity"/>
+                        <SidebarList onclick={onSettings} name={"Members Directory"} icon={"users"} path="/members"/>
+                        <SidebarList onclick={onSettings} name={"Meetings"} icon={"calendar"} path="/meetings"/>
                         <SidebarList onclick={onSettings} name={"Referral Slips"} icon={"fileText"} />
-                        <SidebarList onclick={onSettings} name={"Analytics"} icon={"chartLine"} />
-                        <SidebarList onclick={onSettings} name={"Chapter Info"} icon={"building2"} />
-                        <SidebarList onclick={onSettings} name={"Visitors"} icon={"userPlus"} />
-                        <SidebarList onclick={onSettings} name={"Substitutes"} icon={"clock4"} />
+                        <SidebarList onclick={onSettings} name={"Analytics"} icon={"chartLine"} path="/analytics"/>
+                        <SidebarList onclick={onSettings} name={"Chapter Info"} icon={"building2"} path="/mychapter"/>
+                        <SidebarList onclick={onSettings} name={"Visitors"} icon={"userPlus"} path="/visitors"/>
+                        <SidebarList onclick={onSettings} name={"Substitutes"} icon={"clock4"} path="/subtitutes"/>
                     </ul>
                 </div>
             )}

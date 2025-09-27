@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
-html{
+html {
   scrollbar-color: red rgba(255, 255, 0, 0);
-  scrollbar-width: thin ; 
+  scrollbar-width: thin;
 }
 
 body {
-    scrollbar-color: #9ca3af00 #f3f4f600;
-    scrollbar-width: thin ;
+  scrollbar-color: #9ca3af00 #f3f4f600;
+  scrollbar-width: thin;
 }
 
 .scrollbar-left {
@@ -20,7 +20,7 @@ body {
   overflow: auto;
 }
 
-.scrollbar-left > * {
+.scrollbar-left>* {
   direction: ltr;
   text-align: left;
 }
@@ -30,11 +30,11 @@ body {
 }
 
 body {
-    scrollbar-color: #7d1616cd #1c3c7d06;
-    scrollbar-width: thin ;
+  scrollbar-color: rgb(255, 0, 0) #1c3c7d06;
+  scrollbar-width: thin;
 }
 
-.activity-container{
-    scrollbar-color: rgb(255, 0, 0) #1c3c7d06;
-    scrollbar-width: thin ;
+.activity-container {
+  scrollbar-color: rgb(255, 0, 0) #1c3c7d06;
+  scrollbar-width: thin;
 }

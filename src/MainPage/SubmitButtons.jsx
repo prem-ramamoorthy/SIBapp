@@ -7,26 +7,31 @@ function SubmitButtons() {
     {
       label : "Submit Referral",
       discription : "Create new referal slip",
+      component : "referral"
     },
     {
       label : "Submit TYFTB",
-      discription : "Create new referal slip"
+      discription : "Create new referal slip",
+      component : "tyftb"
     },
     {
       label : "Submit M to M",
-      discription : "Create new referal slip"
+      discription : "Create new referal slip",
+      component : "m2m"
     },
     {
       label : "Submit Visitor",
-      discription : "Create new referal slip"
+      discription : "Create new referal slip",
+      component : "visitors"
     },
   ]
 
   const buttons = () => {
     return buttonData.map((button , i) => (
-      <ButtonUI key={i} index={i} label={button.label} description={button.discription} />
+      <ButtonUI key={i} index={i} label={button.label} description={button.discription} component={button.component}/>
     ));
   }
+
   return (
     <div className="div7 rounded-lg sm:rounded-xl lg:rounded-2xl
                 [grid-area:20/1/21/2]
