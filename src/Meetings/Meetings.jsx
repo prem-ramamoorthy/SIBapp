@@ -9,7 +9,7 @@ function Meetings() {
         { name: "Total Meetings", value: 10 },
         { name: "Guests Brought", value: 5 },
         { name: "Attendance Rate", value: "80%" },
-        { name: "Perfect Attendance Streak", value: 4 },
+        { name: "Attendance Streak", value: 4 },
     ]
 
     const content = {
