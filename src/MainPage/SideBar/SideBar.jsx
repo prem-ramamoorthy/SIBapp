@@ -3,8 +3,17 @@ import { useEffect, useRef, useState } from "react"
 import SidebarList from './SidebarList';
 
 export default function HeaderAvatar({
-    onProfile,
-    onSettings,
+    items = [
+        { name: "Dashboard", icon: "House", path: "/" , onclick },
+        { name: "My Activity", icon: "TrendingUp", path: "/myactivity" , onclick },
+        { name: "Members Directory", icon: "users", path: "/members" , onclick },
+        { name: "Meetings", icon: "calendar", path: "/meetings"  , onclick},
+        { name: "Referral Slips", icon: "fileText"  , onclick},
+        { name: "Analytics", icon: "chartLine", path: "/analytics" , onclick },
+        { name: "Chapter Info", icon: "building2", path: "/mychapter" , onclick },
+        { name: "Visitors", icon: "userPlus", path: "/visitors" , onclick },
+        { name: "Substitutes", icon: "clock4", path: "/subtitutes" , onclick }
+    ]
 }) {
     const [open, setOpen] = useState(false)
     const btnRef = useRef(null)
@@ -29,6 +38,10 @@ export default function HeaderAvatar({
             document.removeEventListener("keydown", onKey)
         }
     }, [open])
+
+    const SidebarElements = items.map((element , index) => {
+        return (<SidebarList onclick={element.onclick} name={element.name} icon={element.icon} path={element.path} key={index} />)
+    })
 
     return (
         <div className="relative cursor [z-index:1]">
@@ -63,15 +76,7 @@ export default function HeaderAvatar({
           "
                 >
                     <ul className="py-1 m-2">
-                        <SidebarList onclick={onProfile} name={"Dashboard"} icon={"House"} path="/"/>
-                        <SidebarList onclick={onSettings} name={"My Activity"} icon={"TrendingUp"} path="/myactivity"/>
-                        <SidebarList onclick={onSettings} name={"Members Directory"} icon={"users"} path="/members"/>
-                        <SidebarList onclick={onSettings} name={"Meetings"} icon={"calendar"} path="/meetings"/>
-                        <SidebarList onclick={onSettings} name={"Referral Slips"} icon={"fileText"} />
-                        <SidebarList onclick={onSettings} name={"Analytics"} icon={"chartLine"} path="/analytics"/>
-                        <SidebarList onclick={onSettings} name={"Chapter Info"} icon={"building2"} path="/mychapter"/>
-                        <SidebarList onclick={onSettings} name={"Visitors"} icon={"userPlus"} path="/visitors"/>
-                        <SidebarList onclick={onSettings} name={"Substitutes"} icon={"clock4"} path="/subtitutes"/>
+                        {SidebarElements}
                     </ul>
                 </div>
             )}

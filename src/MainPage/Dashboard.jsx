@@ -5,6 +5,7 @@ import Siteinfo from './SiteInfo.jsx'
 import UpcomingEvents from './UpcomingEvents.jsx'
 import Graphs from './Graphs.jsx'
 import SubmitButtons from './SubmitButtons.jsx'
+import ReferralSlips from './ReferralSlips.jsx'
 
 function Dashboard() {
   return (
@@ -31,6 +32,7 @@ function Dashboard() {
                     sm:p-3"
     >
       <Header />
+      {/* <ReferralSlips /> */}
       <Activity />
       <ChapterOverview />
       <Siteinfo />

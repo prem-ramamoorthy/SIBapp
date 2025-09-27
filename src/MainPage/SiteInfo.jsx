@@ -4,7 +4,7 @@ function SiteInfo() {
 
   const Buttons = {
     renewalDate: <SiteButtonUI content="12 Sep 2025" />,
-    website: <SiteButtonUI content="SIB Website" style={{display: "none"}} color="text-red-500/80" style2={{fontWeight: "600" , fontSize: "1rem"}} />,
+    website: <SiteButtonUI content="SIB Website" style={{display: "none"}} color="text-red-500/80" style2={{fontWeight: "600" , fontSize: "1rem"}} to="https://business-connect-three.vercel.app/"/>,
   }
   return (
      <div className="div4 rounded-lg sm:rounded-xl lg:rounded-2xl
