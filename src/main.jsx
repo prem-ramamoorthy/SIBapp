@@ -10,6 +10,7 @@ import Mychapter from './ChapterPage/Mychapter';
 import Profile from './ProfilePage/Profile';
 import Settings from './Settings/Settings';
 import NotFound404 from './Notfound/Notfound';
+import FunctionalPage from './ButtonPages/FunctionalPage'
 
 import './index.css'
 
@@ -20,7 +21,8 @@ const router = createBrowserRouter([
   { path: '/meetings', element: <Meetings /> },
   { path: '/mychapter', element: <Mychapter /> },
   { path: '/profile', element: <Profile /> },
-  { path: '/settings', element: <Settings /> }
+  { path: '/settings', element: <Settings /> },
+  { path: '/slips', element: <FunctionalPage /> }
 ]);
 
 const rootEl = document.getElementById('root');
