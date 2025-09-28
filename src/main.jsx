@@ -11,18 +11,21 @@ import Profile from './ProfilePage/Profile';
 import Settings from './Settings/Settings';
 import NotFound404 from './Notfound/Notfound';
 import FunctionalPage from './ButtonPages/FunctionalPage'
+import SignInPage from './SigninPage/SignInPage';
 
 import './index.css'
 
 const router = createBrowserRouter([
-  { path: '/', element: <Dashboard /> ,  errorElement: <NotFound404 />},
+  { path: '/', element: <SignInPage />, errorElement: <NotFound404 /> },
   { path: '/members', element: <Members /> },
   { path: '/myactivity', element: <Myactivity /> },
   { path: '/meetings', element: <Meetings /> },
   { path: '/mychapter', element: <Mychapter /> },
   { path: '/profile', element: <Profile /> },
   { path: '/settings', element: <Settings /> },
-  { path: '/slips', element: <FunctionalPage /> }
+  { path: '/slips', element: <FunctionalPage /> },
+  { path: '/dashboard', element: <Dashboard /> },
+  { path: '/logout', element: <SignInPage /> }
 ]);
 
 const rootEl = document.getElementById('root');
