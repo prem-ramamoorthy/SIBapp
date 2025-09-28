@@ -9,11 +9,12 @@ import Meetings from './Meetings/Meetings';
 import Mychapter from './ChapterPage/Mychapter';
 import Profile from './ProfilePage/Profile';
 import Settings from './Settings/Settings';
+import NotFound404 from './Notfound/Notfound';
 
 import './index.css'
 
 const router = createBrowserRouter([
-  { path: '/', element: <Dashboard /> },
+  { path: '/', element: <Dashboard /> ,  errorElement: <NotFound404 />},
   { path: '/members', element: <Members /> },
   { path: '/myactivity', element: <Myactivity /> },
   { path: '/meetings', element: <Meetings /> },
