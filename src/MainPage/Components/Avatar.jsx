@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import SidebarList from "../SideBar/SidebarList"
 import { LogOut } from "lucide-react"
+import { NavLink } from "react-router-dom"
 
 function classNames(...c) { return c.filter(Boolean).join(" ") }
 
@@ -108,19 +109,20 @@ export function HeaderAvatar({
                     </div>
 
                     <ul className="py-1">
-                        <SidebarList onclick={onProfile} name={"Profile"} icon={"User"} />
-                        <SidebarList onclick={onSettings} name={"Settings"} icon={"Settings"} />
+                        <SidebarList onclick={onProfile} name={"Profile"} icon={"User"} path="/profile" />
+                        <SidebarList onclick={onSettings} name={"Settings"} icon={"Settings"} path="/settings" />
                     </ul>
 
                     <div className="border-t border-neutral-100">
-                        <button
+                        <NavLink
+                            to="/logout"
                             role="menuitem"
                             onClick={onLogout}
                             className="flex w-full items-center gap-2 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50"
                         >
                             <LogOut className="h-4 w-4" />
                             <span>Sign out</span>
-                        </button>
+                        </NavLink>
                     </div>
                 </div>
             )}
