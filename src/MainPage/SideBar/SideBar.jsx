@@ -8,9 +8,9 @@ export default function HeaderAvatar({
         { name: "My Activity", icon: "TrendingUp", path: "/myactivity" , onclick },
         { name: "Members Directory", icon: "users", path: "/members" , onclick },
         { name: "Meetings", icon: "calendar", path: "/meetings"  , onclick},
+        { name: "Chapter Info", icon: "building2", path: "/mychapter" , onclick },
         { name: "Referral Slips", icon: "fileText"  , onclick},
         { name: "Analytics", icon: "chartLine", path: "/analytics" , onclick },
-        { name: "Chapter Info", icon: "building2", path: "/mychapter" , onclick },
         { name: "Visitors", icon: "userPlus", path: "/visitors" , onclick },
         { name: "Substitutes", icon: "clock4", path: "/subtitutes" , onclick }
     ]

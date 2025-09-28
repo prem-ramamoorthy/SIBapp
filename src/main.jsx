@@ -8,6 +8,7 @@ import Myactivity from './MyActivity/Myactivity';
 import Meetings from './Meetings/Meetings';
 import Mychapter from './ChapterPage/Mychapter';
 import Profile from './ProfilePage/Profile';
+import Settings from './Settings/Settings';
 
 import './index.css'
 
@@ -17,7 +18,8 @@ const router = createBrowserRouter([
   { path: '/myactivity', element: <Myactivity /> },
   { path: '/meetings', element: <Meetings /> },
   { path: '/mychapter', element: <Mychapter /> },
-  { path: '/profile', element: <Profile /> }
+  { path: '/profile', element: <Profile /> },
+  { path: '/settings', element: <Settings /> }
 ]);
 
 const rootEl = document.getElementById('root');
