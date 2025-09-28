@@ -4,7 +4,7 @@ import SidebarList from './SidebarList';
 
 export default function HeaderAvatar({
     items = [
-        { name: "Dashboard", icon: "House", path: "/" , onclick },
+        { name: "Dashboard", icon: "House", path: "/dashboard" , onclick },
         { name: "My Activity", icon: "TrendingUp", path: "/myactivity" , onclick },
         { name: "Members Directory", icon: "users", path: "/members" , onclick },
         { name: "Meetings", icon: "calendar", path: "/meetings"  , onclick},

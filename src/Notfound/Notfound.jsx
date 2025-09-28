@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 export default function NotFound404() {
   return (
     <main className="min-h-screen bg-white text-gray-800 flex items-center justify-center px-6">
@@ -23,12 +25,12 @@ export default function NotFound404() {
         <div className="mx-auto my-6 h-px w-20 bg-gray-200" />
 
         <div className="mt-2 flex items-center justify-center gap-3">
-          <a
-            href="/"
+          <NavLink
+            to="/dashboard"
             className="inline-flex items-center gap-2 rounded-lg bg-amber-400 px-5 py-2.5 font-semibold text-gray-900 shadow-sm ring-1 ring-amber-400/40 transition hover:-translate-y-0.5 hover:bg-amber-400/90 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-amber-400"
           >
             Go home
-          </a>
+          </NavLink>
           
         </div>
         <div className="pointer-events-none relative mt-10 flex items-center justify-center">

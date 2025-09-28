@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react"
 import Events from "./Components/Events"
+import { NavLink } from "react-router-dom"
 
 function UpcomingEvents() {
   return (
@@ -19,12 +20,13 @@ function UpcomingEvents() {
     >
       <div className="flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 shrink-0">
         <h2 className="text-[16px] sm:text-xl font-bold m-0">Upcoming Events</h2>
-        <button
+        <NavLink
           className="flex items-center gap-2 p-2 rounded-md"
           aria-label="See all events"
+          to={"/events"}
         >
           <ArrowRight className="h-4 w-4" />
-        </button>
+        </NavLink>
       </div>
 
       <div
