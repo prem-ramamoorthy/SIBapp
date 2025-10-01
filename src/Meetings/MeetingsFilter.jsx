@@ -45,7 +45,7 @@ function MeetingsFilter(
                 <Filter name="Date Range" state={state.daterange} update={update} content={daterange} />
                 <Filter name="Meeting Type" state={state.meetingtype} update={update} content={meetingtype} />
                 <Filter name="Status" state={state.status} update={update} content={status} />
-                <FilterButton content="Clear Filter" onClick={()=>setState(reset)} bg="bg-gray-200" hover="hover:bg-gray-300 mt-6" />
+                <FilterButton content="Clear Filter" onClick={()=>setState(reset)} bg="bg-gray-300" hover="hover:bg-gray-200 mt-6" />
             </div>
 
         </section>

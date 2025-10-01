@@ -14,7 +14,7 @@ function Meeting({ header = false, content = {
     if (header) {
         const headers = ["S.No", "Member Name", "Category", "Joined Date", "Referrals Given", "Referrals Received", "Business Generated"];
         return (
-            <div className="sticky top-0 flex justify-around bg-gradient-to-r from-yellow-300 to-yellow-400 shadow-md rounded-t-2xl py-4 px-2 select-none w-max lg:w-full xl:w-full">
+            <div className="sticky top-0 flex justify-around bg-gradient-to-r from-yellow-300 to-yellow-400 shadow-md rounded-t-2xl py-4 px-2 select-none w-fit lg:w-full xl:w-full">
                 {headers.map((element, index) => (
                     <p
                         key={index}
