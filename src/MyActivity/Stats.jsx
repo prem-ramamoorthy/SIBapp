@@ -14,9 +14,9 @@ function Stats({
     ));
 
     return (
-        <div className="h-fit w-[98%] bg-white rounded-2xl mx-2 -mt-2 border border-gray-600 p-4">
+        <div className="h-fit w-[98%] bg-white rounded-2xl mx-2 -mt-2 border border-gray-600 p-2">
             <p className="font-bold -mt-2">{header}</p>
-            <div className="flex flex-wrap justify-between">
+            <div className="flex flex-wrap justify-between items-center">
                 {StatItems}
             </div>
         </div>

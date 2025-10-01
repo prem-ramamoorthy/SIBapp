@@ -40,14 +40,14 @@ function Meetings() {
     ));
 
     return (
-        <div className="ml-5 ">
+        <div className="">
             <Header />
             <h1 className="m-3 pb-2 text-2xl font-bold">
                 Chapter Details
             </h1>
-            <div className="container -m-2 mx-0 w-[98%] ml-2 mb-3 bg-gray-100 rounded-2xl h-fit border-1">
+            <div className="w-[98%] -m-2 mx-0 ml-2 mb-3 bg-gray-100 rounded-2xl h-fit border-1">
                 <div className="flex flex-row justify-between">
-                    <p className="m-3 p-4 text-xl font-bold">Chapter Name</p>
+                    <p className="m-3 p-4 text-xl font-bold text-nowrap">Chapter Name</p>
                     <div className="w-[220px] mr-10 mt-4 mb-0">
                         <Filter content={dropdown} name={"Select Company"} state={state.dropdown} update={update} />
                     </div>

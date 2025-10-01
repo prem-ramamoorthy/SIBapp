@@ -32,7 +32,7 @@ function Meetings() {
             <h1 className="m-3 pb-2 text-2xl font-bold">
                 Meetings
             </h1>
-            <div className="container -m-2 mb-1 mx-0 w-[98%] ml-2">
+            <div className="w-full px-2">
                 <MeetingsFilter />
             </div>
             <div className="mt-5">

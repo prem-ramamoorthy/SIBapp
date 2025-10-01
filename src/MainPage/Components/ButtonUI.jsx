@@ -20,7 +20,7 @@ function ButtonUI({ label, description, component }) {
   const Comp = componentMap[component] ?? null;
 
   return (
-    <div className="m-4">
+    <div className="my-2">
       <button
         onClick={handleToggle}
         className="bg-yellow-400 hover:bg-yellow-500 rounded-2xl hover:scale-105 transition-transform duration-200 ease-in-out flex flex-col items-center justify-center h-4/5 w-full p-2 lg:h-auto lg:w-60 md:h-auto md:w-40"
