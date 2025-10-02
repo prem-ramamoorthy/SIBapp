@@ -2,7 +2,6 @@ import { useState } from 'react';
 import TextField from './components/TextField';
 import PasswordField from './components/PasswordField';
 import SubmitButton from './components/SubmitButton';
-import SocialButton from './components/SocialButton';
 import Alert from './components/Alert';
 import { validateEmail, validatePassword } from './utils/validators';
 
@@ -67,11 +66,7 @@ export default function SignInForm() {
                 error={errors.password}
             />
 
-            <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm text-gray-700">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-yellow-500 focus:ring-yellow-400" />
-                    Remember me
-                </label>
+            <div className="flex items-center justify-end w-full">
                 <a href="#" className="text-sm text-red-600 hover:underline">Forgot password?</a>
             </div>
 
@@ -81,14 +76,6 @@ export default function SignInForm() {
                 <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-200" />
                 </div>
-                <div className="relative flex justify-center">
-                    <span className="bg-white px-2 text-sm text-gray-600">Or continue with</span>
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <SocialButton provider="Google" onClick={() => { }} />
-                <SocialButton provider="GitHub" onClick={() => { }} />
             </div>
         </form>
     );
