@@ -17,7 +17,10 @@ import ProtectedRoute from './hooks/protectedRoute';
 import './index.css'
 
 const router = createBrowserRouter([
-  { path: '/', element: <SignInPage />, errorElement: <NotFound404 /> },
+  {
+    path: '/',
+    element: <SignInPage />
+  },
   {
     element: <ProtectedRoute />,
     children: [
@@ -31,7 +34,8 @@ const router = createBrowserRouter([
       { path: '/slips', element: <FunctionalPage /> }
     ]
   },
-  { path: '/logout', element: <SignInPage /> }
+  { path: '/logout', element: <SignInPage /> },
+  { path: '*', element: <NotFound404 /> }
 ]);
 
 const rootEl = document.getElementById('root');
