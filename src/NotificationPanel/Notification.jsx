@@ -111,7 +111,7 @@ export default function Notification() {
           role="dialog"
           aria-label="Notifications"
           aria-modal="true"
-          className="absolute -right-50 z-50 mt-2 w-80 origin-top-right rounded-lg border border-gray-200 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none "
+          className="absolute -right-[80px] z-50 mt-2 w-80 origin-top-right rounded-lg border border-gray-200 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
         >
           <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3  ">
             <h3 className="text-sm font-semibold text-black ">
