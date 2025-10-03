@@ -6,7 +6,7 @@ function useSession() {
   useEffect(() => {
     const abortController = new AbortController();
 
-    fetch("https://sibbackend-production.up.railway.app/auth/profile", {
+    fetch(`${import.meta.env.VITE_BACKEND_SERVER}/auth/profile`, {
       credentials: "include",
       signal: abortController.signal,
     })

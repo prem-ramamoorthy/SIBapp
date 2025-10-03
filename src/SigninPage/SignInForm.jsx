@@ -42,7 +42,7 @@ export default function SignInForm() {
       const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
 
       const idToken = await userCredential.user.getIdToken(true);
-      const res = await fetch("https://sibbackend-production.up.railway.app/auth/sessionLogin", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/auth/sessionLogin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
