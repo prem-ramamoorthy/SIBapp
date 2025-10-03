@@ -24,7 +24,7 @@ const ResetPassword = () => {
       if (data.message === "Password reset email sent successfully") {
         setMessage("Password reset link has been generated and sent successfully.");
       } else {
-        console.log(data.message);
+        console.log(data.error);
         setMessage("Unknown error occurred") ;
       }
     } catch (error) {
