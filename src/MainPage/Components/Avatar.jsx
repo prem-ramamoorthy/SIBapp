@@ -2,10 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import SidebarList from "../SideBar/SidebarList";
 import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-function classNames(...c) {
-    return c.filter(Boolean).join(" ");
-}
+import classNames from "../../utils/classname";
 
 export function HeaderAvatar({
     src,
@@ -148,7 +145,7 @@ export function HeaderAvatar({
                             onClick={onLogout}
                             className={classNames(
                                 "flex w-full items-center gap-2 px-3 py-2 text-rose-600 hover:bg-rose-50",
-                                loading && "opacity-50 pointer-events-none"
+                                loading && "opacity-50 cursor-no-drop"
                             )}
                             tabIndex={-1}
                             aria-disabled={loading}

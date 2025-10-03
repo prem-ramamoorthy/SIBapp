@@ -13,6 +13,7 @@ import NotFound404 from './Notfound/Notfound';
 import FunctionalPage from './ButtonPages/FunctionalPage'
 import SignInPage from './SigninPage/SignInPage';
 import ProtectedRoute from './hooks/protectedRoute';
+import ResetPassword from './ResetPassword/ResetPassword';
 
 import './index.css'
 
@@ -30,7 +31,8 @@ const router = createBrowserRouter([
       { path: '/settings', element: <Settings /> },
       { path: '/slips', element: <FunctionalPage /> }
     ]
-  }
+  },
+  { path: '/reset-password', element: <ResetPassword /> }
 ]);
 
 const rootEl = document.getElementById('root');
