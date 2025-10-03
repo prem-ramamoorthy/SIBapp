@@ -30,8 +30,7 @@ const router = createBrowserRouter([
       { path: '/settings', element: <Settings /> },
       { path: '/slips', element: <FunctionalPage /> }
     ]
-  },
-  { path: '/logout', element: <SignInPage /> }
+  }
 ]);
 
 const rootEl = document.getElementById('root');

@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from "react"
-import SidebarList from "../SideBar/SidebarList"
-import { LogOut } from "lucide-react"
-import { NavLink } from "react-router-dom"
+import { useEffect, useRef, useState } from "react";
+import SidebarList from "../SideBar/SidebarList";
+import { LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-function classNames(...c) { return c.filter(Boolean).join(" ") }
+function classNames(...c) {
+    return c.filter(Boolean).join(" ");
+}
 
 export function HeaderAvatar({
     src,
@@ -12,31 +14,58 @@ export function HeaderAvatar({
     status = "online",
     onProfile,
     onSettings,
-    onLogout,
 }) {
-    const [open, setOpen] = useState(false)
-    const btnRef = useRef(null)
-    const menuRef = useRef(null)
+    const [open, setOpen] = useState(false);
+    const [loading, setloading] = useState(false);
+    const btnRef = useRef(null);
+    const menuRef = useRef(null);
+    const navigate = useNavigate();
+
+    const logoutUrl = `${import.meta.env.VITE_BACKEND_SERVER}/auth/sessionLogout`;
+    const logoutOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+    };
+
+    async function onLogout() {
+        try {
+            setloading(true);
+            const response = await fetch(logoutUrl, logoutOptions);
+            const data = await response.json();
+
+            if (data.message === "Logged out") {
+                navigate("/");
+            } else {
+                alert(`Logout failed: ${data.message || "Unknown error"}`);
+            }
+        } catch (error) {
+            alert(`Error occurred: ${error.message}`);
+        } finally {
+            setloading(false);
+        }
+    }
+
 
     useEffect(() => {
         function onDocClick(e) {
-            if (!open) return
+            if (!open) return;
             if (
                 btnRef.current && !btnRef.current.contains(e.target) &&
                 menuRef.current && !menuRef.current.contains(e.target)
-            ) setOpen(false)
+            ) setOpen(false);
         }
         function onKey(e) {
-            if (!open) return
-            if (e.key === "Escape") setOpen(false)
+            if (!open) return;
+            if (e.key === "Escape") setOpen(false);
         }
-        document.addEventListener("mousedown", onDocClick)
-        document.addEventListener("keydown", onKey)
+        document.addEventListener("mousedown", onDocClick);
+        document.addEventListener("keydown", onKey);
         return () => {
-            document.removeEventListener("mousedown", onDocClick)
-            document.removeEventListener("keydown", onKey)
-        }
-    }, [open])
+            document.removeEventListener("mousedown", onDocClick);
+            document.removeEventListener("keydown", onKey);
+        };
+    }, [open]);
 
     const statusColor = {
         online: "bg-emerald-500",
@@ -44,7 +73,7 @@ export function HeaderAvatar({
         busy: "bg-rose-500",
         away: "bg-amber-500",
         null: "bg-transparent",
-    }[status ?? "null"]
+    }[status ?? "null"];
 
     return (
         <div className="relative cursor">
@@ -56,8 +85,8 @@ export function HeaderAvatar({
                 onClick={() => setOpen((v) => !v)}
                 onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault()
-                        setOpen((v) => !v)
+                        e.preventDefault();
+                        setOpen((v) => !v);
                     }
                 }}
                 className="
@@ -114,18 +143,22 @@ export function HeaderAvatar({
                     </ul>
 
                     <div className="border-t border-neutral-100">
-                        <NavLink
-                            to="/logout"
+                        <button
                             role="menuitem"
                             onClick={onLogout}
-                            className="flex w-full items-center gap-2 px-3 py-2 text-sm text-rose-600 hover:bg-rose-50"
+                            className={classNames(
+                                "flex w-full items-center gap-2 px-3 py-2 text-rose-600 hover:bg-rose-50",
+                                loading && "opacity-50 pointer-events-none"
+                            )}
+                            tabIndex={-1}
+                            aria-disabled={loading}
                         >
                             <LogOut className="h-4 w-4" />
                             <span>Sign out</span>
-                        </NavLink>
+                        </button>
                     </div>
                 </div>
             )}
         </div>
-    )
+    );
 }
