@@ -26,7 +26,7 @@ export default function SecurityPanel() {
         }
       );
       const data = await res.json();
-      setresponse(data.message || data.error || "Unknown response");
+      setresponse(data.message || data.error || "ouch! unknown error occured : Try updating secure Password");
     } catch (error) {
       setresponse(`Network or server error : ${error}`);
     }
