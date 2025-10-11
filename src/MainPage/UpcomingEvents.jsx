@@ -1,8 +1,19 @@
 import { ArrowRight } from "lucide-react"
 import Events from "./Components/Events"
 import { NavLink } from "react-router-dom"
+import useFetch from "../hooks/useFetch";
+import Loading from "../Components/Loading";
 
 function UpcomingEvents() {
+
+  const { data, loading, error } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/getupcomingevents`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
   return (
     <div
       className="
@@ -28,7 +39,11 @@ function UpcomingEvents() {
           <ArrowRight className="h-4 w-4" />
         </NavLink>
       </div>
-
+      {error && (
+        <p className="mb-4 rounded-md border px-3 py-2 text-sm bg-red-50 text-red-700 border-red-200">
+          Error: {error}
+        </p>
+      )}
       <div
         className="
           flex-1 min-h-0
@@ -36,10 +51,15 @@ function UpcomingEvents() {
           max-w-full
         "
       >
-        <div className="h-3/4 w-full overflow-auto px-2">
-          <Events company="The Future of AI in Everyday Life" date="July 15, 2024" time="3:00 PM - 4:00 PM" vatNumber="FBIOPENUP" />
-          <Events company="The Future of AI in Everyday Life" date="July 15, 2024" time="3:00 PM - 4:00 PM" vatNumber="FBIOPENUP" />
-        </div>
+        {loading ? (<Loading />) : data ? (<>
+          <div className="h-3/4 w-full overflow-auto px-2">
+            {
+              data.map((event , index) => {
+                return <Events company={event.companyName} date={event.date} time={event.time} vatNumber={event.VATnumber} key={index}/>
+              })
+            }
+          </div>
+        </>) : (<p className="text-gray-500">No Upcoming Events</p>)}
       </div>
     </div>
   )

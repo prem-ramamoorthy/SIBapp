@@ -1,7 +1,6 @@
 import { useState } from "react";
 import TextField from "./components/TextField";
 import PasswordField from "./components/PasswordField";
-import SubmitButton from "./components/SubmitButton";
 import Alert from "./components/Alert";
 import { validateEmail, validatePassword } from "./utils/validators";
 
@@ -40,15 +39,15 @@ export default function SignInForm() {
       setLoading(true);
 
       const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
-
+      const user_id = userCredential.user.uid ;
       const idToken = await userCredential.user.getIdToken(true);
       const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/auth/sessionLogin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ idToken }),
+        body: JSON.stringify({ idToken , user_id }),
       });
-
+      
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Login failed");

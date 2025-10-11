@@ -1,13 +1,23 @@
 import SiteButtonUI from "./Components/SiteButtonUI"
+import useFetch from "../hooks/useFetch";
+import Loading from "../Components/Loading";
 
 function SiteInfo() {
 
+  const { data, loading, error } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/getrenewaldate`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
   const Buttons = {
-    renewalDate: <SiteButtonUI content="12 Sep 2025" />,
-    website: <SiteButtonUI content="SIB Website" style={{display: "none"}} color="text-red-500/80" style2={{fontWeight: "600" , fontSize: "1rem"}} to="https://business-connect-three.vercel.app/"/>,
+    renewalDate: <SiteButtonUI content={error ? "error" : loading ? "loading..." : data ? data.renewal_date : "No data"} />,
+    website: <SiteButtonUI content="SIB Website" style={{ display: "none" }} color="text-red-500/80" style2={{ fontWeight: "600", fontSize: "1rem" }} to="https://business-connect-three.vercel.app/" />,
   }
   return (
-     <div className="div4 rounded-lg sm:rounded-xl lg:rounded-2xl
+    <div className="div4 rounded-lg sm:rounded-xl lg:rounded-2xl
                     [grid-area:2/1/3/2] 
                     sm:[grid-area:2/4/3/5] 
                     md:[grid-area:2/5/3/7] 
@@ -19,9 +29,9 @@ function SiteInfo() {
                     gap-4
                     px-4"
     >
-        {Buttons.renewalDate}
-        {Buttons.website}
-  </div>
+      {Buttons.renewalDate}
+      {Buttons.website}
+    </div>
   )
 }
 
