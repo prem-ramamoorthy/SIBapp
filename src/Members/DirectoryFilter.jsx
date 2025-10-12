@@ -41,7 +41,7 @@ export default function DirectoryFilters({
   return (
     <section
       className="
-        w-full
+        min-w-full
         rounded-3xl
         bg-white
         p-2 md:p-6

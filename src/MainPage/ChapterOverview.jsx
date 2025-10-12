@@ -28,7 +28,7 @@ function ChapterOverview() {
             Error: {error}
           </p>
         )}
-        <div className="container flex flex-col gap-4 items-center justify-between">
+        <div className=" flex flex-col gap-4 items-center justify-between">
           {loading ? (
             <Loading />
           ) : data ? (

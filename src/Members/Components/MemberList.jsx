@@ -13,7 +13,7 @@ const MemberList = ({ members }) => {
 
   return (
     <div>
-      <div className="container grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 my-1 place-items-center">
+      <div className=" grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 my-1 place-items-center">
         {currentMembers.map((member, index) => (
           <MemberCard key={index} member={member} />
         ))}

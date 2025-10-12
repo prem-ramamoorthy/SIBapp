@@ -6,7 +6,7 @@ import Stats from "./Stats"
 function Myactivity() {
     return (
         <>
-            <div className="h-screen w-full p-1.5 ">
+            <div className="min-h-screen w-full p-1.5 ">
                 <Header />
                 <Hero />
                 <Stats />

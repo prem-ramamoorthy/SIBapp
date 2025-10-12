@@ -15,7 +15,7 @@ function Hero() {
   ];
 
   return (
-    <div className="container w-[98%] h-fit border-1 border-gray-600 bg-white px-4 pt-2 my-4 ml-2 rounded-2xl flex flex-col justify-start gap-2">
+    <div className="min-w-[98%] h-fit border-1 border-gray-600 bg-white px-4 pt-2 my-4 mx-4 rounded-2xl flex flex-col justify-start gap-2">
       <h2 className="font-bold text-md">Activity Type</h2>
       <fieldset
         role="radiogroup"

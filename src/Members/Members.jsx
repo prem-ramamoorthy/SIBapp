@@ -53,12 +53,12 @@ function Members() {
   ];
 
   return (
-    <div className="m-2 h-fit">
+    <div className="m-2 min-h-screen w-full flex-wrap items-center justify-center">
       <Header />
-      <h1 className="m-3 pb-2 text-2xl font-bold">
+      <h1 className="m-3 pb-2 text-2xl font-bold flex-1 items-center">
         Members Directory
       </h1>
-      <div className="container -m-2 mb-1 mx-0">
+      <div className="-m-2 mb-1 mx-0 ">
         <DirectoryFilters />
       </div>
       <MemberList members={members} />

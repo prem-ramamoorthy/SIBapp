@@ -32,14 +32,14 @@ function Meetings() {
             <h1 className="m-3 pb-2 text-2xl font-bold">
                 Meetings
             </h1>
-            <div className="w-full px-2">
+            <div className="w-full px-5">
                 <MeetingsFilter />
             </div>
             <div className="mt-5">
                 <Stats header="Meeting Stats" items={item} />
             </div>
-            <div className="activity-container w-[98%] min-h-[330px] m-2 border-2 border-gray-400 bg-white rounded-2xl">
-                <div className="holder overflow-scroll h-[330px]">
+            <div className="activity-container max-w-[98%] min-h-[420px] m-2 border-2 border-gray-400 bg-white rounded-2xl">
+                <div className="holder overflow-scroll h-[420px]">
                     <Meeting header={true} />
                     {MeetingComponents}
                 </div>

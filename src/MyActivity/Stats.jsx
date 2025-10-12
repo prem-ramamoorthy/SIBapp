@@ -14,7 +14,7 @@ function Stats({
     ));
 
     return (
-        <div className="h-fit bg-white rounded-2xl -mt-2 border border-gray-600 p-2">
+        <div className="h-fit min-w-[98%] max-w-[98%] bg-white rounded-2xl -mt-2 ml-3 border border-gray-600 p-2">
             <p className="font-bold mx-2">{header}</p>
             <div className="flex flex-wrap justify-around items-center text-nowrap">
                 {StatItems}

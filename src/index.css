@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 html {
-  scrollbar-color: red rgba(255, 255, 0, 0);
+  scrollbar-color: rgba(255, 0, 0, 0) rgba(255, 255, 0, 0);
   scrollbar-width: thin;
 }
 
@@ -30,12 +30,12 @@ body {
 }
 
 body {
-  scrollbar-color: rgb(255, 0, 0) #1c3c7d06;
+  scrollbar-color: rgba(255, 0, 0, 0) #1c3c7d06;
   scrollbar-width: thin;
 }
 
 .activity-container {
-  scrollbar-color: rgb(255, 0, 0) #1c3c7d06;
+  scrollbar-color: rgba(255, 0, 0, 0) #1c3c7d06;
   scrollbar-width: thin;
 }
 
