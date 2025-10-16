@@ -11,8 +11,6 @@ function ChapterOverview() {
     }
   );
 
-  console.log(data)
-
   return (
     <div className="div3 bg-white rounded-lg sm:rounded-xl lg:rounded-2xl
                     [grid-area:3/1/7/2] 
