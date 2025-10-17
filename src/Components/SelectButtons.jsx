@@ -27,7 +27,7 @@ export default function SelectButtons({
 
   return (
     <fieldset className="w-full">
-      <legend className="mb-2 block text-sm font-medium text-gray-900">
+      <legend className="mb-2 block text-sm font-medium text-gray-900 dark:text-gray-100">
         {label}
       </legend>
       <div className="flex flex-col gap-4">
@@ -37,7 +37,7 @@ export default function SelectButtons({
             <label
               key={item.value ?? idx}
               htmlFor={`${groupId}-${item.value}`}
-              className="relative flex items-center gap-2 cursor-pointer select-none text-gray-900"
+              className="relative flex items-center gap-2 cursor-pointer select-none text-gray-900 dark:text-gray-100"
             >
               <input
                 id={`${groupId}-${item.value}`}
@@ -50,8 +50,10 @@ export default function SelectButtons({
                 aria-hidden="true"
                 className={[
                   "grid size-4 place-items-center rounded-sm border transition-colors",
-                  isChecked ? "border-blue-600 bg-blue-600" : "border-gray-300 bg-white",
-                  "outline-none peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue-500",
+                  isChecked
+                    ? "border-blue-600 bg-blue-600 dark:border-blue-400 dark:bg-blue-400"
+                    : "border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800",
+                  "outline-none peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-blue-500 dark:peer-focus-visible:outline-blue-400",
                 ].join(" ")}
               >
                 <svg

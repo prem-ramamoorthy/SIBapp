@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Bell } from "lucide-react";
 
-
 export default function Notification() {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef(null);
   const panelRef = useRef(null);
-
 
   const [notifications, setNotifications] = useState([
     { id: 1, title: "New Visitor", body: "New Member arrived to your company", time: "Just now", unread: true },
@@ -14,18 +12,14 @@ export default function Notification() {
     { id: 3, title: "New Meeting", body: "New Meeting has been scheduled by your chapter leader on 12/12/2025", time: "1h ago", unread: true },
   ]);
 
-
   const unreadCount = notifications.filter(n => n.unread).length;
 
-
   const toggle = () => setOpen(o => !o);
-
 
   const close = useCallback(() => {
     setOpen(false);
     requestAnimationFrame(() => buttonRef.current?.focus());
   }, []);
-
 
   useEffect(() => {
     if (!open) return;
@@ -37,16 +31,12 @@ export default function Notification() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open, close]);
 
-
   useEffect(() => {
     if (!open) return;
-
-
     const focusable = panelRef.current?.querySelector(
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     focusable?.focus();
-
 
     const onKeyDown = (e) => {
       if (e.key === "Escape") {
@@ -62,7 +52,6 @@ export default function Notification() {
         const last = focusables[focusables.length - 1];
         if (!first || !last) return;
 
-
         if (e.shiftKey && document.activeElement === first) {
           e.preventDefault();
           last.focus();
@@ -76,11 +65,9 @@ export default function Notification() {
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open, close]);
 
-
   const markAllRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
   };
-
 
   return (
     <div className="relative inline-block text-left">
@@ -91,10 +78,9 @@ export default function Notification() {
         aria-expanded={open}
         aria-controls="notification-panel"
         onClick={toggle}
-        className="relative inline-flex items-center justify-center rounded-full p-2 hover:bg-gray-100 "
+        className="relative inline-flex items-center justify-center rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
       >
-        <Bell />
-
+        <Bell className="text-gray-700 dark:text-gray-200" />
 
         {unreadCount > 0 && (
           <span className="absolute -right-0.5 -top-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-xs font-medium text-white">
@@ -103,7 +89,6 @@ export default function Notification() {
         )}
       </button>
 
-
       {open && (
         <div
           ref={panelRef}
@@ -111,23 +96,23 @@ export default function Notification() {
           role="dialog"
           aria-label="Notifications"
           aria-modal="true"
-          className="absolute -right-[80px] z-50 mt-2 w-80 origin-top-right rounded-lg border border-gray-200 bg-white shadow-lg ring-1 ring-black/5 focus:outline-none"
+          className="absolute -right-[80px] z-50 mt-2 w-80 origin-top-right rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black/5 focus:outline-none"
         >
-          <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3  ">
-            <h3 className="text-sm font-semibold text-black ">
+          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+            <h3 className="text-sm font-semibold text-black dark:text-gray-200">
               Notifications
             </h3>
             <div className="flex items-center gap-2">
               <button
                 onClick={markAllRead}
-                className="rounded-md px-2 py-1 text-xs text-black hover:bg-indigo-50 "
+                className="rounded-md px-2 py-1 text-xs text-black dark:text-gray-200 hover:bg-indigo-50 dark:hover:bg-indigo-600/30 transition-colors"
               >
                 Mark all read
               </button>
               <button
                 onClick={close}
                 aria-label="Close notifications"
-                className="rounded-md p-1 text-gray-500 hover:bg-gray-100 focus:outline-none "
+                className="rounded-md p-1 text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none transition-colors"
               >
                 <svg viewBox="0 0 20 20" className="h-4 w-4" fill="currentColor" aria-hidden="true">
                   <path
@@ -139,17 +124,17 @@ export default function Notification() {
               </button>
             </div>
           </div>
+
           <ul className="max-h-80 overflow-y-auto">
             {notifications.length === 0 && (
-              <li className="px-4 py-6 text-sm text-black">
+              <li className="px-4 py-6 text-sm text-black dark:text-gray-200">
                 No notifications
               </li>
             )}
             {notifications.map((n, idx) => (
               <li key={n.id}>
                 <button
-                  className={`flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-gray-50 ${n.unread ? "bg-indigo-50/60 " : ""
-                    }`}
+                  className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 ${n.unread ? "bg-indigo-50/60 dark:bg-indigo-900/30" : "bg-white dark:bg-gray-800"}`}
                   onClick={() =>
                     setNotifications(prev =>
                       prev.map(x => (x.id === n.id ? { ...x, unread: false } : x))
@@ -157,32 +142,30 @@ export default function Notification() {
                   }
                 >
                   <span
-                    className={`mt-1 h-2 w-2 flex-none rounded-full ${n.unread ? "bg-red-500" : "bg-gray-300 "
-                      }`}
+                    className={`mt-1 h-2 w-2 flex-none rounded-full ${n.unread ? "bg-red-500" : "bg-gray-400 dark:bg-gray-500"}`}
                     aria-hidden="true"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-gray-900 ">
+                    <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-200">
                       {n.title}
                     </p>
-                    <p className="mt-0.5 line-clamp-2 text-xs text-gray-600 ">
+                    <p className="mt-0.5 line-clamp-2 text-xs text-gray-600 dark:text-gray-300">
                       {n.body}
                     </p>
-                    <p className="mt-1 text-[11px] text-gray-400">{n.time}</p>
+                    <p className="mt-1 text-[11px] text-gray-400 dark:text-gray-400">{n.time}</p>
                   </div>
                 </button>
                 {idx < notifications.length - 1 && (
-                  <div className="h-px bg-gray-200" />
+                  <div className="h-px bg-gray-200 dark:bg-gray-700" />
                 )}
               </li>
             ))}
           </ul>
-          <div className="border-t border-gray-200 px-4 py-2 ">
+
+          <div className="border-t border-gray-200 dark:border-gray-700 px-4 py-2">
             <button
-              className="w-full rounded-md px-3 py-2 text-sm text-amber-400 hover:bg-indigo-50 "
-              onClick={() => {
-                close();
-              }}
+              className="w-full rounded-md px-3 py-2 text-sm text-amber-400 hover:bg-indigo-50 dark:hover:bg-indigo-600/30 transition-colors"
+              onClick={() => { close(); }}
             >
               View all
             </button>

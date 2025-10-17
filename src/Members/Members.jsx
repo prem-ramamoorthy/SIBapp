@@ -1,7 +1,6 @@
-import Header from "../MainPage/Header"
-import MemberList from "./Components/MemberList"
-import DirectoryFilters from "./DirectoryFilter"
-import MemberCard from "./MemberCard/MemberCard"
+import Header from "../MainPage/Header";
+import MemberList from "./Components/MemberList";
+import DirectoryFilters from "./DirectoryFilter";
 
 function Members() {
   const members = [
@@ -12,7 +11,7 @@ function Members() {
       vertical: "IT professional",
       tag: "Photography and Services",
       chapter: "Alpha Chapter",
-      region: "Erode"
+      region: "Erode",
     },
     {
       img: "/assets/19.jpg",
@@ -21,7 +20,7 @@ function Members() {
       vertical: "IT professional",
       tag: "Photography and Services",
       chapter: "Alpha Chapter",
-      region: "Erode"
+      region: "Erode",
     },
     {
       img: "/assets/19.jpg",
@@ -30,7 +29,7 @@ function Members() {
       vertical: "IT professional",
       tag: "Photography and Services",
       chapter: "Alpha Chapter",
-      region: "Erode"
+      region: "Erode",
     },
     {
       img: "/assets/19.jpg",
@@ -39,7 +38,7 @@ function Members() {
       vertical: "IT professional",
       tag: "Photography and Services",
       chapter: "Alpha Chapter",
-      region: "Erode"
+      region: "Erode",
     },
     {
       img: "/assets/19.jpg",
@@ -48,22 +47,26 @@ function Members() {
       vertical: "IT professional",
       tag: "Photography and Services",
       chapter: "Alpha Chapter",
-      region: "Erode"
+      region: "Erode",
     },
   ];
 
   return (
-    <div className="m-2 min-h-screen w-full flex-wrap items-center justify-center">
-      <Header />
-      <h1 className="m-3 pb-2 text-2xl font-bold flex-1 items-center">
-        Members Directory
-      </h1>
-      <div className="-m-2 mb-1 mx-0 ">
-        <DirectoryFilters />
+    <div className="w-screen min-h-screen flex justify-center  transition-colors duration-300">
+      <div className="  max-w-fit w-full flex flex-col flex-wrap items-center justify-center text-gray-900 dark:text-gray-100">
+        <div className="absolute w-[90%] mt-1 top-0">
+          <Header />
+        </div>
+        <h1 className="mt-[80px] pb-2 text-2xl font-bold flex-1 items-center">
+          Members Directory
+        </h1>
+        <div className="  mx-0 w-full">
+          <DirectoryFilters />
+        </div>
+        <MemberList members={members} />
       </div>
-      <MemberList members={members} />
     </div>
-  )
+  );
 }
 
-export default Members
+export default Members;

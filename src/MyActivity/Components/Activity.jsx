@@ -1,44 +1,49 @@
-import ActivityField from "./ActivityField"
-import ActivityBadge from "./ActivityBadge"
+import ActivityField from "./ActivityField";
+import ActivityBadge from "./ActivityBadge";
 
 function Activity(
-    {
-        header = false,
-        content = {
-            date : "20 sept 2025" ,
-            type : "TYFCB",
-            direction : "Given",
-            name : "yonesh Murugan",
-            detail : "Hi hello everyone how are you" ,
-            status : "Approved"
-        }
+  {
+    header = false,
+    content = {
+      date: "20 sept 2025",
+      type: "TYFCB",
+      direction: "Given",
+      name: "yonesh Murugan",
+      detail: "Hi hello everyone how are you",
+      status: "Approved"
     }
+  }
 ) {
-    if (header) {
+  if (header) {
+    const HeaderComponent = [
+      "Date", "Type", "Direction", "Member Name", "Details", "Status", "Action"
+    ].map((element, index) => (
+      <p
+        className="w-[120px] font-bold mx-2 text-center text-gray-900 dark:text-gray-100"
+        key={index}
+      >
+        {element}
+      </p>
+    ));
 
-        const HeaderComponent = [
-            "Date" ,"Type" , "Direction" , "Member Name" , "Details" , "Status" , "Action"
-        ].map((element,index)=>{
-            return <p className="w-[120px] font-bold  mx-2 text-center" key={index}>{element}</p>
-        })
-
-        return (
-            <div className="sticky top-0 heade flex flex-row justify-around border-b-1 pt-4 px-2 pb-3  bg-gray-200 rounded-t-2xl w-max items-center lg:w-full xl:w-full ">
-                {HeaderComponent}
-            </div>
-        )
-    }
     return (
-        <div className="activity-field nth-[odd]:bg-gray-200 flex flex-row justify-around py-2 items-center w-max cursor-auto lg:w-full xl:w-full">
-            <ActivityField data={content.date} classname="overflow-x-hidden font-semibold "/>
-            <ActivityBadge content = {content.type} color={"blue"} />
-            <ActivityField data={content.direction}/>
-            <ActivityField data={content.name} classname="font-semibold"/>
-            <ActivityField data={content.detail} classname="overflow-x-hidden"/>
-            <ActivityBadge content = {content.status} color={"green"} />
-            <ActivityBadge content={"View Details"} font="bold" border={3} cursor="pointer" />
-        </div>
-    )
+      <div className="sticky top-0 heade flex flex-row justify-around border-b border-gray-400 dark:border-gray-600 pt-4 px-2 pb-3 bg-gray-200 dark:bg-gray-900 rounded-t-2xl w-max items-center lg:w-full xl:w-full transition-colors duration-300">
+        {HeaderComponent}
+      </div>
+    );
+  }
+
+  return (
+    <div className="activity-field nth-[odd]:bg-gray-200 dark:nth-[odd]:bg-gray-800 flex flex-row justify-around py-2 items-center w-max cursor-auto lg:w-full xl:w-full transition-colors duration-300">
+      <ActivityField data={content.date} classname="overflow-x-hidden font-semibold text-gray-900 dark:text-gray-100" />
+      <ActivityBadge content={content.type} color="blue" />
+      <ActivityField data={content.direction} classname="text-gray-900 dark:text-gray-100" />
+      <ActivityField data={content.name} classname="font-semibold text-gray-900 dark:text-gray-100" />
+      <ActivityField data={content.detail} classname="overflow-x-hidden text-gray-900 dark:text-gray-100" />
+      <ActivityBadge content={content.status} color="green" />
+      <ActivityBadge content="View Details" font="bold" border={3} cursor="pointer" />
+    </div>
+  );
 }
 
-export default Activity
+export default Activity;

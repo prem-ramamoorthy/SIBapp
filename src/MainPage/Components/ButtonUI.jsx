@@ -23,12 +23,21 @@ function ButtonUI({ label, description, component }) {
     <div className="my-2">
       <button
         onClick={handleToggle}
-        className="bg-yellow-400 hover:bg-yellow-500 rounded-2xl hover:scale-105 transition-transform duration-200 ease-in-out flex flex-col items-center justify-center h-4/5 w-full p-2 lg:h-auto lg:w-60 md:h-auto md:w-40"
+        className="
+          bg-yellow-300  dark:bg-yellow-500
+          hover:bg-yellow-500 dark:hover:bg-yellow-500/80
+          rounded-2xl
+          hover:scale-105 transition-transform duration-200 ease-in-out
+          flex flex-col items-center justify-center
+          h-4/5 w-full p-2
+          lg:h-auto lg:w-60 md:h-auto md:w-40
+          text-black dark:text-white
+        "
         type="button"
       >
         <div>
-          <h4 className="text-[0.9rem] font-semibold text-black mt-1">{label}</h4>
-          <p className="text-[0.8rem] text-gray-600 font-semibold mb-2">{description}</p>
+          <h4 className="text-[0.9rem] font-semibold mt-1">{label}</h4>
+          <p className="text-[0.8rem] font-semibold mb-2 text-gray-600 dark:text-gray-300">{description}</p>
         </div>
       </button>
 
@@ -39,16 +48,24 @@ function ButtonUI({ label, description, component }) {
           role="dialog"
         >
           <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-[1px]"
+            className="absolute inset-0 bg-black/10 dark:bg-black/10 backdrop-blur-[1px]"
             onClick={handleClose}
           />
 
           <div className="absolute inset-0 flex items-center justify-center p-4">
-            <div className="w-full h-full max-w-[1600px] max-h-[100vh]">
-              <div className="relative w-full h-full rounded-xl shadow-xl overflow-scroll
-              backdrop-blur-5xl backdrop-saturate-200
-                              border border-white/30 p-5">
-                  <Comp onClose={handleClose} />
+            <div className="w-fit h-full max-w-[1600px] max-h-[100vh]">
+              <div
+                className="
+                  relative w-full h-full
+                  rounded-xl shadow-xl
+                  overflow-scroll
+                  border border-white/20 dark:border-gray-600/50
+                  bg-white/20 dark:bg-gray-800/20
+                  p-5
+                  transition-colors duration-300
+                "
+              >
+                <Comp onClose={handleClose} />
               </div>
             </div>
           </div>
@@ -56,7 +73,9 @@ function ButtonUI({ label, description, component }) {
       ) : null}
 
       {open && !Comp ? (
-        <div className="mt-2 text-red-600 text-sm">Unknown component: {String(component)}</div>
+        <div className="mt-2 text-red-600 dark:text-red-400 text-sm">
+          Unknown component: {String(component)}
+        </div>
       ) : null}
     </div>
   );

@@ -1,13 +1,43 @@
 import React from 'react'
 
-function SiteButtonUI({style , style2 , color = "black" , content = "12 sep 2025" , display = "content" , to = null}) {
+function SiteButtonUI({
+  style,
+  style2,
+  color = "text-black",
+  content = "12 Sep 2025",
+  display = "content",
+  to = null
+}) {
   return (
-    <a className="px-4 py-2 bg-yellow-50 rounded-xl hover:bg-yellow-100/40 w-4/4 h-4/4 border-2 border-gray-400/50 hover:border-gray-500/70 transition-all duration-200 ease-in-out cursor-pointer
-                    flex flex-col justify-center items-center" href={to}>
-        <span className={`text-md font-medium [display:${display}]`} style={style}>Renewal Date</span>
-        <span className={`text-sm font-semibold ${color}`} style={style2}>{content}</span>
+    <a
+      href={to}
+      className="
+        px-4 py-2
+        bg-yellow-50 dark:bg-yellow-200/10
+        rounded-xl
+        hover:bg-yellow-100/40 dark:hover:bg-yellow-200/30
+        w-full h-full
+        border-2 border-gray-400/50 dark:border-gray-500/40
+        hover:border-gray-500/70 dark:hover:border-gray-300/70
+        transition-all duration-200 ease-in-out
+        cursor-pointer
+        flex flex-col justify-center items-center
+      "
+    >
+      <span
+        className={`text-md font-medium [display:${display}] text-gray-800 dark:text-gray-100`}
+        style={style}
+      >
+        Renewal Date
+      </span>
+      <span
+        className={`text-sm font-semibold ${color} dark:text-gray-200`}
+        style={style2}
+      >
+        {content}
+      </span>
     </a>
   )
 }
 
-export default SiteButtonUI 
+export default SiteButtonUI

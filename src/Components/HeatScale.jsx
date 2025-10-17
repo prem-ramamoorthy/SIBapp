@@ -13,7 +13,7 @@ export default function HeatScale({
   options = PRESETS,
   value,
   onChange,
-  defaultValue = "tepid"
+  defaultValue = "tepid",
 }) {
   const name = useId();
   const [internal, setInternal] = useState(value ?? defaultValue);
@@ -31,7 +31,7 @@ export default function HeatScale({
 
   return (
     <fieldset className="w-full">
-      <legend className="mb-3 block text-sm font-medium text-gray-900">
+      <legend className="mb-3 block text-sm font-medium text-gray-900 dark:text-gray-100">
         {legend}
       </legend>
 
@@ -44,10 +44,10 @@ export default function HeatScale({
               htmlFor={`${name}-${opt.value}`}
               className={[
                 "group relative grid cursor-pointer select-none place-items-center",
-                "rounded-md px-1 py-2",
-                active ? "bg-yellow-400" : "bg-transparent",
-                active ? "shadow-sm ring-1 ring-yellow-500/50" : "",
-                "transition-colors",
+                "rounded-md px-1 py-2 transition-colors",
+                active
+                  ? "bg-yellow-400 dark:bg-yellow-600 shadow-sm ring-1 ring-yellow-500/50"
+                  : "bg-gray-100 dark:bg-gray-800",
               ].join(" ")}
             >
               <input
@@ -61,17 +61,15 @@ export default function HeatScale({
                 aria-label={opt.label}
               />
               <span
-                className={[
-                  "mb-1 h-2 w-2 rounded-full",
-                  opt.bar,
-                  active ? "" : "opacity-90",
-                ].join(" ")}
+                className={[opt.bar, "mb-1 h-2 w-2 rounded-full transition-opacity", active ? "" : "opacity-90"].join(" ")}
                 aria-hidden="true"
               />
               <span
                 className={[
                   "text-sm",
-                  active ? "font-bold text-gray-900" : "font-semibold text-gray-800",
+                  active
+                    ? "font-bold text-gray-900 dark:text-gray-100"
+                    : "font-semibold text-gray-800 dark:text-gray-300",
                 ].join(" ")}
               >
                 {opt.label}

@@ -12,37 +12,68 @@ function ChapterOverview() {
   );
 
   return (
-    <div className="div3 bg-white rounded-lg sm:rounded-xl lg:rounded-2xl
-                    [grid-area:3/1/7/2] 
-                    sm:[grid-area:2/1/5/4] 
-                    md:[grid-area:2/1/5/5] 
-                    lg:[grid-area:2/1/5/6] 
-                    xl:[grid-area:2/1/5/7]
-                    max-h-4/4 max-w-4/4">
+    <div
+      className="
+        div3 
+        bg-white dark:bg-gray-900
+        text-gray-900 dark:text-gray-100
+        rounded-lg sm:rounded-xl lg:rounded-2xl
+        [grid-area:3/1/7/2] 
+        sm:[grid-area:2/1/5/4] 
+        md:[grid-area:2/1/5/5] 
+        lg:[grid-area:2/1/5/6] 
+        xl:[grid-area:2/1/5/7]
+        max-h-4/4 max-w-4/4
+        shadow-md dark:shadow-gray-800/50
+        transition-colors duration-300
+      "
+    >
       <div>
-        <p className="font-semibold p-4 text-gray-700">Chapter Overview</p>
+        <p className="font-semibold p-4 text-gray-700 dark:text-gray-200">
+          Chapter Overview
+        </p>
+
         {error && (
-          <p className="mb-4 rounded-md border px-3 py-2 text-sm bg-red-50 text-red-700 border-red-200">
+          <p className="
+            mb-4 rounded-md border px-3 py-2 text-sm
+            bg-red-50 dark:bg-red-900/30
+            text-red-700 dark:text-red-300
+            border-red-200 dark:border-red-700
+            transition-colors duration-300
+          ">
             Error: {error}
           </p>
         )}
-        <div className=" flex flex-col gap-4 items-center justify-between">
+
+        <div className="flex flex-col gap-4 items-center justify-between">
           {loading ? (
             <Loading />
           ) : data ? (
             <>
-              <h2 className="text-2xl font-bold">{data.chapterName}</h2>
-              <h3 className="text-lg font-semibold text-gray-600">
-                Next Meeting <span className="text-amber-400">{data.nextMeeting}</span>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {data.chapterName}
+              </h2>
+
+              <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300">
+                Next Meeting{" "}
+                <span className="text-amber-500 dark:text-amber-400">
+                  {data.nextMeeting}
+                </span>
               </h3>
-              <div className="stats flex flex-row justify-between text-lg font-semibold w-3/4 pb-4">
+
+              <div className="
+                stats flex flex-row justify-between 
+                text-lg font-semibold w-3/4 pb-4
+              ">
                 <Stat value={data.totalMembers} label="Members" />
                 <Stat value={data.totalRevenue} label="Revenue" money={true} />
                 <Stat value={data.totalvisitors} label="Visitors" />
               </div>
             </>
           ) : (
-            <p className="text-gray-500">No data available.</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              No data available.
+            </p>
           )}
         </div>
       </div>

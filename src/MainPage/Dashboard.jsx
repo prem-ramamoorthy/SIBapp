@@ -31,7 +31,6 @@ function Dashboard() {
                     sm:p-3"
     >
       <Header />
-      {/* <ReferralSlips /> */}
       <Activity />
       <ChapterOverview />
       <Siteinfo />

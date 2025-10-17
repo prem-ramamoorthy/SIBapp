@@ -10,14 +10,17 @@ const ProfileStrip = ({
   onOverview = () => {},
 }) => {
   return (
-    <div className="w-full rounded-2xl border border-sky-200 bg-gradient-to-r from-white to-amber-100 shadow-sm my-2">
+    <div className="w-full rounded-2xl border border-sky-200 bg-gradient-to-r from-white to-amber-100 dark:from-gray-800 dark:to-gray-700 shadow-sm my-2">
       <div className="flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative h-12 w-12 shrink-0 rounded-xl bg-red-500 md:h-14 md:w-14">
+            <span className="absolute inset-0 flex items-center justify-center text-white font-bold dark:text-gray-200">
+              {initials}
+            </span>
             <button
               type="button"
               onClick={() => document.getElementById("avatar-upload")?.click()}
-              className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-cyan-500 text-white shadow hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:ring-offset-2 focus:ring-offset-white"
+              className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-cyan-500 text-white shadow hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:ring-offset-2 focus:ring-offset-white dark:border-gray-800"
               aria-label="Edit profile photo"
               title="Edit photo"
             >
@@ -27,22 +30,23 @@ const ProfileStrip = ({
           </div>
 
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900 line-clamp-2 md:line-clamp-1">
+            <p className="text-sm font-semibold text-slate-900 dark:text-gray-100 line-clamp-2 md:line-clamp-1">
               {name}
             </p>
-            <p className="text-xs text-slate-500 truncate">{email}</p>
+            <p className="text-xs text-slate-500 dark:text-gray-400 truncate">{email}</p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2 md:gap-3">
+
+        <div className="flex flex-row-reverse items-center justify-center gap-2 md:gap-3">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onShare}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-slate-300"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 dark:focus:ring-gray-500"
             >
               <svg
                 viewBox="0 0 24 24"
-                className="h-4 w-4 text-slate-500"
+                className="h-4 w-4 text-slate-500 dark:text-gray-300"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -52,14 +56,15 @@ const ProfileStrip = ({
               </svg>
               <span>Share</span>
             </button>
+
             <button
               type="button"
               onClick={onOverview}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-500"
             >
               <svg
                 viewBox="0 0 24 24"
-                className="h-4 w-4 text-slate-600"
+                className="h-4 w-4 text-slate-600 dark:text-gray-300"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -70,11 +75,9 @@ const ProfileStrip = ({
               OVERVIEW
             </button>
           </div>
-          <span className="hidden text-sm text-slate-700 sm:inline">
+
+          <span className="hidden text-sm text-slate-700 dark:text-gray-300 sm:inline">
             {chapter}
-          </span>
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-yellow-400 text-xs font-bold text-slate-900">
-            {initials}
           </span>
         </div>
       </div>

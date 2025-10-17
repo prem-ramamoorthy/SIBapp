@@ -6,13 +6,13 @@ const BioSection = ({ title, children, defaultOpen = false }) => {
   const btnId = `${title.replace(/\s+/g, "-").toLowerCase()}-button`;
 
   return (
-    <div className="border-t border-slate-200 first:border-t-0 p-2">
-      <div className="flex items-center justify-between ">
-        <h3 className="text-sm font-bold text-slate-800">{title}</h3>
+    <div className="border-t border-slate-200 dark:border-gray-700 first:border-t-0 p-2">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-bold text-slate-800 dark:text-gray-100">{title}</h3>
         <button
           id={btnId}
           type="button"
-          className="inline-flex w-8 items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-300"
+          className="inline-flex w-8 items-center justify-center rounded-md text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:focus:ring-gray-500"
           aria-controls={panelId}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
@@ -32,7 +32,7 @@ const BioSection = ({ title, children, defaultOpen = false }) => {
         aria-labelledby={btnId}
         className={`grid overflow-hidden transition-all duration-200 ${open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
       >
-        <div className="min-h-0 pb-4 text-sm leading-6 text-slate-700">
+        <div className="min-h-0 pb-4 text-sm leading-6 text-slate-700 dark:text-gray-300">
           {children}
         </div>
       </div>
@@ -42,13 +42,13 @@ const BioSection = ({ title, children, defaultOpen = false }) => {
 
 const MyBioCard = ({ onEdit = () => {} }) => {
   return (
-    <section className="w-full rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
-      <div className=" flex items-start justify-between">
-        <h2 className="text-2xl font-semibold text-slate-900 p-2 mx-2">My Bio</h2>
+    <section className="w-full rounded-2xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 shadow-sm">
+      <div className="flex items-start justify-between">
+        <h2 className="text-2xl font-semibold text-slate-900 dark:text-gray-100 p-2 mx-2">My Bio</h2>
         <button
           type="button"
           onClick={onEdit}
-          className="mx-4 mt-2 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-amber-600 shadow-sm hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+          className="mx-4 mt-2 inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1.5 text-sm font-medium text-amber-600 dark:text-amber-400 shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/20 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
           aria-label="Edit bio"
           title="Edit"
         >
@@ -66,7 +66,7 @@ const MyBioCard = ({ onEdit = () => {} }) => {
         </button>
       </div>
 
-      <div className=" p-2">
+      <div className="p-2">
         <BioSection title="GAINS Profile" defaultOpen>
           <ul className="space-y-3 pt-4">
             <li>
