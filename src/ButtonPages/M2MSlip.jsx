@@ -1,13 +1,36 @@
+import { useState } from "react";
 import CrossChapterSearch from "../Components/CrossSearch";
 import EntryField from "../Components/EntryField";
 import TextArea from "../Components/TextArea";
 import FilterButton from "../Members/Components/FilterButton";
+import {getDate} from '../utils/getDate.mjs'
+import { X } from "lucide-react";
 
 function ButtonPage({ onClose = () => {} }) {
+
+  const todaysDate = getDate() ;
+
+  const [chapterName, setChapterName] = useState("");
+  const [invitedBy, setInvitedBy] = useState("");
+  const [date, setDate] = useState(todaysDate);
+  const [location, setLocation] = useState("");
+  const [conversationTopic, setConversationTopic] = useState("");
+
+  const handleSubmit = () => {
+    const formData = {
+      chapterName,
+      invitedBy,
+      date,
+      location,
+      conversationTopic,
+    };
+
+    console.log("Form Submitted:", formData);
+  };
+
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="w-fit max-w-4xl bg-white dark:bg-gray-900 rounded-2xl p-6 flex flex-col gap-4 shadow-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-[90vh]">
-        {/* Header */}
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center backdrop-blur-sm p-4">
+      <div className="w-fit max-w-full bg-white dark:bg-gray-900 rounded-2xl p-6 flex flex-col gap-4 shadow-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-[90vh]">
         <div className="flex justify-between items-center border-b-2 border-gray-300 dark:border-gray-600 pb-2">
           <p className="font-bold text-lg dark:text-gray-100">SIB M to M Slip</p>
           <button
@@ -15,19 +38,50 @@ function ButtonPage({ onClose = () => {} }) {
             onClick={onClose}
             aria-label="Close"
           >
-            ×
+            <X />
           </button>
         </div>
 
-        {/* Form Fields */}
-        <EntryField type="text" placeholder="Chapter Name" label="Chapter" />
-        <CrossChapterSearch label="Met with" placeholder="Search cross chapter" />
-        <EntryField type="text" placeholder="Enter Invited member name" label="Invited By" />
-        <EntryField placeholder="Date" label="Date" />
-        <EntryField type="text" placeholder="Meeting Location" label="Location" />
-        <TextArea label="Topic of conversation" placeholder="Describe Topics discussed..." />
+        <EntryField
+          type="text"
+          placeholder="Chapter Name"
+          label="Chapter"
+          onChange={setChapterName}
+        />
 
-        {/* Actions */}
+        <CrossChapterSearch
+          label="Met with"
+          placeholder="Search cross chapter"
+        />
+
+        <EntryField
+          type="text"
+          placeholder="Enter Invited member name"
+          label="Invited By"
+          onChange={setInvitedBy}
+        />
+
+        <EntryField
+          type="date"
+          placeholder="Date"
+          label="Date"
+          value={date}
+          onChange={setDate}
+        />
+
+        <EntryField
+          type="text"
+          placeholder="Meeting Location"
+          label="Location"
+          onChange={setLocation}
+        />
+
+        <TextArea
+          label="Topic of conversation"
+          placeholder="Describe Topics discussed..."
+          onChange={setConversationTopic}
+        />
+
         <div className="mt-2 flex w-full justify-end gap-4 border-t-2 border-gray-300 dark:border-gray-600 pt-3">
           <FilterButton
             content="Close"
@@ -39,6 +93,7 @@ function ButtonPage({ onClose = () => {} }) {
             content="Submit"
             bg="bg-yellow-300 dark:bg-yellow-400"
             hover="hover:bg-yellow-400 dark:hover:bg-yellow-500"
+            onClick={handleSubmit}
           />
         </div>
       </div>

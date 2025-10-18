@@ -48,7 +48,7 @@ function ButtonUI({ label, description, component }) {
           role="dialog"
         >
           <div
-            className="absolute inset-0 bg-black/10 dark:bg-black/10 backdrop-blur-[1px]"
+            className="absolute inset-0 backdrop-blur-sm"
             onClick={handleClose}
           />
 
@@ -57,10 +57,8 @@ function ButtonUI({ label, description, component }) {
               <div
                 className="
                   relative w-full h-full
-                  rounded-xl shadow-xl
+                  rounded-xl
                   overflow-scroll
-                  border border-white/20 dark:border-gray-600/50
-                  bg-white/20 dark:bg-gray-800/20
                   p-5
                   transition-colors duration-300
                 "

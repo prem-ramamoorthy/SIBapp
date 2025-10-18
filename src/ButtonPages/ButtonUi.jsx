@@ -60,7 +60,7 @@ function ButtonUI({ label, description, component }) {
           />
           <div className="absolute inset-0 flex items-center justify-center p-4">
             <div className="w-full h-full max-w-[1600px] max-h-[100vh]">
-              <div className="relative w-full h-full rounded-xl border border-white/20 dark:border-gray-600 shadow-xl overflow-auto p-5 bg-white dark:bg-gray-900">
+              <div className="relative w-full h-full rounded-xl overflow-auto p-5 ">
                 <Comp onClose={handleClose} />
               </div>
             </div>

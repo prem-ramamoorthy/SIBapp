@@ -5,11 +5,42 @@ import SelectButtons from "../Components/SelectButtons";
 import TextArea from "../Components/TextArea";
 import HeatScale from "../Components/HeatScale";
 import FilterButton from "../Members/Components/FilterButton";
+import { useState } from "react";
+import { getDate } from "../utils/getDate.mjs";
+import { X } from "lucide-react";
 
 function ButtonPage({ onClose = () => {} }) {
+
+  const todaysDate = getDate() ;
+
+  const [date, setDate] = useState(todaysDate) ;
+  const [from , setFrom ] = useState('') ;
+  const [referraldetails , setreferralDetails ] = useState('') ;
+  const [referralType , setreferraltype ] = useState("Value1") ;
+  const [ReferralStatus, setReferralStatus] = useState([]);
+  const [phone , setphone ] = useState("") ;
+  const [email , setEmail] = useState("") ;
+  const [address , setaddress] = useState("") ;
+  const [comments , setcomments] = useState("") ;
+  const [heatscale , setheatscale] = useState("") ;
+
+  const handler = ()=>{
+    console.log(date) ;
+    console.log(from) ;
+    console.log(referralType) ;
+    console.log(referraldetails)
+    console.log(phone);
+    console.log(email) ;
+    console.log(address) ;
+    console.log(comments)
+    console.log(heatscale)
+    console.log(ReferralStatus)
+    console.log("IM clicked !!!");
+  }
+
   return (
-    <div className="container flex flex-1 items-center justify-center p-4">
-      <div className="max-w-[87.5%] bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-5 rounded-2xl flex flex-col gap-4 shadow-lg">
+    <div className="flex flex-1 items-center justify-center">
+      <div className="max-w-full border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-5 rounded-2xl flex flex-col gap-4 shadow-lg">
         {/* Header */}
         <div className="header border-b-2 border-gray-300 dark:border-gray-700 pb-2 flex justify-between items-center">
           <p className="font-bold text-lg">SIB Referral Slip</p>
@@ -17,40 +48,41 @@ function ButtonPage({ onClose = () => {} }) {
             className="font-bold text-gray-900 dark:text-gray-100"
             onClick={onClose}
           >
-            X
+            <X />
           </button>
         </div>
 
-        {/* Top Entry Fields */}
         <div className="flex flex-col md:flex-row w-full gap-4">
           <EntryField
             readOnly={false}
             type="date"
-            placeholder="2025-12-12"
+            placeholder={todaysDate}
             label="Date"
+            value={date}
+            onChange={setDate}
           />
           <EntryField
             readOnly={false}
             type="text"
             placeholder="Your Name"
             label="From"
+            onChange={setFrom}
           />
         </div>
 
-        {/* Cross Chapter Search */}
         <CrossChapterSearch
           label="To"
           placeholder="Search cross chapter Name"
         />
 
-        {/* Text Areas */}
-        <TextArea label="Referral" placeholder="Enter the Referral details..." />
+        <TextArea label="Referral" placeholder="Enter the Referral details..." onChange={setreferralDetails}/>
         <RadioButtons
           label="Referral Type"
           buttons={[
             { name: "Tier 1 (Inside)", value: "tier1" },
             { name: "Tier 2 (OutSide)", value: "tier2" },
           ]}
+          onChange={setreferraltype}
         />
         <SelectButtons
           label="Referral Status"
@@ -58,22 +90,19 @@ function ButtonPage({ onClose = () => {} }) {
             { name: "Given Your card", value: "option1" },
             { name: "Told them you would call", value: "option2" },
           ]}
+          onChange={setReferralStatus}
         />
 
-        {/* Contact Info */}
         <div className="flex flex-col md:flex-row w-full gap-4">
-          <EntryField type="text" placeholder="Phone Number" label="Telephone" />
-          <EntryField type="email" placeholder="Email address" label="Email" />
+          <EntryField type="text" placeholder="Phone Number" label="Telephone" onChange={setphone}/>
+          <EntryField type="email" placeholder="Email address" label="Email" onChange={setEmail}/>
         </div>
 
-        {/* Address and Comments */}
-        <TextArea label="Address" placeholder="Address Details..." />
-        <TextArea label="Comments" placeholder="Additional comments..." />
+        <TextArea label="Address" placeholder="Address Details..." onChange={setaddress}/>
+        <TextArea label="Comments" placeholder="Additional comments..." onChange={setcomments}/>
 
-        {/* Heat Scale */}
-        <HeatScale />
+        <HeatScale onChange={setheatscale}/>
 
-        {/* Action Buttons */}
         <div className="mt-2 flex w-full justify-end gap-4 border-t-2 border-gray-300 dark:border-gray-700 pt-3">
           <FilterButton
             content="Close"
@@ -85,6 +114,7 @@ function ButtonPage({ onClose = () => {} }) {
             content="Submit"
             bg="bg-yellow-300 dark:bg-yellow-500"
             hover="hover:bg-yellow-400 dark:hover:bg-yellow-600"
+            onClick={handler}
           />
         </div>
       </div>
