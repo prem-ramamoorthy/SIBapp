@@ -14,6 +14,7 @@ import FunctionalPage from './ButtonPages/FunctionalPage'
 import SignInPage from './SigninPage/SignInPage';
 import ProtectedRoute from './hooks/protectedRoute';
 import ResetPassword from './ResetPassword/ResetPassword';
+import AnimatedRoute from './hooks/AnimatedRoutes';
 
 import './index.css'
 
@@ -40,6 +41,6 @@ if (!rootEl) throw new Error('Root element not found');
 
 createRoot(rootEl).render(
   <StrictMode>
-    <RouterProvider router={router} />
+      <RouterProvider router={router} />
   </StrictMode>
 );
