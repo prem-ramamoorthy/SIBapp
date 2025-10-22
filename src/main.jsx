@@ -23,14 +23,14 @@ const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
-      { path: '/dashboard', element: <Dashboard /> },
-      { path: '/members', element: <Members /> },
-      { path: '/myactivity', element: <Myactivity /> },
-      { path: '/meetings', element: <Meetings /> },
-      { path: '/mychapter', element: <Mychapter /> },
-      { path: '/profile', element: <Profile /> },
-      { path: '/settings', element: <Settings /> },
-      { path: '/slips', element: <FunctionalPage /> }
+      { path: '/dashboard', element: <AnimatedRoute><Dashboard /></AnimatedRoute> },
+      { path: '/members', element: <AnimatedRoute><Members /></AnimatedRoute> },
+      { path: '/myactivity', element: <AnimatedRoute><Myactivity /></AnimatedRoute> },
+      { path: '/meetings', element: <AnimatedRoute><Meetings /></AnimatedRoute> },
+      { path: '/mychapter', element: <AnimatedRoute><Mychapter /></AnimatedRoute> },
+      { path: '/profile', element: <AnimatedRoute><Profile /></AnimatedRoute> },
+      { path: '/settings', element: <AnimatedRoute><Settings /></AnimatedRoute> },
+      { path: '/slips', element: <AnimatedRoute><FunctionalPage /></AnimatedRoute> }
     ]
   },
   { path: '/reset-password', element: <ResetPassword /> }

@@ -5,12 +5,10 @@ import Siteinfo from './SiteInfo.jsx'
 import UpcomingEvents from './UpcomingEvents.jsx'
 import Graphs from './Graphs.jsx'
 import SubmitButtons from './SubmitButtons.jsx'
-import AnimatedRoute from '../hooks/AnimatedRoutes.jsx'
 
 function Dashboard() {
   return (
-    <AnimatedRoute>
-      <div className="parent grid grid-flow-row-dense 
+    <div className="parent grid grid-flow-row-dense 
                     grid-cols-1 
                     sm:grid-cols-4 
                     md:grid-cols-6 
@@ -31,16 +29,15 @@ function Dashboard() {
                     md:max-h-screen
                     p-2 
                     sm:p-3"
-      >
-        <Header />
-        <Activity />
-        <ChapterOverview />
-        <Siteinfo />
-        <UpcomingEvents />
-        <Graphs />
-        <SubmitButtons />
-      </div>
-    </AnimatedRoute>
+    >
+      <Header />
+      <Activity />
+      <ChapterOverview />
+      <Siteinfo />
+      <UpcomingEvents />
+      <Graphs />
+      <SubmitButtons />
+    </div>
   )
 }
 

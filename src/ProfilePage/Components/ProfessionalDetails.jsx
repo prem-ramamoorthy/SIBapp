@@ -1,4 +1,47 @@
-import React from "react";
+import { PencilLine, Save, Plus } from "lucide-react";
+import { useState } from "react";
+
+const COLORS = [
+  "bg-sky-100 text-sky-800 ring-sky-200 dark:bg-sky-900 dark:text-sky-200 dark:ring-sky-700",
+  "bg-green-100 text-green-800 ring-green-200 dark:bg-green-900 dark:text-green-200 dark:ring-green-700",
+  "bg-pink-100 text-pink-800 ring-pink-200 dark:bg-pink-900 dark:text-pink-200 dark:ring-pink-700",
+  "bg-purple-100 text-purple-800 ring-purple-200 dark:bg-purple-900 dark:text-purple-200 dark:ring-purple-700",
+  "bg-orange-100 text-orange-800 ring-orange-200 dark:bg-orange-900 dark:text-orange-200 dark:ring-orange-700",
+];
+
+const Chip = ({ children, editable, onChange, onDelete }) => (
+  <span className="inline-flex items-center rounded-full border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-700 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-gray-200 shadow-sm">
+    {editable ? (
+      <input
+        type="text"
+        value={children}
+        onChange={(e) => onChange(e.target.value)}
+        className="bg-transparent w-full focus:outline-none"
+      />
+    ) : (
+      children
+    )}
+    {editable && onDelete && (
+      <button
+        onClick={onDelete}
+        className="ml-1 text-red-500 hover:text-red-700 font-bold"
+      >
+        ×
+      </button>
+    )}
+  </span>
+);
+
+const VerticalChip = ({ children }) => {
+  const [color] = useState(COLORS[Math.floor(Math.random() * COLORS.length)]);
+  return (
+    <div
+      className={`rounded-md px-3 py-2 text-center text-sm font-semibold ring-1 ring-inset ${color}`}
+    >
+      {children}
+    </div>
+  );
+};
 
 const Labeled = ({ label, value }) => (
   <div className="space-y-0.5">
@@ -9,15 +52,10 @@ const Labeled = ({ label, value }) => (
   </div>
 );
 
-const Chip = ({ children }) => (
-  <span className="inline-flex items-center rounded-full border border-slate-200 dark:border-gray-700 bg-slate-50 dark:bg-gray-700 px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-gray-200 shadow-sm">
-    {children}
-  </span>
-);
+const ProfessionalDetailsCard = () => {
+  const [isEditing, setIsEditing] = useState(false);
 
-const ProfessionalDetailsCard = ({
-  onEdit = () => {},
-  data = {
+  const [data, setData] = useState({
     company: "Kumar Financial Services",
     gst: "33ABCDE1234F1Z5",
     years: "30 Years",
@@ -33,33 +71,53 @@ const ProfessionalDetailsCard = ({
     verticals: ["Finance & Banking", "Investment Services"],
     referral:
       "Individuals or businesses looking for comprehensive financial planning, investment advisory services, or tax‑efficient investment solutions. Particularly interested in connecting with professionals aged 25–55 with disposable income for long‑term wealth creation.",
-  },
-}) => {
+  });
+
+  const toggleEdit = () => setIsEditing((prev) => !prev);
+
+  const updateService = (index, value) => {
+    const updated = [...data.services];
+    updated[index] = value;
+    setData({ ...data, services: updated });
+  };
+
+  const deleteService = (index) => {
+    const updated = data.services.filter((_, i) => i !== index);
+    setData({ ...data, services: updated });
+  };
+
+  const addService = () => {
+    setData({ ...data, services: [...data.services, ""] });
+  };
+
+  const updateVertical = (index, value) => {
+    const updated = [...data.verticals];
+    updated[index] = value;
+    setData({ ...data, verticals: updated });
+  };
+
+  const deleteVertical = (index) => {
+    const updated = data.verticals.filter((_, i) => i !== index);
+    setData({ ...data, verticals: updated });
+  };
+
+  const addVertical = () => {
+    setData({ ...data, verticals: [...data.verticals, ""] });
+  };
+
   return (
     <section className="w-full rounded-2xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
-
       <div className="mb-3 flex items-start justify-between">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-gray-100">
           Professional Details
         </h2>
         <button
           type="button"
-          onClick={onEdit}
+          onClick={toggleEdit}
           className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1.5 text-sm font-medium text-amber-600 dark:text-amber-400 shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/20 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
-          aria-label="Edit professional details"
-          title="Edit"
         >
-          <svg
-            viewBox="0 0 24 24"
-            className="h-4 w-4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M12 20h9" />
-            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
-          </svg>
-          Edit
+          {isEditing ? <Save size={15} /> : <PencilLine size={15} />}
+          {isEditing ? "Save" : "Edit"}
         </button>
       </div>
 
@@ -69,14 +127,29 @@ const ProfessionalDetailsCard = ({
         <p className="mb-2 text-xs font-semibold tracking-wide text-slate-500 dark:text-gray-400">
           BUSINESS VERTICALS
         </p>
-
-        <div className="space-y-2">
-          <div className="rounded-md bg-sky-100 dark:bg-sky-900 px-3 py-2 text-center text-sm font-semibold text-sky-800 dark:text-sky-200 ring-1 ring-inset ring-sky-200 dark:ring-sky-700">
-            {data.verticals[0]}
-          </div>
-          <div className="rounded-md bg-green-100 dark:bg-green-900 px-3 py-2 text-center text-sm font-semibold text-green-800 dark:text-green-200 ring-1 ring-inset ring-green-200 dark:ring-green-700">
-            {data.verticals[1]}
-          </div>
+        <div className="flex flex-wrap gap-2">
+          {data.verticals.map((v, i) =>
+            isEditing ? (
+              <Chip
+                key={i}
+                editable
+                onChange={(val) => updateVertical(i, val)}
+                onDelete={() => deleteVertical(i)}
+              >
+                {v}
+              </Chip>
+            ) : (
+              <VerticalChip key={i}>{v}</VerticalChip>
+            )
+          )}
+          {isEditing && (
+            <button
+              onClick={addVertical}
+              className="inline-flex items-center rounded-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-xs font-medium text-amber-600 dark:text-amber-400 shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/20"
+            >
+              <Plus size={12} /> Add
+            </button>
+          )}
         </div>
       </div>
 
@@ -92,9 +165,24 @@ const ProfessionalDetailsCard = ({
           SERVICES OFFERED
         </p>
         <div className="flex flex-wrap gap-2">
-          {data.services.map((s) => (
-            <Chip key={s}>{s}</Chip>
+          {data.services.map((s, i) => (
+            <Chip
+              key={i}
+              editable={isEditing}
+              onChange={(val) => updateService(i, val)}
+              onDelete={() => deleteService(i)}
+            >
+              {s}
+            </Chip>
           ))}
+          {isEditing && (
+            <button
+              onClick={addService}
+              className="inline-flex items-center rounded-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-2 py-1 text-xs font-medium text-amber-600 dark:text-amber-400 shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/20"
+            >
+              <Plus size={12} /> Add
+            </button>
+          )}
         </div>
       </div>
 
@@ -102,9 +190,18 @@ const ProfessionalDetailsCard = ({
         <p className="mb-2 text-[11px] font-semibold tracking-wide text-slate-500 dark:text-gray-400">
           IDEAL REFERRAL
         </p>
-        <p className="text-sm leading-6 text-slate-700 dark:text-gray-300">
-          {data.referral}
-        </p>
+        {isEditing ? (
+          <textarea
+            value={data.referral}
+            onChange={(e) => setData({ ...data, referral: e.target.value })}
+            className="w-full rounded border border-slate-300 dark:border-gray-600 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
+            rows={4}
+          />
+        ) : (
+          <p className="text-sm leading-6 text-slate-700 dark:text-gray-300">
+            {data.referral}
+          </p>
+        )}
       </div>
     </section>
   );
