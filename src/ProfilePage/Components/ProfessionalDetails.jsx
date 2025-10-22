@@ -1,5 +1,5 @@
 import { PencilLine, Save, Plus } from "lucide-react";
-import { useState } from "react";
+import { useState , useEffect} from "react";
 
 const COLORS = [
   "bg-sky-100 text-sky-800 ring-sky-200 dark:bg-sky-900 dark:text-sky-200 dark:ring-sky-700",
@@ -52,7 +52,9 @@ const Labeled = ({ label, value }) => (
   </div>
 );
 
-const ProfessionalDetailsCard = () => {
+const ProfessionalDetailsCard = (
+  { editable = false }
+) => {
   const [isEditing, setIsEditing] = useState(false);
 
   const [data, setData] = useState({
@@ -73,7 +75,12 @@ const ProfessionalDetailsCard = () => {
       "Individuals or businesses looking for comprehensive financial planning, investment advisory services, or tax‑efficient investment solutions. Particularly interested in connecting with professionals aged 25–55 with disposable income for long‑term wealth creation.",
   });
 
+  const [isEditable, setEditable] = useState(editable);
   const toggleEdit = () => setIsEditing((prev) => !prev);
+
+  useEffect(() => {
+    setEditable(editable);
+  }, [editable])
 
   const updateService = (index, value) => {
     const updated = [...data.services];
@@ -111,14 +118,14 @@ const ProfessionalDetailsCard = () => {
         <h2 className="text-xl font-semibold text-slate-900 dark:text-gray-100">
           Professional Details
         </h2>
-        <button
+        {isEditable && <button
           type="button"
           onClick={toggleEdit}
           className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1.5 text-sm font-medium text-amber-600 dark:text-amber-400 shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/20 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
         >
           {isEditing ? <Save size={15} /> : <PencilLine size={15} />}
           {isEditing ? "Save" : "Edit"}
-        </button>
+        </button>}
       </div>
 
       <div className="my-2 h-px w-full bg-slate-200/70 dark:bg-gray-700" />

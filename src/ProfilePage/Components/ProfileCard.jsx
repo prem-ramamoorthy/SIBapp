@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PencilLine, Save } from "lucide-react";
 
 
@@ -53,9 +53,14 @@ const ProfileCard = ({
     gothramLabel: "கோத்திரம்:",
     gothram: "செம்பூததான்",
   },
+  editable = false 
 }) => {
-
+  const [isEditable, setEditable ] = useState(editable);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(()=>{
+    setEditable(editable);
+  } , [editable])
 
   const handler = ()=> {
     setIsEditing((e)=> e ? false : true) ;
@@ -66,7 +71,7 @@ const ProfileCard = ({
 
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-slate-900 dark:text-gray-100">Personal Details</h2>
-        <button
+        {isEditable ? <button
           type="button"
           onClick={handler}
           className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1.5 text-sm font-medium text-amber-600 dark:text-amber-400 shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/20 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
@@ -75,7 +80,7 @@ const ProfileCard = ({
         >
           {isEditing ? <Save size={"15 "}/> : <PencilLine size={"15 "}/> }
           {isEditing ? "Save"  : "Edit"}
-        </button>
+        </button> : null}
       </div>
 
       <div className="my-4 h-px w-full bg-slate-200/70 dark:bg-gray-700" />

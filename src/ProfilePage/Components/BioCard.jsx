@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import { PencilLine, Save } from "lucide-react";
 
 const BioSection = ({ title, content, editable, onChange, defaultOpen = false }) => {
@@ -77,9 +77,16 @@ const initialBioData = [
   }
 ];
 
-const MyBioCard = () => {
+const MyBioCard = ({
+  editable = false
+}) => {
+  const [isEditable, setEditable] = useState(editable);
   const [isEditing, setIsEditing] = useState(false);
   const [bioData, setBioData] = useState(initialBioData);
+
+  useEffect(() => {
+    setEditable(editable);
+  }, [editable])
 
   const toggleEdit = () => setIsEditing(prev => !prev);
 
@@ -93,16 +100,16 @@ const MyBioCard = () => {
     <section className="w-full rounded-2xl border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 shadow-sm">
       <div className="flex items-start justify-between">
         <h2 className="text-2xl font-semibold text-slate-900 dark:text-gray-100 p-2 mx-2">My Bio</h2>
-        <button
+        {isEditable && <button
           type="button"
           onClick={toggleEdit}
           className="mx-4 mt-2 inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1.5 text-sm font-medium text-amber-600 dark:text-amber-400 shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/20 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
           aria-label="Edit bio"
           title="Edit"
         >
-          {isEditing ? <Save size={"15 "}/> : <PencilLine size={"15 "}/> }
+          {isEditing ? <Save size={"15 "} /> : <PencilLine size={"15 "} />}
           {isEditing ? "Save" : "Edit"}
-        </button>
+        </button>}
       </div>
 
       <div className="p-2 space-y-2">
