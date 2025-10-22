@@ -1,14 +1,35 @@
 import { Pencil } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
 const ProfileStrip = ({
   name = "Esthera Jackson",
   email = "esthera@simmpple.com",
   chapter = "Alpha Chapter",
   initials = "AC",
-  onShare = () => {},
-  onOverview = () => {},
+  shareText = "Check this profile!",
 }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const shareData = {
+      title: document.title,
+      text: shareText,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
+
   return (
     <div className="w-full rounded-2xl border border-sky-200 bg-gradient-to-r from-white to-amber-100 dark:from-gray-800 dark:to-gray-700 shadow-sm my-2">
       <div className="flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
@@ -26,14 +47,21 @@ const ProfileStrip = ({
             >
               <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
-            <input id="avatar-upload" type="file" accept="image/*" className="sr-only" />
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              className="sr-only"
+            />
           </div>
 
           <div className="min-w-0">
             <p className="text-sm font-semibold text-slate-900 dark:text-gray-100 line-clamp-2 md:line-clamp-1">
               {name}
             </p>
-            <p className="text-xs text-slate-500 dark:text-gray-400 truncate">{email}</p>
+            <p className="text-xs text-slate-500 dark:text-gray-400 truncate">
+              {email}
+            </p>
           </div>
         </div>
 
@@ -41,7 +69,7 @@ const ProfileStrip = ({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={onShare}
+              onClick={handleShare}
               className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 dark:focus:ring-gray-500"
             >
               <svg
@@ -54,25 +82,7 @@ const ProfileStrip = ({
                 <path d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1" />
                 <path d="M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7-7l1-1" />
               </svg>
-              <span>Share</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onOverview}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm ring-1 ring-slate-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:bg-gray-800 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-500"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="h-4 w-4 text-slate-600 dark:text-gray-300"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <path d="m16 8-4 8-4-4 8-4z" />
-              </svg>
-              OVERVIEW
+              <span>{copied ? "Copied!" : "Share"}</span>
             </button>
           </div>
 
