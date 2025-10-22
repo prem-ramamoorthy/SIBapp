@@ -28,11 +28,11 @@ const router = createBrowserRouter([
       { path: '/myactivity', element: <AnimatedRoute><Myactivity /></AnimatedRoute> },
       { path: '/meetings', element: <AnimatedRoute><Meetings /></AnimatedRoute> },
       { path: '/mychapter', element: <AnimatedRoute><Mychapter /></AnimatedRoute> },
-      { path: '/profile', element: <AnimatedRoute><Profile /></AnimatedRoute> },
       { path: '/settings', element: <AnimatedRoute><Settings /></AnimatedRoute> },
       { path: '/slips', element: <AnimatedRoute><FunctionalPage /></AnimatedRoute> }
     ]
   },
+  { path: '/profile', element: <AnimatedRoute><Profile /></AnimatedRoute> },
   { path: '/reset-password', element: <ResetPassword /> }
 ]);
 
