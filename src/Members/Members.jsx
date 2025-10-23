@@ -8,7 +8,7 @@ function Members() {
       img: "/assets/19.jpg",
       bg: "O+",
       name: "Yonesh Murugan",
-      vertical: "IT professional",
+      vertical: "IT Professional",
       tag: "Photography and Services",
       chapter: "Alpha Chapter",
       region: "Erode",
@@ -17,7 +17,7 @@ function Members() {
       img: "/assets/19.jpg",
       bg: "O+",
       name: "Arun",
-      vertical: "IT professional",
+      vertical: "IT Professional",
       tag: "Photography and Services",
       chapter: "Alpha Chapter",
       region: "Erode",
@@ -26,7 +26,7 @@ function Members() {
       img: "/assets/19.jpg",
       bg: "O+",
       name: "Prem",
-      vertical: "IT professional",
+      vertical: "IT Professional",
       tag: "Photography and Services",
       chapter: "Alpha Chapter",
       region: "Erode",
@@ -35,7 +35,7 @@ function Members() {
       img: "/assets/19.jpg",
       bg: "O+",
       name: "Lokesh",
-      vertical: "IT professional",
+      vertical: "IT Professional",
       tag: "Photography and Services",
       chapter: "Alpha Chapter",
       region: "Erode",
@@ -44,7 +44,7 @@ function Members() {
       img: "/assets/19.jpg",
       bg: "O+",
       name: "Lokesh",
-      vertical: "IT professional",
+      vertical: "IT Professional",
       tag: "Photography and Services",
       chapter: "Alpha Chapter",
       region: "Erode",
@@ -52,19 +52,24 @@ function Members() {
   ];
 
   return (
-    <div className="w-screen min-h-screen flex justify-center  transition-colors duration-300">
-      <div className="  max-w-fit w-full flex flex-col flex-wrap items-center justify-center text-gray-900 dark:text-gray-100">
-        <div className="absolute w-[90%] mt-1 top-0">
-          <Header />
-        </div>
-        <h1 className="mt-[80px] pb-2 text-2xl font-bold flex-1 items-center">
+    <div className="flex flex-col items-center justify-start w-full min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
+      <div className="fixed top-[10px] left-0 w-full z-10 bg-transparent">
+        <Header />
+      </div>
+
+      <main className="mt-[80px] w-full max-w-7xl px-3 sm:px-6 md:px-10">
+        <h1 className="pb-2 text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
           Members Directory
         </h1>
-        <div className="  mx-0 w-full">
+
+        <section className="w-full mb-1">
           <DirectoryFilters />
-        </div>
-        <MemberList members={members} />
-      </div>
+        </section>
+
+        <section className="w-full">
+          <MemberList members={members} />
+        </section>
+      </main>
     </div>
   );
 }

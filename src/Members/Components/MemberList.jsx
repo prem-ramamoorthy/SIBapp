@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import MemberCard from "../MemberCard/MemberCard";
 
-const ITEMS_PER_PAGE = 4;
+const ITEMS_PER_PAGE = 5;
 
 const MemberList = ({ members }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,7 +16,7 @@ const MemberList = ({ members }) => {
 
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8 place-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-20 place-items-center">
         {currentMembers.map((member, index) => (
           <MemberCard key={index} member={member} />
         ))}

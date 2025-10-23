@@ -34,7 +34,7 @@ function Activity(
   }
 
   return (
-    <div className="activity-field nth-[odd]:bg-gray-200 dark:nth-[odd]:bg-gray-800 flex flex-row justify-around py-2 items-center w-max cursor-auto lg:w-full xl:w-full transition-colors duration-300">
+    <div className="activity-field nth-[odd]:bg-gray-200 dark:nth-[odd]:bg-gray-700 flex flex-row justify-around py-2 items-center w-max cursor-auto lg:w-full xl:w-full transition-colors duration-300 hover:bg-amber-200/20 dark:hover:bg-amber-200/20 nth-[odd]:hover:bg-amber-200/20 dark:nth-[odd]:hover:bg-amber-200/20">
       <ActivityField data={content.date} classname="overflow-x-hidden font-semibold text-gray-900 dark:text-gray-100" />
       <ActivityBadge content={content.type} color="blue" />
       <ActivityField data={content.direction} classname="text-gray-900 dark:text-gray-100" />

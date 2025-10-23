@@ -15,6 +15,7 @@ function Header() {
         xl:[grid-area:1/1/2/11]
         flex justify-between items-center z-50
         transition-colors duration-300
+        mx-2
       "
     >
       <div className="flex flex-row items-center mt-2 pl-5 gap-3">
