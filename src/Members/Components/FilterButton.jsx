@@ -29,7 +29,9 @@ function FilterButton({
         className
       )}
     >
-      {loading ? 'Please wait…' : content}
+      {loading && (
+          <div className="absolute right-3 top-3 animate-spin rounded-full h-5 w-5 border-2 border-yellow-400 border-t-transparent" />
+        )} {content}
     </button>
   );
 }

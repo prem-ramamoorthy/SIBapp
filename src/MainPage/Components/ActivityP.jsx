@@ -11,12 +11,13 @@ function ActivityP({
       <p className="text-gray-600 dark:text-gray-300 text-md font-semibold">{content}</p>
       <div className="nums flex flex-row gap-4 items-center">
         <Helpful
-          content={upcoming !== null ? `+${upcoming}` : ''}
+          content={upcoming !== 0 ? `+${upcoming}` : ''}
           content2="Values Yet to be added"
           styles="num font-bold text-yellow-400 dark:text-yellow-300"
         />
         <Helpful
           content={actual}
+          content2={"Values approved by admin"}
           styles="actual font-bold text-gray-600 dark:text-gray-300"
         />
         <FilePlus
