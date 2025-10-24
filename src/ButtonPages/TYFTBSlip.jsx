@@ -7,25 +7,58 @@ import FilterButton from "../Members/Components/FilterButton";
 import { getDate } from "../utils/getDate.mjs";
 import { X } from "lucide-react";
 
-function ButtonPage({ onClose = () => {} }) {
-  const todaysDate = getDate() ;
-  const [chapterName, setChapterName] = useState("");
+function ButtonPage({ onClose = () => { } }) {
+  const todaysDate = getDate();
   const [date, setDate] = useState(todaysDate);
   const [amount, setAmount] = useState("");
   const [businessType, setBusinessType] = useState("new");
   const [referralType, setReferralType] = useState("tier1");
   const [comments, setComments] = useState("");
+  const [to, setTo] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [response, setResponse] = useState(null);
 
-  const handleSubmit = () => {
-    const formData = {
-      chapterName,
-      date,
-      amount,
-      businessType,
-      referralType,
-      comments,
+  const handleSubmit = async () => {
+    const data = {
+      receiver_displayname: to,
+      business_type: businessType,
+      referral_type: referralType,
+      business_amount: amount,
+      business_description: comments,
+      created_at: date
     };
-    console.log("Form Data Submitted:", formData);
+
+    try {
+      setLoading(true);
+
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/slips/tyftb/createtyftb`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+          credentials: "include",
+        }
+      );
+      const result = await res.json();
+      console.log("TYFTB Slip Response:", result);
+      if (result?.errors || result?.message) {
+        const errMsg = result?.errors?.[0]
+          ? `${result?.errors?.[0].path} : ${result?.errors?.[0].msg}`
+          : (result?.message || "An error occurred.");
+        if (errMsg)
+          setError(errMsg);
+      }
+      else {
+        setResponse(result);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+
   };
 
   return (
@@ -37,7 +70,7 @@ function ButtonPage({ onClose = () => {} }) {
             className="font-bold text-gray-900 dark:text-gray-100 hover:text-red-500 dark:hover:text-red-400"
             onClick={onClose}
           >
-            <X/>
+            <X />
           </button>
         </div>
 
@@ -46,7 +79,6 @@ function ButtonPage({ onClose = () => {} }) {
             type="text"
             placeholder="Chapter Name"
             label="Chapter"
-            onChange={setChapterName}
             className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
           />
           <EntryField
@@ -62,6 +94,8 @@ function ButtonPage({ onClose = () => {} }) {
         <CrossChapterSearch
           label="Thank you to"
           placeholder="Select a member"
+          value={to}
+          onChange={setTo}
           className="dark:bg-gray-700 dark:text-gray-100 dark:border-yellow-400"
         />
 
@@ -93,11 +127,23 @@ function ButtonPage({ onClose = () => {} }) {
         />
 
         <TextArea
-          label="Comments"
+          label="Business Description"
           placeholder="Additional Comments..."
           onChange={setComments}
           className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
         />
+
+        {error && (
+          <p className="rounded-md border px-3 py-2 text-sm border-red-300 bg-red-100 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
+            {error}
+          </p>
+        )}
+
+        {response && (
+          <p className="rounded-md border px-3 py-2 text-sm border-green-300 bg-green-100 text-green-700 dark:border-green-700 dark:bg-green-900 dark:text-green-300">
+            {response}
+          </p>
+        )}
 
         <div className="mt-2 flex w-full justify-end gap-4 border-t-2 border-gray-300 dark:border-gray-600 pt-3">
           <FilterButton
@@ -110,6 +156,7 @@ function ButtonPage({ onClose = () => {} }) {
             content="Submit"
             bg="bg-yellow-300 dark:bg-yellow-500"
             hover="hover:bg-yellow-400 dark:hover:bg-yellow-600"
+            loading={loading}
             onClick={handleSubmit}
           />
         </div>
