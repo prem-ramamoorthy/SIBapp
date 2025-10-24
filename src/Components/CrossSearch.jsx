@@ -5,6 +5,8 @@ function CrossChapterSearch({
   onChange,
   placeholder = "Search username...",
   label = "To",
+  offsubmit = false,
+  searchdomain = "searchuser"
 }) {
   const [searchTerm, setSearchTerm] = useState(value || "");
   const [results, setResults] = useState([]);
@@ -38,7 +40,7 @@ function CrossChapterSearch({
         setLoading(true);
         setError("");
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/searchuser`,
+          `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/${searchdomain}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -129,9 +131,9 @@ function CrossChapterSearch({
         )}
 
       </div>
-      <button type="button" className="mt-2 inline-flex items-center justify-center rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-500 " >
+      { offsubmit !== true ? <button type="button" className="mt-2 inline-flex items-center justify-center rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-500 " >
         Search Cross Chapter
-      </button>
+      </button> : null}
     </div>
   );
 }

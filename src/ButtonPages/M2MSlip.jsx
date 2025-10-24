@@ -3,29 +3,63 @@ import CrossChapterSearch from "../Components/CrossSearch";
 import EntryField from "../Components/EntryField";
 import TextArea from "../Components/TextArea";
 import FilterButton from "../Members/Components/FilterButton";
-import {getDate} from '../utils/getDate.mjs'
+import { getDate } from '../utils/getDate.mjs'
 import { X } from "lucide-react";
 
-function ButtonPage({ onClose = () => {} }) {
+function ButtonPage({ onClose = () => { } }) {
 
-  const todaysDate = getDate() ;
+  const todaysDate = getDate();
 
   const [chapterName, setChapterName] = useState("");
   const [invitedBy, setInvitedBy] = useState("");
   const [date, setDate] = useState(todaysDate);
   const [location, setLocation] = useState("");
   const [conversationTopic, setConversationTopic] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [response, setResponse] = useState(null);
+  const [member2Name, setMember2Name] = useState("");
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const formData = {
-      chapterName,
-      invitedBy,
-      date,
-      location,
-      conversationTopic,
-    };
+      member2_name: member2Name,
+      chapter_name: chapterName,
+      meeting_date: date,
+      location: location,
+      discussion_points: conversationTopic,
+      created_by_username: invitedBy
+    }
 
-    console.log("Form Submitted:", formData);
+    try {
+      setLoading(true);
+
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/slips/one2one/createone2one`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+          credentials: "include",
+        }
+      );
+      const result = await res.json();
+      console.log(result);
+      if (result?.errors || result?.message) {
+        const errMsg = result?.errors?.[0]
+          ? `${result?.errors?.[0].path} : ${result?.errors?.[0].msg}`
+          : (result?.message || "An error occurred.");
+        if (errMsg)
+          setError(errMsg);
+      }
+      else {
+        setResponse(result);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+
   };
 
   return (
@@ -42,45 +76,61 @@ function ButtonPage({ onClose = () => {} }) {
           </button>
         </div>
 
-        <EntryField
-          type="text"
-          placeholder="Chapter Name"
-          label="Chapter"
-          onChange={setChapterName}
+        <CrossChapterSearch
+          label="Met with"
+          placeholder="Search a member"
+          onChange={setMember2Name}
         />
 
         <CrossChapterSearch
-          label="Met with"
-          placeholder="Search cross chapter"
-        />
-
-        <EntryField
-          type="text"
-          placeholder="Enter Invited member name"
-          label="Invited By"
+          label="Enter Invited member name"
+          placeholder="Search a member"
           onChange={setInvitedBy}
+          offsubmit={true}
         />
 
-        <EntryField
-          type="date"
-          placeholder="Date"
-          label="Date"
-          value={date}
-          onChange={setDate}
+        <CrossChapterSearch
+          label="Chapter"
+          placeholder="Chapter Name of the member met"
+          onChange={setChapterName}
+          offsubmit={true}
+          searchdomain="searchchapter"
         />
 
-        <EntryField
-          type="text"
-          placeholder="Meeting Location"
-          label="Location"
-          onChange={setLocation}
-        />
+        <div className="flex flex-row w-full gap-2">
+
+          <EntryField
+            type="date"
+            placeholder="Date"
+            label="Date"
+            value={date}
+            onChange={setDate}
+          />
+          <EntryField
+            type="text"
+            placeholder="Meeting Location"
+            label="Location"
+            onChange={setLocation}
+          />
+        </div>
 
         <TextArea
           label="Topic of conversation"
           placeholder="Describe Topics discussed..."
           onChange={setConversationTopic}
         />
+
+        {error && (
+          <p className="rounded-md border px-3 py-2 text-sm border-red-300 bg-red-100 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
+            {error}
+          </p>
+        )}
+
+        {response && (
+          <p className="rounded-md border px-3 py-2 text-sm border-green-300 bg-green-100 text-green-700 dark:border-green-700 dark:bg-green-900 dark:text-green-300">
+            {response}
+          </p>
+        )}
 
         <div className="mt-2 flex w-full justify-end gap-4 border-t-2 border-gray-300 dark:border-gray-600 pt-3">
           <FilterButton
@@ -94,6 +144,7 @@ function ButtonPage({ onClose = () => {} }) {
             bg="bg-yellow-300 dark:bg-yellow-400"
             hover="hover:bg-yellow-400 dark:hover:bg-yellow-500"
             onClick={handleSubmit}
+            loading={loading}
           />
         </div>
       </div>

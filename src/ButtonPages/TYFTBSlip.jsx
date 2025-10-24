@@ -42,7 +42,6 @@ function ButtonPage({ onClose = () => { } }) {
         }
       );
       const result = await res.json();
-      console.log("TYFTB Slip Response:", result);
       if (result?.errors || result?.message) {
         const errMsg = result?.errors?.[0]
           ? `${result?.errors?.[0].path} : ${result?.errors?.[0].msg}`
