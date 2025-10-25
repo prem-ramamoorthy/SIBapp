@@ -5,6 +5,7 @@ import SelectButtons from '../Components/SelectButtons';
 import FilterButton from '../Members/Components/FilterButton';
 import { getDate } from '../utils/getDate.mjs'
 import { X } from 'lucide-react';
+import CrossChapterSearch from "../Components/CrossSearch";
 
 function ButtonPage({ onClose = () => { } }) {
 
@@ -12,7 +13,7 @@ function ButtonPage({ onClose = () => { } }) {
 
   const [registrationChapter, setRegistrationChapter] = useState('');
   const [visitDate, setVisitDate] = useState(todaysDate);
-  const [title, setTitle] = useState('');
+  const [Industry, setIndustry] = useState('');
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -30,7 +31,7 @@ function ButtonPage({ onClose = () => { } }) {
     const formData = {
       registrationChapter,
       visitDate,
-      title,
+      Industry,
       firstName,
       email,
       phone,
@@ -75,13 +76,15 @@ function ButtonPage({ onClose = () => { } }) {
         </div>
 
         <div className="flex w-full gap-4">
-          <EntryField
-            type="text"
-            placeholder="Chapter Name"
+          
+          <CrossChapterSearch
             label="Registration Chapter"
-            className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+            placeholder="Chapter Name to be visited"
             onChange={setRegistrationChapter}
+            offsubmit={true}
+            searchdomain="searchchapter"
           />
+
           <EntryField
             type="date"
             placeholder={todaysDate}
@@ -99,15 +102,15 @@ function ButtonPage({ onClose = () => { } }) {
         <div className="flex w-full gap-4">
           <EntryField
             type="text"
-            placeholder="Enter Title"
-            label="Title (Optional)"
+            placeholder="Enter Industry"
+            label="Industry"
             className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-            onChange={setTitle}
+            onChange={setIndustry}
           />
           <EntryField
             type="text"
             placeholder="Enter First Name"
-            label="First Name"
+            label="Name"
             className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
             onChange={setFirstName}
           />
@@ -186,7 +189,7 @@ function ButtonPage({ onClose = () => { } }) {
         <EntryField
           type="text"
           placeholder="Enter Category"
-          label="Category"
+          label="Business Category"
           className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
           onChange={setCategory}
         />

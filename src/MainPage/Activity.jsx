@@ -16,8 +16,8 @@ function Activity() {
   );
 
   const ActivityPs = [
-    { content: "Referal Given", upcoming: 0 , actual: error ? "error" : loading ? "loading..." : data ? data.referral_given : -1 },
-    { content: "Referal Received", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.referral_received : -1 },
+    { content: "Referral Given", upcoming: 0 , actual: error ? "error" : loading ? "loading..." : data ? data.referral_given : -1 },
+    { content: "Referral Received", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.referral_received : -1 },
     { content: "TYFTB Received", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.tyftb_received : -1 },
     { content: "TYFTB Given", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.tyftb_given : -1 },
     { content: "Business Made", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.business_made : -1 },
