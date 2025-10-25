@@ -7,6 +7,7 @@ function SiteButtonUI({
   content = "12 Sep 2025",
   display = "content",
   to = null
+, need = true
 }) {
   return (
     <a
@@ -24,12 +25,12 @@ function SiteButtonUI({
         flex flex-col justify-center items-center
       "
     >
-      <span
+      {need ? <span
         className={`text-md font-medium [display:${display}] text-gray-800 dark:text-gray-100`}
         style={style}
       >
         Renewal Date
-      </span>
+      </span> : null}
       <span
         className={`text-sm font-semibold ${color} dark:text-gray-200`}
         style={style2}
