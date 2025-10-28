@@ -1,5 +1,5 @@
 import { PencilLine, Save, Plus } from "lucide-react";
-import { useState , useEffect} from "react";
+import { useState, useEffect } from "react";
 
 const COLORS = [
   "bg-sky-100 text-sky-800 ring-sky-200 dark:bg-sky-900 dark:text-sky-200 dark:ring-sky-700",
@@ -43,12 +43,30 @@ const VerticalChip = ({ children }) => {
   );
 };
 
+const CompanyName = ({label , value}) => (
+  <div className="space-y-0.5">
+    <p className="text-[13px] font-semibold tracking-wide text-slate-500 dark:text-gray-400">
+      {label}
+    </p>
+    <p className="text-sm font-bold text-slate-900 dark:text-gray-300">{value}</p>
+  </div>
+);
+
 const Labeled = ({ label, value }) => (
   <div className="space-y-0.5">
     <p className="text-[11px] font-semibold tracking-wide text-slate-500 dark:text-gray-400">
       {label}
     </p>
     <p className="text-sm text-slate-900 dark:text-gray-100">{value}</p>
+  </div>
+);
+
+const Weblink = ({ label, url }) => (
+  <div className="space-y-0.5 overflow-x-clip">
+    <p className="text-[11px] font-semibold tracking-wide text-slate-500 dark:text-gray-400">
+      {label}
+    </p>
+    <a className="text-sm w-full text-blue-500" href={url} target="_blank" rel="noopener noreferrer">{url}</a>
   </div>
 );
 
@@ -59,7 +77,7 @@ const ProfessionalDetailsCard = (
 
   const [data, setData] = useState({
     company: "Kumar Financial Services",
-    gst: "33ABCDE1234F1Z5",
+    website: "www.kumarfinancialservices.com",
     years: "30 Years",
     turnover: "₹1–5 Cr",
     services: [
@@ -161,8 +179,8 @@ const ProfessionalDetailsCard = (
       </div>
 
       <div className="grid grid-cols-1 gap-6 py-1 md:grid-cols-2">
-        <Labeled label="COMPANY" value={data.company} />
-        <Labeled label="GST NUMBER" value={data.gst} />
+        <CompanyName label="COMPANY" value={data.company} />
+        <Weblink label="Website" url={data.website} />
         <Labeled label="YEARS IN BUSINESS" value={data.years} />
         <Labeled label="TURNOVER BAND" value={data.turnover} />
       </div>
