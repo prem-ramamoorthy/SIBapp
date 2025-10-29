@@ -43,7 +43,7 @@ const VerticalChip = ({ children }) => {
   );
 };
 
-const CompanyName = ({label , value}) => (
+const CompanyName = ({ label, value }) => (
   <div className="space-y-0.5">
     <p className="text-[13px] font-semibold tracking-wide text-slate-500 dark:text-gray-400">
       {label}
@@ -70,12 +70,8 @@ const Weblink = ({ label, url }) => (
   </div>
 );
 
-const ProfessionalDetailsCard = (
-  { editable = false }
-) => {
-  const [isEditing, setIsEditing] = useState(false);
-
-  const [data, setData] = useState({
+const ProfessionalDetailsCard = ({
+  datagiven = {
     company: "Kumar Financial Services",
     website: "www.kumarfinancialservices.com",
     years: "30 Years",
@@ -91,14 +87,25 @@ const ProfessionalDetailsCard = (
     verticals: ["Finance & Banking", "Investment Services"],
     referral:
       "Individuals or businesses looking for comprehensive financial planning, investment advisory services, or tax‑efficient investment solutions. Particularly interested in connecting with professionals aged 25–55 with disposable income for long‑term wealth creation.",
+  },
+  editable = false,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [data, setData] = useState({
+    ...datagiven,
+    verticals: datagiven?.verticals || [],
+    services: datagiven?.services || [],
   });
 
-  const [isEditable, setEditable] = useState(editable);
-  const toggleEdit = () => setIsEditing((prev) => !prev);
-
   useEffect(() => {
-    setEditable(editable);
-  }, [editable])
+    setData({
+      ...datagiven,
+      verticals: datagiven?.verticals || [],
+      services: datagiven?.services || [],
+    });
+  }, [datagiven]);
+
+  const toggleEdit = () => setIsEditing((prev) => !prev);
 
   const updateService = (index, value) => {
     const updated = [...data.services];
@@ -136,14 +143,16 @@ const ProfessionalDetailsCard = (
         <h2 className="text-xl font-semibold text-slate-900 dark:text-gray-100">
           Professional Details
         </h2>
-        {isEditable && <button
-          type="button"
-          onClick={toggleEdit}
-          className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1.5 text-sm font-medium text-amber-600 dark:text-amber-400 shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/20 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
-        >
-          {isEditing ? <Save size={15} /> : <PencilLine size={15} />}
-          {isEditing ? "Save" : "Edit"}
-        </button>}
+        {editable && (
+          <button
+            type="button"
+            onClick={toggleEdit}
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1.5 text-sm font-medium text-amber-600 dark:text-amber-400 shadow-sm hover:bg-amber-50 dark:hover:bg-amber-500/20 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+          >
+            {isEditing ? <Save size={15} /> : <PencilLine size={15} />}
+            {isEditing ? "Save" : "Edit"}
+          </button>
+        )}
       </div>
 
       <div className="my-2 h-px w-full bg-slate-200/70 dark:bg-gray-700" />

@@ -1,4 +1,4 @@
-import { useState , useEffect} from "react";
+import { useState, useEffect } from "react";
 import { PencilLine, Save } from "lucide-react";
 
 const BioSection = ({ title, content, editable, onChange, defaultOpen = false }) => {
@@ -59,34 +59,38 @@ const BioSection = ({ title, content, editable, onChange, defaultOpen = false })
   );
 };
 
-const initialBioData = [
-  {
-    title: "GAINS Profile",
-    content: "Goals: Help 100 families achieve financial freedom by 2026.Accomplishments: 30+ years in finance, helped clients grow wealth.Interests: Stock market analysis, economic trends. Networks: Financial planning association, Investment clubs.Skills: Portfolio management, risk assessment, financial modeling.",
-    defaultOpen: true
-  },
-  {
-    title: "30-sec Pitch",
-    content: "Certified planner helping professionals create resilient, tax‑efficient portfolios with clear, goal‑based plans.",
-    defaultOpen: false
-  },
-  {
-    title: "Why SIB?",
-    content: "Community, accountability, and curated opportunities to expand networks and accelerate impact.",
-    defaultOpen: false
-  }
-];
-
 const MyBioCard = ({
   editable = false
+  , initialBioData = [
+    {
+      title: "GAINS Profile",
+      content: "Goals: Help 100 families achieve financial freedom by 2026.Accomplishments: 30+ years in finance, helped clients grow wealth.Interests: Stock market analysis, economic trends. Networks: Financial planning association, Investment clubs.Skills: Portfolio management, risk assessment, financial modeling.",
+      defaultOpen: true
+    },
+    {
+      title: "30-sec Pitch",
+      content: "Certified planner helping professionals create resilient, tax‑efficient portfolios with clear, goal‑based plans.",
+      defaultOpen: false
+    },
+    {
+      title: "Why SIB?",
+      content: "Community, accountability, and curated opportunities to expand networks and accelerate impact.",
+      defaultOpen: false
+    }
+  ]
 }) => {
+
   const [isEditable, setEditable] = useState(editable);
   const [isEditing, setIsEditing] = useState(false);
   const [bioData, setBioData] = useState(initialBioData);
 
   useEffect(() => {
     setEditable(editable);
-  }, [editable])
+  }, [editable]);
+
+  useEffect(() => {
+    setBioData(initialBioData);
+  }, [initialBioData]);
 
   const toggleEdit = () => setIsEditing(prev => !prev);
 

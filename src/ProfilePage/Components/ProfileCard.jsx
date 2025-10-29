@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { PencilLine, Save } from "lucide-react";
+import { Calendar, EqualApproximatelyIcon, Heart, MailCheck, PencilLine, Phone, Pin, Save } from "lucide-react";
 
 
 const DetailRow = ({
@@ -48,9 +48,7 @@ const ProfileCard = ({
     bloodGroup: "O+",
     motherTongue: "பெருந்துறை",
     subCaste: "Example வகையறா",
-    kuladeivamLabel: "குலதெய்வம்:",
     kuladeivam: "அங்காளம்மன்",
-    gothramLabel: "கோத்திரம்:",
     gothram: "செம்பூததான்",
   },
   editable = false 
@@ -89,9 +87,7 @@ const ProfileCard = ({
         <DetailRow
           editable = {isEditing}
           icon={
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M22 16.92V21a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3 5.18 2 2 0 0 1 5 3h4.09a2 2 0 0 1 2 1.72l.45 3a2 2 0 0 1-.55 1.73L9.91 11a16 16 0 0 0 3.18 3.18l1.55-1.08a2 2 0 0 1 1.73-.55l3 .45A2 2 0 0 1 20 14.91" />
-            </svg>
+            <Phone className="h-5 w-5" />
           }
           label="Phone"
           value={data.phone}
@@ -99,10 +95,7 @@ const ProfileCard = ({
         <DetailRow
         editable = {isEditing}
           icon={
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" />
-              <path d="M22 6 12 13 2 6" />
-            </svg>
+            <MailCheck className="h-5 w-5" />
           }
           label="Email"
           value={data.email}
@@ -111,10 +104,7 @@ const ProfileCard = ({
           <DetailRow
           editable = {isEditing}
             icon={
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 1 1 18 0Z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
+              <Pin className="h-5 w-5" />
             }
             label="Address"
             value={data.address}
@@ -128,10 +118,7 @@ const ProfileCard = ({
         <DetailRow
         editable = {isEditing}
           icon={
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" />
-              <path d="M16 2v4M8 2v4M3 10h18" />
-            </svg>
+            <Calendar className="h-5 w-5" />
           }
           label="DOB"
           value={data.dob}
@@ -139,11 +126,7 @@ const ProfileCard = ({
         <DetailRow
         editable = {isEditing}
           icon={
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 21v-6a2 2 0 0 0-2-2h-1" />
-              <path d="M4 21V8a2 2 0 0 1 2-2h7" />
-              <path d="M18 3 21 6 12 15H9v-3L18 3z" />
-            </svg>
+            <Calendar className="h-5 w-5" />
           }
           label="Wedding Date"
           value={data.wedding}
@@ -151,18 +134,16 @@ const ProfileCard = ({
         <DetailRow
         editable = {isEditing}
           icon={
-            <svg viewBox="0 0 24 24" className="h-5 w-5 text-rose-500" fill="currentColor">
-              <path d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10z" />
-            </svg>
+            <Heart className="h-5 w-5" />
           }
           label="Blood Group"
           value={data.bloodGroup}
         />
         <DetailRow editable = {isEditing} label="வகையறா" value={data.subCaste} />
-        <DetailRow  editable = {isEditing}label="குட்டம்" value={`${data.gothramLabel} ${data.gothram}`} />
+        <DetailRow  editable = {isEditing}label="குட்டம்" value={data.gothram} />
         <DetailRow  editable = {isEditing}label="ஊர்" value={data.motherTongue} />
         <div className="md:col-span-2">
-          <DetailRow editable = {isEditing} label="குலதெய்வம்" value={`${data.kuladeivam}`} valueClass="text-rose-600" />
+          <DetailRow editable = {isEditing} label="குலதெய்வம்" value={data.kuladeivam} valueClass="text-rose-600" />
         </div>
       </div>
     </section>

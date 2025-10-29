@@ -1,20 +1,31 @@
-import { Pencil } from "lucide-react";
-import React, { useState } from "react";
+import { RotateCcw } from "lucide-react";
+import { useEffect, useState } from "react";
 
 const ProfileStrip = ({
   name = "Esthera Jackson",
   email = "esthera@simmpple.com",
-  chapter = "Alpha Chapter",
-  initials = "AC",
-  shareText = "Check this profile!",
+  avatarUrl = null,
+  shareText = "I'm excited to share my professional profile with you! Please check it out to know more about my background, expertise, and how we can connect or collaborate",
+  user_id = "",
+  chapter = "" 
 }) => {
   const [copied, setCopied] = useState(false);
+  const [initials , setinitials ] = useState(name.split(' ').map(n => n[0]).join(''));
+  const [url , seturl ] = useState(`${window.location.href}/`) ;
+
+  useEffect(() => {
+    setinitials(name.split(' ').map(n => n[0]).join(''));
+  }, [name]);
+
+  useEffect(()=>{
+    seturl(`${window.location.href}/${user_id}`)
+  },[user_id])
 
   const handleShare = async () => {
     const shareData = {
       title: document.title,
       text: shareText,
-      url: window.location.href,
+      url: url,
     };
 
     try {
@@ -36,16 +47,18 @@ const ProfileStrip = ({
         <div className="flex min-w-0 items-center gap-3">
           <div className="relative h-12 w-12 shrink-0 rounded-xl bg-red-500 md:h-14 md:w-14">
             <span className="absolute inset-0 flex items-center justify-center text-white font-bold dark:text-gray-200">
-              {initials}
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="ProfilePhoto" className="h-full w-full border-x-fuchsia-100 rounded-xl object-cover" />
+              ) : initials }
             </span>
             <button
               type="button"
               onClick={() => document.getElementById("avatar-upload")?.click()}
-              className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-cyan-500 text-white shadow hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:ring-offset-2 focus:ring-offset-white dark:border-gray-800"
+              className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full border-2 border-white text-white shadow bg-cyan-500 hover:bg-cyan-600 dark:border-gray-800"
               aria-label="Edit profile photo"
               title="Edit photo"
             >
-              <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
             <input
               id="avatar-upload"
@@ -87,7 +100,7 @@ const ProfileStrip = ({
           </div>
 
           <span className="hidden text-sm text-slate-700 dark:text-gray-300 sm:inline">
-            {chapter}
+            {chapter || ""}
           </span>
         </div>
       </div>

@@ -34,7 +34,6 @@ function Profile() {
 
   useEffect(() => {
     if (!getProfileData) return;
-
     if (getProfileData.message === "Profile not found") {
       (async () => {
         try {
@@ -80,17 +79,58 @@ function Profile() {
       <div className="container mx-auto px-4 py-4">
         <Header />
         <div className="mt-3">
-          <ProfileStrip />
+          <ProfileStrip name={profileData?.user?.username} email={profileData?.user?.email} chapter={profileData?.chaptername} user_id={profileData?.user?._id}/>
         </div>
         <section className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <div className="order-1">
-            <ProfileCard editable={editable} profileData={profileData} />
+            <ProfileCard data={
+              {
+                phone: profileData?.company_phone,
+                email: profileData?.company_email,
+                address: profileData?.company_address,
+                dob: profileData?.dob,
+                wedding: profileData?.wedding_date,
+                bloodGroup: profileData?.blood_group,
+                motherTongue: profileData?.native_place,
+                subCaste: profileData?.vagai_category,
+                kuladeivam: profileData?.kuladeivam,
+                gothram: profileData?.kulam_category
+              }
+            } editable={editable} />
           </div>
           <div className="order-2">
-            <ProfessionalDetailsCard editable={editable} profileData={profileData} />
+            <ProfessionalDetailsCard datagiven={
+              {
+                company: profileData?.company_name,
+                website: profileData?.website,
+                years: profileData?.years_in_business,
+                turnover: profileData?.annual_turnover,
+                services: profileData?.services || [],
+                verticals: profileData?.vertical_ids || [],
+                referral: profileData?.ideal_referral
+              }
+            } editable={editable} />
           </div>
           <div className="order-3 md:col-span-2 lg:col-span-1">
-            <MyBioCard editable={editable} profileData={profileData} />
+            <MyBioCard editable={editable} initialBioData={
+              [
+                {
+                  title: "GAINS Profile",
+                  content: profileData?.bio,
+                  defaultOpen: true
+                },
+                {
+                  title: "30-sec Pitch",
+                  content: profileData?.elevator_pitch_30s,
+                  defaultOpen: false
+                },
+                {
+                  title: "Why SIB?",
+                  content: profileData?.why_sib,
+                  defaultOpen: false
+                }
+              ]
+            } />
           </div>
         </section>
       </div>
