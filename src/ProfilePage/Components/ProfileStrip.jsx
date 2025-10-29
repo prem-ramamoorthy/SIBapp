@@ -1,25 +1,41 @@
 import { RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
+import { CompletionRing } from "./CompletionRing";
 
 const ProfileStrip = ({
   name = "Esthera Jackson",
   email = "esthera@simmpple.com",
   avatarUrl = null,
-  shareText = "I'm excited to share my professional profile with you! Please check it out to know more about my background, expertise, and how we can connect or collaborate",
+  shareText = "I'm excited to share my professional profile with you! Please check it out to know more about my background, expertise, and how we can connect or collaborate.",
   user_id = "",
-  chapter = "" 
+  chapter = "",
+  profile_id = "",
+  editable = false ,
+  completionPercentage = 0
 }) => {
   const [copied, setCopied] = useState(false);
-  const [initials , setinitials ] = useState(name.split(' ').map(n => n[0]).join(''));
-  const [url , seturl ] = useState(`${window.location.href}/`) ;
+
+  const getInitials = (name) =>
+    name
+      .trim()
+      .split(' ')
+      .map(n => n[0] || '')
+      .join('')
+      .toUpperCase();
+
+  const [initials, setInitials] = useState(getInitials(name));
+
+  const [url, setUrl] = useState("");
 
   useEffect(() => {
-    setinitials(name.split(' ').map(n => n[0]).join(''));
+    setInitials(getInitials(name));
   }, [name]);
 
-  useEffect(()=>{
-    seturl(`${window.location.href}/${user_id}`)
-  },[user_id])
+  useEffect(() => {
+    const origin = window.location.origin;
+    const path = "/profile/"+profile_id+"?user=" + user_id ;
+    setUrl(`${origin}${path}`);
+  }, [user_id, profile_id]);
 
   const handleShare = async () => {
     const shareData = {
@@ -41,6 +57,10 @@ const ProfileStrip = ({
     }
   };
 
+  const openFileSelector = () => {
+    document.getElementById("avatar-upload")?.click();
+  };
+
   return (
     <div className="w-full rounded-2xl border border-sky-200 bg-gradient-to-r from-white to-amber-100 dark:from-gray-800 dark:to-gray-700 shadow-sm my-2">
       <div className="flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
@@ -49,17 +69,17 @@ const ProfileStrip = ({
             <span className="absolute inset-0 flex items-center justify-center text-white font-bold dark:text-gray-200">
               {avatarUrl ? (
                 <img src={avatarUrl} alt="ProfilePhoto" className="h-full w-full border-x-fuchsia-100 rounded-xl object-cover" />
-              ) : initials }
+              ) : initials}
             </span>
-            <button
+            {editable && <button
               type="button"
-              onClick={() => document.getElementById("avatar-upload")?.click()}
+              onClick={openFileSelector}
               className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full border-2 border-white text-white shadow bg-cyan-500 hover:bg-cyan-600 dark:border-gray-800"
               aria-label="Edit profile photo"
-              title="Edit photo"
+              title="Change Photo"
             >
               <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-            </button>
+            </button>}
             <input
               id="avatar-upload"
               type="file"
@@ -67,7 +87,6 @@ const ProfileStrip = ({
               className="sr-only"
             />
           </div>
-
           <div className="min-w-0">
             <p className="text-sm font-semibold text-slate-900 dark:text-gray-100 line-clamp-2 md:line-clamp-1">
               {name}
@@ -98,10 +117,10 @@ const ProfileStrip = ({
               <span>{copied ? "Copied!" : "Share"}</span>
             </button>
           </div>
-
           <span className="hidden text-sm text-slate-700 dark:text-gray-300 sm:inline">
             {chapter || ""}
           </span>
+           {editable &&<CompletionRing percentage={completionPercentage} />}
         </div>
       </div>
     </div>
