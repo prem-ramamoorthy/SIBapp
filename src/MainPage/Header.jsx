@@ -1,8 +1,28 @@
 import { HeaderAvatar } from './Components/Avatar';
 import Sidebar from './SideBar/SideBar';
 import NotificationPanel from '../NotificationPanel/Notification';
+import useFetch from '../hooks/useFetch';
+import CircularLoading from '../Components/CircularLoading';
+import ErrorComponent from '../Components/ErrorComponent';
 
 function Header() {
+
+  const { data, loading, error } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/auth/getuser`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
+  const getInitials = (name) =>
+    name
+      .trim()
+      .split(' ')
+      .map(n => n[0] || '')
+      .join('')
+      .toUpperCase();
+
   return (
     <div
       className="
@@ -55,8 +75,11 @@ function Header() {
         >
           Chapter Name
         </h1>
-
-        <HeaderAvatar />
+        {loading ? <CircularLoading /> : error ? <ErrorComponent /> : data ? <HeaderAvatar
+          initials = {getInitials(data.username)}
+          Name = {data.username}
+          status = {data.status === true ? "online" : "offline"}
+          email = {data.email}/> : null}
       </div>
     </div>
   );

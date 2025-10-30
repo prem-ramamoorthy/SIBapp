@@ -11,6 +11,7 @@ export function HeaderAvatar({
   status = "online",
   email = "user@example.com",
   onProfile,
+  Name = "Default",
   onSettings,
 }) {
   const [open, setOpen] = useState(false);
@@ -131,7 +132,7 @@ export function HeaderAvatar({
           "
         >
           <div className="px-3 py-2 border-b border-neutral-100 dark:border-neutral-700">
-            <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">Account</p>
+            <p className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">{Name}</p>
             <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{email}</p>
           </div>
 
