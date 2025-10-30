@@ -15,7 +15,7 @@ const DetailRow = ({
   <div className="flex items-start gap-3">
     <span className="mt-0.5 text-slate-400 dark:text-gray-400 shrink-0">{icon}</span>
     <div className="min-w-0">
-      <p className="text-sm font-semibold text-slate-600 dark:text-gray-300">{label}</p>
+      <p className="text-sm w-full truncate font-semibold text-slate-600 dark:text-gray-300 ${valueClass}">{label}</p>
       {editable ? (
         <input
           type={type}
@@ -24,7 +24,7 @@ const DetailRow = ({
           className={`truncate text-sm w-full text-slate-900 dark:text-gray-100 ${valueClass} border border-slate-300 dark:border-gray-600 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400`}
         />
       ) : (
-        <p className={`truncate text-sm text-slate-900 w-fit dark:text-gray-100 ${valueClass}`}>{value}</p>
+        <p className={`truncate w-full text-sm text-slate-900 dark:text-gray-100 ${valueClass}`}>{value}</p>
       )}
     </div>
   </div>

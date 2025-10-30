@@ -42,10 +42,10 @@ function Profile() {
   );
 
   useEffect(() => {
-    if (showProfileData?.editable) {
+    if (showProfileData?.editable && !id) {
       setEditable(showProfileData.editable);
     }
-  }, [showProfileData]);
+  }, [showProfileData , id]);
 
   useEffect(() => {
     if (!getProfileData) return;
