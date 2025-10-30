@@ -10,6 +10,7 @@ export default function HeaderAvatar({
     { name: "Meetings", icon: "calendar", path: "/meetings", onclick },
     { name: "Chapter Info", icon: "building2", path: "/mychapter", onclick },
     { name: "Referral Slips", icon: "fileText", path: "/slips", onclick },
+    { name: "Notifications", icon: "messageSquareDot", path: "/allnotifications", onclick },
     { name: "Analytics", icon: "chartLine", path: "/analytics", onclick },
     { name: "Visitors", icon: "userPlus", path: "/visitors", onclick },
     { name: "Substitutes", icon: "clock4", path: "/subtitutes", onclick }

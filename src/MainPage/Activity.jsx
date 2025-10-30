@@ -1,28 +1,72 @@
-import ActivityButton from './Components/ActivityButton'
+import { useEffect, useMemo, useState } from 'react';
+import ActivityButton from './Components/ActivityButton';
 import ActivityP from './Components/ActivityP';
-import useFetch from '../hooks/useFetch';
+
+const TABS = [
+  { label: 'Lifetime', value: 'full' },
+  { label: '6 Months', value: '6months' },
+  { label: 'Month', value: 'amonth' },
+];
 
 function Activity() {
-  const Buttons = ['Month', '6 Months', 'Lifetime'].map((item, index) => (
-    <ActivityButton content={item} key={index} />
-  ));
+  const [activeTab, setActiveTab] = useState('full');
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const { data, loading, error } = useFetch(
-    `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/getactivity`,
-    {
-      method: "GET",
-      credentials: "include",
-    }
+  const base = import.meta.env.VITE_BACKEND_SERVER;
+  const url = useMemo(
+    () => `${base}/dashboard/getactivity/${activeTab}`,
+    [base, activeTab]
   );
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchActivity() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(url, { method: 'GET', credentials: 'include' });
+        if (!res.ok) {
+          const msg = `Request failed: ${res.status}`;
+          throw new Error(msg);
+        }
+        const json = await res.json();
+        if (!cancelled) setData(json);
+      } catch (err) {
+        if (!cancelled) {
+          setError(err?.message || 'Unknown error');
+          setData(null);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    fetchActivity();
+    return () => {
+      cancelled = true;
+    };
+  }, [url]);
+
+  const Buttons = TABS.map((tab) => (
+    <ActivityButton
+      key={tab.value}
+      content={tab.label}
+      onClick={() => setActiveTab(tab.value)}
+      active={activeTab === tab.value}
+    />
+  ));
+
   const ActivityPs = [
-    { content: "Referral Given", upcoming: 0 , actual: error ? "error" : loading ? "loading..." : data ? data.referral_given : -1 },
-    { content: "Referral Received", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.referral_received : -1 },
-    { content: "TYFTB Received", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.tyftb_received : -1 },
-    { content: "TYFTB Given", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.tyftb_given : -1 },
-    { content: "Business Made", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.business_made : -1 },
-    { content: "M to M", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.M2Ms : -1 },
-    { content: "Visitor", upcoming: 0, actual: error ? "error" : loading ? "loading..." : data ? data.Visitors : -1 },
+    { content: 'Referral Given', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.referral_given : -1 },
+    { content: 'Referral Received', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.referral_received : -1 },
+    { content: 'TYFTB Received', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.tyftb_received : -1 },
+    { content: 'TYFTB Given', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.tyftb_given : -1 },
+    { content: 'Business Made', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.business_made : -1 },
+    { content: 'M to M', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.M2Ms : -1 },
+    { content: 'Visitor', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.Visitors : -1 },
   ].map((props, index) => <ActivityP key={index} {...props} />);
 
   return (
@@ -53,19 +97,11 @@ function Activity() {
         </div>
       </div>
 
-      <div
-        className="
-          container
-          max-w-full
-          min-h-0
-          flex-1
-          overflow-auto
-        "
-      >
+      <div className="container max-w-full min-h-0 flex-1 overflow-auto">
         {ActivityPs}
       </div>
     </div>
-  )
+  );
 }
 
-export default Activity
+export default Activity;

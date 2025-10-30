@@ -15,6 +15,7 @@ import SignInPage from './SigninPage/SignInPage';
 import ProtectedRoute from './hooks/protectedRoute';
 import ResetPassword from './ResetPassword/ResetPassword';
 import AnimatedRoute from './hooks/AnimatedRoutes';
+import NotificationsPage from './NotificationPanel/NotificationsPage';
 
 import './index.css'
 
@@ -31,6 +32,7 @@ const router = createBrowserRouter([
       { path: '/settings', element: <AnimatedRoute><Settings /></AnimatedRoute> },
       { path: '/slips', element: <AnimatedRoute><FunctionalPage /></AnimatedRoute> },
       { path: '/profile', element: <AnimatedRoute><Profile /></AnimatedRoute> },
+      { path: '/allnotifications', element: <AnimatedRoute><NotificationsPage /></AnimatedRoute> },
     ]
   },
   { path: '/profile/:id', element: <AnimatedRoute><Profile /></AnimatedRoute> },
