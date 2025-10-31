@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import ActivityButton from './Components/ActivityButton';
 import ActivityP from './Components/ActivityP';
+import LoadingPage from '../Components/CircularLoading'
 
 const TABS = [
   { label: 'Lifetime', value: 'full' },
@@ -60,13 +61,13 @@ function Activity() {
   ));
 
   const ActivityPs = [
-    { content: 'Referral Given', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.referral_given : -1 },
-    { content: 'Referral Received', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.referral_received : -1 },
-    { content: 'TYFTB Received', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.tyftb_received : -1 },
-    { content: 'TYFTB Given', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.tyftb_given : -1 },
-    { content: 'Business Made', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.business_made : -1 },
-    { content: 'M to M', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.M2Ms : -1 },
-    { content: 'Visitor', upcoming: 0, actual: error ? 'error' : loading ? 'loading...' : data ? data.Visitors : -1 },
+    { content: 'Referral Given', upcoming: 0, actual: error ? 'error' : data ? data.referral_given : -1 },
+    { content: 'Referral Received', upcoming: 0, actual: error ? 'error' : data ? data.referral_received : -1 },
+    { content: 'TYFTB Received', upcoming: 0, actual: error ? 'error' : data ? data.tyftb_received : -1 },
+    { content: 'TYFTB Given', upcoming: 0, actual: error ? 'error' : data ? data.tyftb_given : -1 },
+    { content: 'Business Made', upcoming: 0, actual: error ? 'error' : data ? data.business_made : -1 },
+    { content: 'M to M', upcoming: 0, actual: error ? 'error' : data ? data.M2Ms : -1 },
+    { content: 'Visitor', upcoming: 0, actual: error ? 'error' : data ? data.Visitors : -1 },
   ].map((props, index) => <ActivityP key={index} {...props} />);
 
   return (
@@ -93,6 +94,10 @@ function Activity() {
           Activity
         </h2>
         <div className="buttonContainer flex gap-2">
+          {loading && 
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-red-400"></div>
+          </div>}
           {Buttons}
         </div>
       </div>

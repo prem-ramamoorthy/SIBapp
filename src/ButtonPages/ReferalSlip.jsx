@@ -5,12 +5,12 @@ import SelectButtons from "../Components/SelectButtons";
 import TextArea from "../Components/TextArea";
 import HeatScale from "../Components/HeatScale";
 import FilterButton from "../Members/Components/FilterButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getDate } from "../utils/getDate.mjs";
 import { X } from "lucide-react";
 import { sanitizeReferralData } from "../utils/slipsSanitization.mjs";
 
-function ButtonPage({ onClose = () => { } }) {
+function ButtonPage({ onClose = () => {} }) {
   const todaysDate = getDate();
 
   const [date, setDate] = useState(todaysDate);
@@ -28,6 +28,33 @@ function ButtonPage({ onClose = () => { } }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [response, setResponse] = useState(null);
+  const [username, setUsername] = useState("loading...");
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_BACKEND_SERVER}/auth/getuser`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+          }
+        );
+        const user = await res.json();
+        if (!cancelled && user?.username) {
+          setUsername(user.username);
+          setFrom(user.username);
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handler = async () => {
     setError(null);
@@ -49,20 +76,27 @@ function ButtonPage({ onClose = () => { } }) {
     };
 
     data = sanitizeReferralData(data);
+
     if (!data.referrer_username || !data.referee_username || !data.description) {
-      setError("Please fill in all required fields (*) .");
+      setError("Please fill in all required fields (*).");
+      return;
+    }
+    if (data.referral_type === "tier2" && !data.contact_name) {
+      setError("Contact Name is required for Tier 2 referrals.");
       return;
     }
 
     try {
       setLoading(true);
+
       const notificationData = {
         receiver: data.referee_username,
         sender: data.referrer_username,
         header: `New Referral Received from ${data.referrer_username}`,
         content: `Hello! You’ve been referred by ${data.referrer_username} : ${data.description}`,
-        read: false
-      }
+        read: false,
+      };
+
       await fetch(
         `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotification`,
         {
@@ -72,6 +106,7 @@ function ButtonPage({ onClose = () => { } }) {
           credentials: "include",
         }
       );
+
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_SERVER}/slips/referral/createreferral`,
         {
@@ -81,19 +116,24 @@ function ButtonPage({ onClose = () => { } }) {
           credentials: "include",
         }
       );
+
       const result = await res.json();
-      if (result?.errors || result?.message) {
-        const errMsg = result?.errors?.[0]
-          ? `${result?.errors?.[0].path} : ${result?.errors?.[0].msg}`
-          : (result?.message || "An error occurred.");
-        if (errMsg)
-          setError(errMsg);
-      }
-      else {
-        setResponse(result);
+
+      if (result?.errors || result?.message === "error" || result?.error) {
+        const errMsg =
+          result?.errors?.[0]
+            ? `${result?.errors?.[0].path} : ${result?.errors?.[0].msg}`
+            : result?.message || result?.error || "An error occurred.";
+        setError(String(errMsg));
+      } else {
+        const okText =
+          typeof result === "string"
+            ? result
+            : result?.message || "Referral created successfully.";
+        setResponse(okText);
       }
     } catch (err) {
-      setError(err.message);
+      setError(err?.message || "Network error.");
     } finally {
       setLoading(false);
     }
@@ -122,10 +162,11 @@ function ButtonPage({ onClose = () => { } }) {
           />
           <EntryField
             type="text"
-            placeholder="Your Name"
+            placeholder={username || "Loading..."}
             label="From *"
             value={from}
-            onChange={setFrom}
+            readOnly={true}
+            onChange={() => {}}
           />
         </div>
 
@@ -147,6 +188,7 @@ function ButtonPage({ onClose = () => { } }) {
             { name: "Tier 1 (Inside)", value: "tier1" },
             { name: "Tier 2 (Outside)", value: "tier2" },
           ]}
+          value={referralType}
           onChange={setReferralType}
         />
 
@@ -155,6 +197,7 @@ function ButtonPage({ onClose = () => { } }) {
             type="text"
             placeholder="Enter Contact Name"
             label="Contact Name *"
+            value={contactName}
             onChange={setContactName}
           />
         )}
@@ -165,6 +208,7 @@ function ButtonPage({ onClose = () => { } }) {
             { name: "Given Your Card", value: "given_card" },
             { name: "Told Them You Would Call", value: "told_to_call" },
           ]}
+          value={referralStatus}
           onChange={setReferralStatus}
         />
 
@@ -173,30 +217,42 @@ function ButtonPage({ onClose = () => { } }) {
             type="text"
             placeholder="Phone Number"
             label="Telephone *"
+            value={phone}
             onChange={setPhone}
           />
           <EntryField
             type="email"
             placeholder="Email Address"
             label="Email"
+            value={email}
             onChange={setEmail}
           />
         </div>
 
-        <TextArea label="Address" placeholder="Address Details..." onChange={setAddress} />
-        <TextArea label="Comments" placeholder="Additional comments..." onChange={setComments} />
+        <TextArea
+          label="Address"
+          placeholder="Address Details..."
+          value={address}
+          onChange={setAddress}
+        />
+        <TextArea
+          label="Comments"
+          placeholder="Additional comments..."
+          value={comments}
+          onChange={setComments}
+        />
 
-        <HeatScale onChange={setHeatScale} />
+        <HeatScale value={heatScale} onChange={setHeatScale} />
 
         {error && (
           <p className="rounded-md border px-3 py-2 text-sm border-red-300 bg-red-100 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
-            {error}
+            {String(error)}
           </p>
         )}
 
         {response && (
           <p className="rounded-md border px-3 py-2 text-sm border-green-300 bg-green-100 text-green-700 dark:border-green-700 dark:bg-green-900 dark:text-green-300">
-            {response}
+            {String(response)}
           </p>
         )}
 

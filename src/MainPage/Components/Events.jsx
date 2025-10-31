@@ -2,12 +2,11 @@ function Events({
   company = "The Future of AI in Everyday Life",
   date = "July 15, 2024",
   time = "3:00 PM - 4:00 PM",
-  vatNumber = "FBIOPENUP"
 }) {
   return (
     <div
       className="
-        event flex flex-wrap gap-2 px-4 overflow-auto
+        event flex flex-col gap-2 px-4 overflow-auto
         sm:px-6 lg:px-4 md:px-2 pb-4
         bg-white dark:bg-gray-800/5
         rounded-lg
@@ -21,9 +20,6 @@ function Events({
       <p className="text-gray-600 dark:text-gray-300">
         <span className="font-semibold text-gray-800 dark:text-gray-100">Date :</span> {date} |{" "}
         <span className="font-semibold text-gray-800 dark:text-gray-100">Time :</span> {time}
-      </p>
-      <p className="text-gray-600 dark:text-gray-300">
-        <span className="font-semibold text-gray-800 dark:text-gray-100">VAT Number :</span> {vatNumber}
       </p>
     </div>
   );

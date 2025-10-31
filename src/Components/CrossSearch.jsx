@@ -6,7 +6,8 @@ function CrossChapterSearch({
   placeholder = "Search username...",
   label = "To",
   offsubmit = false,
-  searchdomain = "searchuser"
+  searchdomain = "searchuser",
+  readonly = false
 }) {
   const [searchTerm, setSearchTerm] = useState(value || "");
   const [results, setResults] = useState([]);
@@ -87,6 +88,7 @@ function CrossChapterSearch({
       <div className="relative w-full">
         <input
           type="text"
+          readOnly={readonly}
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);

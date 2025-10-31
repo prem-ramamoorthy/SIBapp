@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import CrossChapterSearch from "../Components/CrossSearch";
 import EntryField from "../Components/EntryField";
 import TextArea from "../Components/TextArea";
@@ -11,7 +11,6 @@ function ButtonPage({ onClose = () => { } }) {
   const todaysDate = getDate();
 
   const [chapterName, setChapterName] = useState("");
-  const [invitedBy, setInvitedBy] = useState("");
   const [date, setDate] = useState(todaysDate);
   const [location, setLocation] = useState("");
   const [conversationTopic, setConversationTopic] = useState("");
@@ -19,6 +18,32 @@ function ButtonPage({ onClose = () => { } }) {
   const [error, setError] = useState(null);
   const [response, setResponse] = useState(null);
   const [member2Name, setMember2Name] = useState("");
+  const [username , setUsername] = useState("loading...") ;
+
+  useEffect(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const res = await fetch(
+            `${import.meta.env.VITE_BACKEND_SERVER}/auth/getuser`,
+            {
+              method: "GET",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+            }
+          );
+          const user = await res.json();
+          if (!cancelled && user?.username) {
+            setUsername(user.username);
+          }
+        } catch (e) {
+          console.log(e)
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, []);
 
   const handleSubmit = async () => {
     const formData = {
@@ -27,7 +52,7 @@ function ButtonPage({ onClose = () => { } }) {
       meeting_date: date,
       location: location,
       discussion_points: conversationTopic,
-      created_by_username: invitedBy
+      created_by_username: username
     }
 
     try {
@@ -90,17 +115,17 @@ function ButtonPage({ onClose = () => { } }) {
           </button>
         </div>
 
-        <CrossChapterSearch
-          label="Met with"
-          placeholder="Search a member"
-          onChange={setMember2Name}
-        />
+        <EntryField
+            placeholder={username}
+            label="Member - 1"
+            readOnly = {true }
+            type="text"
+          />
 
         <CrossChapterSearch
-          label="Enter Invited member name"
+          label="Member - 2"
           placeholder="Search a member"
-          onChange={setInvitedBy}
-          offsubmit={true}
+          onChange={setMember2Name}
         />
 
         <CrossChapterSearch
