@@ -1,6 +1,17 @@
 import { FilePlus } from 'lucide-react'
 import Helpful from './Helpful'
 
+function getPrimitive(val) {
+  if (
+    val &&
+    typeof val === 'object' &&
+    '$numberDecimal' in val
+  ) {
+    return Number(val.$numberDecimal)
+  }
+  return val
+}
+
 function ActivityP({
   content = 'Activity',
   upcoming = null,
@@ -16,7 +27,7 @@ function ActivityP({
           styles="num font-bold text-yellow-400 dark:text-yellow-300"
         />
         <Helpful
-          content={actual}
+          content={getPrimitive(actual)}
           content2={"Values approved by admin"}
           styles="actual font-bold text-gray-600 dark:text-gray-300"
         />

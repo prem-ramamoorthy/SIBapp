@@ -31,7 +31,31 @@ function ButtonPage({ onClose = () => { } }) {
 
     try {
       setLoading(true);
-
+      const user = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/auth/getuser`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+      const getuser = await user.json();
+      const notificationData = {
+        receiver: data.receiver_displayname,
+        sender: getuser.username,
+        header: `You've received the TYFTB from the user : ${getuser.username.toString()}`,
+        content: `Thankyou for the Business(TYFTB), I have earned ₹${data.business_amount} from your referral. Description : ${data.business_description} `,
+        read: false
+      }
+      await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotification`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(notificationData),
+          credentials: "include",
+        }
+      );
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_SERVER}/slips/tyftb/createtyftb`,
         {

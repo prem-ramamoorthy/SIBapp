@@ -32,7 +32,22 @@ function ButtonPage({ onClose = () => { } }) {
 
     try {
       setLoading(true);
-
+      const notificationData = {
+        receiver: formData.member2_name,
+        sender: formData.created_by_username,
+        header: `Upcoming Member-to-Member (M2M) Meeting ${formData.created_by_username}`,
+        content: `This is to notify you about the scheduled Member-to-Member (M2M) meeting by the user ${formData.created_by_username}. Topic of conversation :${formData.discussion_points}`,
+        read: false
+      }
+      await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotification`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(notificationData),
+          credentials: "include",
+        }
+      );
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_SERVER}/slips/one2one/createone2one`,
         {
@@ -43,7 +58,6 @@ function ButtonPage({ onClose = () => { } }) {
         }
       );
       const result = await res.json();
-      console.log(result);
       if (result?.errors || result?.message) {
         const errMsg = result?.errors?.[0]
           ? `${result?.errors?.[0].path} : ${result?.errors?.[0].msg}`

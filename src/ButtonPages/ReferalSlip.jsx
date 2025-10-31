@@ -10,7 +10,7 @@ import { getDate } from "../utils/getDate.mjs";
 import { X } from "lucide-react";
 import { sanitizeReferralData } from "../utils/slipsSanitization.mjs";
 
-function ButtonPage({ onClose = () => {} }) {
+function ButtonPage({ onClose = () => { } }) {
   const todaysDate = getDate();
 
   const [date, setDate] = useState(todaysDate);
@@ -56,7 +56,22 @@ function ButtonPage({ onClose = () => {} }) {
 
     try {
       setLoading(true);
-
+      const notificationData = {
+        receiver: data.referee_username,
+        sender: data.referrer_username,
+        header: `New Referral Received from ${data.referrer_username}`,
+        content: `Hello! You’ve been referred by ${data.referrer_username} : ${data.description}`,
+        read: false
+      }
+      await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotification`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(notificationData),
+          credentials: "include",
+        }
+      );
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_SERVER}/slips/referral/createreferral`,
         {
@@ -67,14 +82,14 @@ function ButtonPage({ onClose = () => {} }) {
         }
       );
       const result = await res.json();
-      if(result?.errors || result?.message) {
+      if (result?.errors || result?.message) {
         const errMsg = result?.errors?.[0]
           ? `${result?.errors?.[0].path} : ${result?.errors?.[0].msg}`
           : (result?.message || "An error occurred.");
-        if(errMsg)
-        setError(errMsg);
+        if (errMsg)
+          setError(errMsg);
       }
-      else{
+      else {
         setResponse(result);
       }
     } catch (err) {
