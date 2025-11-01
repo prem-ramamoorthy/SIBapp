@@ -5,7 +5,7 @@ function FullActivity() {
     date: "20 sept 2025",
     type: "TYFCB",
     direction: "Given",
-    name: "yonesh",
+    name: "yonesh Murugan",
     detail: "Hi hello everyone how are you",
     status: "Approved",
   };
