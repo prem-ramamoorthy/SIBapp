@@ -6,10 +6,10 @@ import Loading from "../Components/Loading";
 import { useEffect, useState } from "react";
 
 const coordinators = [
-  { name: "Alice Sharma", role: "Lead Coordinator" },
-  { name: "Rahul Verma", role: "Co-Coordinator" },
-  { name: "Priya Singh", role: "Support" },
-  { name: "Karan Patel", role: "Volunteer" },
+  { name: "Yogibalu", role: "President" },
+  { name: "Kumaresavel", role: "Vice President" },
+  { name: "Siva Chalapathy", role: "Secretary" },
+  { name: "K.Devi", role: "Treasurer" },
 ];
 
 function UpcomingEvents() {
