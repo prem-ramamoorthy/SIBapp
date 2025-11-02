@@ -7,6 +7,7 @@ const Chip = ({
   editable,
   onChange,
   onDelete,
+  isvertical,
 }) => {
   const [inputValue, setInputValue] = useState(children);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -51,7 +52,7 @@ const Chip = ({
             className="bg-transparent w-full focus:outline-none"
             autoComplete="off"
           />
-          {showDropdown && (
+          {isvertical && showDropdown && (
             <div className="absolute z-20 top-full left-0 w-full bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded mt-0.5 shadow-xl max-h-40 overflow-auto">
               {filteredOptions.length > 0 ? (
                 filteredOptions.map((val) => (

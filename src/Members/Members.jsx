@@ -1,55 +1,83 @@
+import { useEffect, useState, useCallback } from "react";
 import Header from "../MainPage/Header";
 import MemberList from "./Components/MemberList";
 import DirectoryFilters from "./DirectoryFilter";
+import ErrorComponent from "./Components/Error";
+import useFetch from "../hooks/useFetch";
+import HalfPageLoader from "./Components/Loader";
+
+const getQueryString = filters => {
+  const params = new URLSearchParams();
+  if (filters.region && filters.region !== "All Regions") params.append("region", filters.region);
+  if (filters.chapter && filters.chapter !== "All Chapters") params.append("chapter", filters.chapter);
+  if (filters.vertical && filters.vertical !== "All Verticals") params.append("vertical", filters.vertical);
+  if (filters.sort) params.append("sort", filters.sort);
+  if (filters.myChapterOnly) params.append("myChapterOnly", "true");
+  return params.toString() ? `?${params.toString()}` : "";
+};
 
 function Members() {
-  const members = [
-    {
-      img: "/assets/19.jpg",
-      bg: "O+",
-      name: "Yonesh Murugan",
-      vertical: "IT Professional",
-      tag: "Photography and Services",
-      chapter: "Alpha Chapter",
-      region: "Erode",
-    },
-    {
-      img: "/assets/19.jpg",
-      bg: "O+",
-      name: "Arun",
-      vertical: "IT Professional",
-      tag: "Photography and Services",
-      chapter: "Alpha Chapter",
-      region: "Erode",
-    },
-    {
-      img: "/assets/19.jpg",
-      bg: "O+",
-      name: "Prem",
-      vertical: "IT Professional",
-      tag: "Photography and Services",
-      chapter: "Alpha Chapter",
-      region: "Erode",
-    },
-    {
-      img: "/assets/19.jpg",
-      bg: "O+",
-      name: "Lokesh",
-      vertical: "IT Professional",
-      tag: "Photography and Services",
-      chapter: "Alpha Chapter",
-      region: "Erode",
-    },
-    {
-      img: "/assets/19.jpg",
-      bg: "O+",
-      name: "Lokesh",
-      vertical: "IT Professional",
-      tag: "Photography and Services",
-      chapter: "Alpha Chapter",
-      region: "Erode",
-    },
-  ];
+  const [region, setRegion] = useState("All Regions");
+  const [chapter, setChapter] = useState("All Chapters");
+  const [vertical, setVertical] = useState("All Verticals");
+  const [myChapterOnly, setMyChapterOnly] = useState(false);
+  const [sort, setSort] = useState("Name A-Z");
+  const [filters, setFilters] = useState({
+    region: "All Regions",
+    chapter: "All Chapters",
+    vertical: "All Verticals",
+    myChapterOnly: false,
+    sort: "Name A-Z"
+  });
+
+  const { data: verticalnamesRaw } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/admin/vertical/getallverticals`
+  );
+  const { data: chapternamesRaw } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/chapter/main/getallchapternames`
+  );
+  const { data: regionnamesRaw } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/admin/region/getallregions`
+  );
+
+  const verticalnames = Array.isArray(verticalnamesRaw) ? verticalnamesRaw : [];
+  const chapternames = Array.isArray(chapternamesRaw) ? chapternamesRaw : [];
+  const regionnames = Array.isArray(regionnamesRaw) ? regionnamesRaw : [];
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const query = getQueryString(filters);
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/profile/getallprofiles${query}`,
+        { method: "GET", credentials: "include" }
+      );
+      if (!response.ok) throw new Error("Failed to fetch profiles");
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      setError(err.message || "Error fetching data");
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [filters]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleFilterChange = filters => setFilters(filters);
+  const handleClear = resetFilters => setFilters(resetFilters);
+
+  const regionOptions = ["All Regions", ...regionnames];
+  const chapterOptions = ["All Chapters", ...chapternames];
+  const verticalOptions = ["All Verticals", ...verticalnames];
 
   return (
     <div className="flex flex-col items-center justify-start w-full min-h-screen bg-gray-50 dark:bg-gray-950 transition-colors duration-300">
@@ -63,11 +91,28 @@ function Members() {
         </h1>
 
         <section className="w-full mb-1">
-          <DirectoryFilters />
+          <DirectoryFilters
+            region={region} setRegion={setRegion}
+            regions={regionOptions}
+            chapter={chapter} setChapter={setChapter}
+            chapters={chapterOptions}
+            vertical={vertical} setVertical={setVertical}
+            verticals={verticalOptions}
+            myChapterOnly={myChapterOnly} setMyChapterOnly={setMyChapterOnly}
+            sort={sort} setSort={setSort}
+            onChange={handleFilterChange}
+            onClear={handleClear}
+          />
         </section>
 
-        <section className="w-full">
-          <MemberList members={members} />
+        <section className="w-full h-full">
+          {loading ? (
+            <HalfPageLoader />
+          ) : error ? (
+            <ErrorComponent message={error} />
+          ) : (
+            <MemberList members={data} />
+          )}
         </section>
       </main>
     </div>

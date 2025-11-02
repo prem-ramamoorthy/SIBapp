@@ -43,6 +43,12 @@ const EditableField = ({
   </div>
 );
 
+const normalizeUrl = (url) => {
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url)) return url;
+  return `https://${url}`;
+};
+
 const EditableWeblink = ({ label, url, editable, onChange }) => (
   <div className="space-y-0.5 overflow-x-clip">
     <p className="text-[11px] font-semibold tracking-wide text-slate-500 dark:text-gray-400">
@@ -56,7 +62,14 @@ const EditableWeblink = ({ label, url, editable, onChange }) => (
         className="truncate text-sm w-full text-slate-900 dark:text-gray-100 border border-slate-300 dark:border-gray-600 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
     ) : (
-      <a className="text-sm w-full text-blue-500" href={url} target="_blank" rel="noopener noreferrer">{url}</a>
+      <a
+        className="text-sm w-full text-blue-500"
+        href={normalizeUrl(url)}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {url}
+      </a>
     )}
   </div>
 );
