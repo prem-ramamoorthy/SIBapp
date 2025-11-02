@@ -28,7 +28,7 @@ const MemberList = ({ members }) => {
             region: member.region,
           }} profileurl="" contactdetails={
             { company_phone: member.company_phone, company_email: member.company_email, company_address: member.company_address }
-          } culturaldetails={{vagai_category : member.vagai_category , kulam_category : member.kulam_category , native_place : member.native_place , kuladeivam : member.kuladeivam}} link={`${import.meta.env.VITE_BACKEND_SERVER}/profile/${member._id}?user=${member.user._id}`} />
+          } culturaldetails={{vagai_category : member.vagai_category , kulam_category : member.kulam_category , native_place : member.native_place , kuladeivam : member.kuladeivam}} link={`${window.location.origin}/profile/${member._id}?user=${member.user._id}`} />
         ))}
       </div>
 
