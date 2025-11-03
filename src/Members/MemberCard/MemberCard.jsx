@@ -18,7 +18,7 @@ function MemberCard({
       <div className="bg-white dark:bg-gray-800 h-[370px] w-full rounded-t-[2rem] rounded-b-2xl flex flex-col justify-start items-center transition-colors duration-300">
         <div className="relative h-[140px] w-[140px] bg-gray-300 dark:bg-gray-700 rounded-full -top-[60px] shadow-2xl border-3 border-gray-400 dark:border-gray-600">
           <img
-            src="../../../public/assets/19.jpg"
+            src="/assets/19.jpg"
             alt= " image NotFound"
             className="h-full w-[200px] rounded-full object-cover object-top"
           />
@@ -55,7 +55,7 @@ function MemberCard({
 
         <div className="flex flex-row justify-between w-full gap-3 mt-2 relative -top-[30px]">
           <ModalViewer contactdetails = {contactdetails} />
-          <NavLink to={link} className="h-[40px] cursor-pointer w-1/2 bg-white dark:bg-gray-400 p-1 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-600 border-2 text-[12px] font-bold border-gray-400 dark:border-gray-600 transition-colors duration-300 mr-4">
+          <NavLink to={link} className="h-[40px] cursor-pointer w-1/2 bg-white dark:bg-gray-400 p-1 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-600 border-2 pl-4 pt-2 text-[12px] font-bold border-gray-400 dark:border-gray-600 transition-colors duration-300 mr-4">
             View Profile
           </NavLink>
         </div>
