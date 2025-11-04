@@ -4,9 +4,10 @@ function Stats({
   header = "Activity Details",
   items = [
     { name: "Referrals Given", value: 23 },
-    { name: "Referrals Given", value: 23 },
-    { name: "Referrals Given", value: 23 },
-    { name: "Referrals Given", value: 23 },
+    { name: "Referrals Received", value: 23 },
+    { name: "TYFTB Given", value: 23 },
+    { name: "TYFTB Received", value: 23 },
+    { name: "M2M Attended", value: 23 },
   ],
 }) {
   const StatItems = items.map((element, index) => (

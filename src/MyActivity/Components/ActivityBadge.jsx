@@ -73,19 +73,28 @@ const colorBg300Half = {
 };
 
 function ActivityBadge({
-  color,
   content,
   border = 0,
   font = "semibold",
   cursor = "no-drop",
   className,
 }) {
+
+  const contentType = {
+    M2M: ["pink", "pink"],
+    TYFTB: ["green", "green"],
+    REFERRAL: ["orange", "orange"],
+    Approved : ["green", "green"] ,
+    Completed : ['blue' , 'blue']
+  }
+
+  const colors = contentType[content] || ['gray', 'gray'];
   return (
     <button
       className={clsx(
         "w-[120px] text-nowrap text-center mx-2 overflow-x-hidden rounded-lg p-1 mb-1 border-amber-500 transition-colors duration-300 dark:text-amber-50",
-        colorText800[color],
-        colorBg300Half[color],
+        colorText800[colors[1]],
+        colorBg300Half[colors[0]],
         fontMap[font],
         cursorMap[cursor],
         borderWidthMap[border],

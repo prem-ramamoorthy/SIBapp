@@ -2,15 +2,12 @@ import { Download } from "lucide-react";
 import React from "react";
 import DateField from "./Components/DateField";
 
-function Hero() {
-  const [value, setValue] = React.useState("all");
-  const [startDate, setStartDate] = React.useState("2025-09-25");
-  const [endDate, setEndDate] = React.useState("2025-09-25");
+function Hero({ value, setValue =()=>{}, startDate, endDate, setStartDate=()=>{}, setEndDate=()=>{} }) {
 
   const options = [
     { value: "all", label: "All" },
-    { value: "tyfcb", label: "TYFCB" },
-    { value: "one_to_one", label: "One to One" },
+    { value: "tyftb", label: "TYFTB" },
+    { value: "m2m", label: "One to One" },
     { value: "referral", label: "Referral" },
   ];
 
