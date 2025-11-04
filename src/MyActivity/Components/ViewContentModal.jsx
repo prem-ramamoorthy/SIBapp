@@ -83,13 +83,11 @@ export function ModalViewer({ content = {} }) {
 
     const renderTYFTB = (data) => (
         <div className="space-y-4">
-            {/* ID Section */}
             <div className="pb-4 border-b-2 border-amber-300">
                 <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide">TYFTB Slip ID</p>
                 <p className="font-mono text-base text-gray-900 dark:text-gray-100 mt-1">{safeGet(data, '_id')}</p>
             </div>
 
-            {/* Payer Details */}
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700">
                 <div className="flex items-center gap-2 mb-3">
                     <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -107,7 +105,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Receiver Details */}
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-red-200 dark:border-red-700">
                 <div className="flex items-center gap-2 mb-3">
                     <User className="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -125,7 +122,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Transaction Amount */}
             <div className="rounded-lg p-4 bg-gradient-to-br from-red-50 to-red-100 dark:from-gray-800 dark:to-gray-900 border-2 border-red-300 dark:border-red-600">
                 <div className="flex items-center gap-2 mb-2">
                     <DollarSign className="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -136,7 +132,6 @@ export function ModalViewer({ content = {} }) {
                 </p>
             </div>
 
-            {/* Business Details */}
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700">
                 <div className="flex items-center gap-2 mb-3">
                     <Tag className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -158,7 +153,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Footer Info */}
             <div className="rounded-lg p-4 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 grid grid-cols-2 gap-4">
                 <div>
                     <div className="flex items-center gap-2 mb-1">
@@ -177,7 +171,6 @@ export function ModalViewer({ content = {} }) {
 
     const renderReferral = (data) => (
         <div className="space-y-4">
-            {/* ID & Status Section */}
             <div className="pb-4 border-b-2 border-amber-300">
                 <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Referral ID</p>
                 <p className="font-mono text-base text-gray-900 dark:text-gray-100 mt-1 mb-3">{safeGet(data, '_id')}</p>
@@ -196,7 +189,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Hot Status */}
             {data.hot && data.hot !== 'N/A' && (
                 <div className="rounded-lg p-3 bg-red-50 dark:bg-red-900 border-2 border-red-300 dark:border-red-700">
                     <div className="flex items-center gap-2">
@@ -208,7 +200,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             )}
 
-            {/* Referrer Details */}
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700">
                 <div className="flex items-center gap-2 mb-3">
                     <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -226,7 +217,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Referee Details */}
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-red-200 dark:border-red-700">
                 <div className="flex items-center gap-2 mb-3">
                     <User className="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -244,7 +234,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Contact Information */}
             <div className="rounded-lg p-4 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
                 <h3 className="font-bold text-gray-900 dark:text-white mb-3">Contact Information</h3>
                 <div className="space-y-2">
@@ -275,7 +264,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Referral Details */}
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700">
                 <h3 className="font-bold text-gray-900 dark:text-white mb-3">Referral Details</h3>
                 <div className="space-y-3">
@@ -290,7 +278,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Footer */}
             <div className="rounded-lg p-4 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 grid grid-cols-2 gap-4">
                 <div>
                     <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Created</p>
@@ -306,13 +293,11 @@ export function ModalViewer({ content = {} }) {
 
     const renderM2M = (data) => (
         <div className="space-y-4">
-            {/* ID Section */}
             <div className="pb-4 border-b-2 border-amber-300">
                 <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Meeting ID</p>
                 <p className="font-mono text-base text-gray-900 dark:text-gray-100 mt-1">{safeGet(data, '_id')}</p>
             </div>
 
-            {/* Member 1 */}
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700">
                 <div className="flex items-center gap-2 mb-3">
                     <Users className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -330,7 +315,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Member 2 */}
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-red-200 dark:border-red-700">
                 <div className="flex items-center gap-2 mb-3">
                     <Users className="w-5 h-5 text-red-600 dark:text-red-400" />
@@ -348,14 +332,12 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Created By */}
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700">
                 <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase mb-2">Created By</p>
                 <p className="text-sm text-gray-900 dark:text-gray-100 font-bold">{safeGet(data, 'created_by.name')}</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">{safeGet(data, 'created_by.email')}</p>
             </div>
 
-            {/* Meeting Details */}
             <div className="rounded-lg p-4 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
                 <div className="space-y-4">
                     <div>
@@ -384,7 +366,6 @@ export function ModalViewer({ content = {} }) {
                 </div>
             </div>
 
-            {/* Footer */}
             <div className="rounded-lg p-4 bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 grid grid-cols-2 gap-4">
                 <div>
                     <div className="flex items-center gap-2 mb-1">
@@ -436,7 +417,7 @@ export function ModalViewer({ content = {} }) {
         <>
             <Button
                 onClick={() => setOpenModal(true)}
-                className="h-[40px] cursor-pointer w-[140px] text-nowrap bg-amber-500 hover:bg-amber-600 p-2 rounded-lg border-0 text-[12px] font-bold text-white transition-all duration-200 shadow-md hover:shadow-lg ml-4"
+                className="h-[40px] cursor-pointer w-[130px] text-nowrap bg-amber-500 hover:bg-amber-600 rounded-lg border-0 text-[12px] font-bold text-white transition-all duration-200 shadow-md hover:shadow-lg ml-4"
             >
                 View Details
             </Button>

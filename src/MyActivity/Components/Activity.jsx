@@ -28,7 +28,7 @@ function Activity(
     ));
 
     return (
-      <div className="ml-2 sticky top-0 heade flex flex-row justify-around border-b border-gray-400 dark:border-gray-600 pt-4 px-2 pb-3 bg-gray-200 dark:bg-gray-900 rounded-t-2xl w-max items-center lg:w-full xl:w-full transition-colors duration-300">
+      <div className="ml-2 z-10 sticky top-0 heade flex flex-row justify-around border-b border-gray-400 dark:border-gray-600 pt-4 px-2 pb-3 bg-gray-200 dark:bg-gray-900 rounded-t-2xl w-max items-center lg:w-full xl:w-full transition-colors duration-300">
         {HeaderComponent}
       </div>
     );

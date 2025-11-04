@@ -31,7 +31,6 @@ function MyActivity() {
 
     if (apiData.tyftb && Array.isArray(apiData.tyftb)) {
       apiData.tyftb.forEach(item => {
-        console.log(item)
         formatted.push({
           date: item.created_at ? new Date(item.created_at).toLocaleDateString('en-GB', { 
             day: '2-digit', 

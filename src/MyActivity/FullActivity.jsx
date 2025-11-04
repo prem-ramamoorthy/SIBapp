@@ -20,7 +20,6 @@ function FullActivity( {data = [
 ]} ) {
 
   const ActivityComponents = data.map((activity , index) => {
-    console.log(activity.fullDetails)
     return (<Activity content={activity} key={index}/>)
   });
 
