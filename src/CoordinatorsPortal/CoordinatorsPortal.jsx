@@ -1,11 +1,9 @@
-import Header from '../MainPage/Header'
+import Header from "../MainPage/Header"
 
-function CoordinatorsPortal() {
+function Coordinatorsportal() {
   return (
-    <div className='pt-2'>
-      <Header />
-    </div>
+    <Header />
   )
 }
 
-export default CoordinatorsPortal
+export default Coordinatorsportal

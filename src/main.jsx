@@ -17,7 +17,8 @@ import ResetPassword from './ResetPassword/ResetPassword';
 import AnimatedRoute from './hooks/AnimatedRoutes';
 import NotificationsPage from './NotificationPanel/NotificationsPage';
 import PresidentPortal from './PresidentPortal/PresidentPortal';
-import CoordinatorsPortal from './CoordinatorsPortal/CoordinatorsPortal';
+import MembersAnalytics from './MembersAnalytics/MembersAnalytics';
+import Coordinatorsportal from './Coordinatorsportal/Coordinatorsportal';
 
 import './index.css'
 
@@ -36,7 +37,8 @@ const router = createBrowserRouter([
       { path: '/profile', element: <AnimatedRoute><Profile /></AnimatedRoute> },
       { path: '/allnotifications', element: <AnimatedRoute><NotificationsPage /></AnimatedRoute> },
       { path: '/presidentportal', element: <AnimatedRoute><PresidentPortal /></AnimatedRoute> },
-      { path: '/coordinatorsportal', element: <AnimatedRoute><CoordinatorsPortal /></AnimatedRoute> },
+      { path: '/memberdetailedanalytics', element: <AnimatedRoute><MembersAnalytics /></AnimatedRoute> },
+      { path: '/coordinatorsportal', element: <AnimatedRoute><Coordinatorsportal /></AnimatedRoute> },
     ]
   },
   { path: '/profile/:id', element: <AnimatedRoute><Profile /></AnimatedRoute> },

@@ -12,8 +12,8 @@ export default function HeaderAvatar({
     { name: "Referral Slips", icon: "fileText", path: "/slips", onclick },
     { name: "Notifications", icon: "messageSquareDot", path: "/allnotifications", onclick },
     { name: "President Portal", icon: "users", path: "/presidentportal", onclick },
-    { name: "Coordinators Portal", icon: "users", path: "/Coordinatorsportal", onclick },
-    { name: "Analytics", icon: "chartLine", path: "/analytics", onclick },
+    { name: "Coordinators Portal", icon: "users", path: "/coordinatorsportal", onclick },
+    { name: "Members Analytics", icon: "chartLine", path: "/memberdetailedanalytics", onclick },
     { name: "Visitors", icon: "userPlus", path: "/visitors", onclick },
     { name: "Substitutes", icon: "clock4", path: "/subtitutes", onclick }
   ]
