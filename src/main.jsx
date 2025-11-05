@@ -18,7 +18,7 @@ import AnimatedRoute from './hooks/AnimatedRoutes';
 import NotificationsPage from './NotificationPanel/NotificationsPage';
 import PresidentPortal from './PresidentPortal/PresidentPortal';
 import MembersAnalytics from './MembersAnalytics/MembersAnalytics';
-import Coordinatorsportal from './Coordinatorsportal/Coordinatorsportal';
+import Coordinatorsportal from './Coordinatorsportal/Coordinatorsportalpage';
 
 import './index.css'
 
