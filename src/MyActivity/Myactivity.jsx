@@ -190,6 +190,7 @@ function MyActivity() {
             endDate={endDate}
             setStartDate={setStartDate}
             setEndDate={setEndDate}
+            userdata={fullactivitydata}
           />
         </section>
 

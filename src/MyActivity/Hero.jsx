@@ -1,8 +1,42 @@
 import { Download } from "lucide-react";
-import React from "react";
 import DateField from "./Components/DateField";
 
-function Hero({ value, setValue =()=>{}, startDate, endDate, setStartDate=()=>{}, setEndDate=()=>{} }) {
+function downloadJsonAsCsvExcludingFullDetails(jsonData, filename = "user_activities.csv") {
+  if (!jsonData || !jsonData.length) {
+    alert("No data to download");
+    return;
+  }
+  const headers = Object.keys(jsonData[0]).filter(h => h !== "fullDetails");
+
+  const csvRows = [];
+  csvRows.push(headers.join(","));
+
+  jsonData.forEach(item => {
+    const values = headers.map(header => {
+      const value = item[header];
+      const escaped = (value === undefined || value === null) ? "" : ("" + value).replace(/"/g, '""');
+      return `"${escaped}"`;
+    });
+    csvRows.push(values.join(","));
+  });
+
+  const csvString = csvRows.join("\n");
+
+  const blob = new Blob([csvString], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+
+  document.body.appendChild(link);
+  link.click();
+
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+
+function Hero({ value, setValue = () => { }, startDate, endDate, setStartDate = () => { }, setEndDate = () => { } , userdata }) {
 
   const options = [
     { value: "all", label: "All" },
@@ -51,6 +85,7 @@ function Hero({ value, setValue =()=>{}, startDate, endDate, setStartDate=()=>{}
         <DateField value={endDate} handler={setEndDate} />
         <button
           className="border rounded-xl bg-amber-300 dark:bg-amber-500 py-2 m-2 font-bold flex px-5 flex-row gap-4 hover:bg-amber-300/80 dark:hover:bg-amber-500/80 justify-center text-gray-900 dark:text-gray-900 transition-colors duration-300"
+          onClick={() => downloadJsonAsCsvExcludingFullDetails(userdata)}
         >
           <Download />
           <p>Download CSV</p>

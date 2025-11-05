@@ -2,13 +2,22 @@ import { HeaderAvatar } from './Components/Avatar';
 import Sidebar from './SideBar/SideBar';
 import NotificationPanel from '../NotificationPanel/Notification';
 import useFetch from '../hooks/useFetch';
-import CircularLoading from '../Components/CircularLoading';
+import Loader from '../Members/Components/Loader';
 import ErrorComponent from '../Components/ErrorComponent';
+import CircularLoading from '../Components/CircularLoading'
 
 function Header() {
 
   const { data, loading, error } = useFetch(
     `${import.meta.env.VITE_BACKEND_SERVER}/auth/getuser`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
+  const { data : chapterName , loading : loading2 , error : error2 } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/getchapteroverview`,
     {
       method: "GET",
       credentials: "include",
@@ -73,7 +82,7 @@ function Header() {
             hidden lg:inline-block md:inline-block xl:inline-block
           "
         >
-          Chapter Name
+          {loading2 ? <Loader /> : error2 ? <ErrorComponent /> : chapterName ? chapterName.chapterName  : "chaptername" }
         </h1>
         {loading ? <CircularLoading /> : error ? <ErrorComponent /> : data ? <HeaderAvatar
           initials = {getInitials(data.username)}
