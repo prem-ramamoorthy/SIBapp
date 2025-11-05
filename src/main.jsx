@@ -16,6 +16,8 @@ import ProtectedRoute from './hooks/protectedRoute';
 import ResetPassword from './ResetPassword/ResetPassword';
 import AnimatedRoute from './hooks/AnimatedRoutes';
 import NotificationsPage from './NotificationPanel/NotificationsPage';
+import PresidentPortal from './PresidentPortal/PresidentPortal';
+import CoordinatorsPortal from './CoordinatorsPortal/CoordinatorsPortal';
 
 import './index.css'
 
@@ -33,6 +35,8 @@ const router = createBrowserRouter([
       { path: '/slips', element: <AnimatedRoute><FunctionalPage /></AnimatedRoute> },
       { path: '/profile', element: <AnimatedRoute><Profile /></AnimatedRoute> },
       { path: '/allnotifications', element: <AnimatedRoute><NotificationsPage /></AnimatedRoute> },
+      { path: '/presidentportal', element: <AnimatedRoute><PresidentPortal /></AnimatedRoute> },
+      { path: '/coordinatorsportal', element: <AnimatedRoute><CoordinatorsPortal /></AnimatedRoute> },
     ]
   },
   { path: '/profile/:id', element: <AnimatedRoute><Profile /></AnimatedRoute> },
