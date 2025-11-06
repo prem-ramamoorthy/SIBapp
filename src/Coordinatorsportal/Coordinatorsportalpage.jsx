@@ -1,8 +1,17 @@
 import Header from "../MainPage/Header"
+import LowAttendanceAlert from "./components/LowAttendanceAlert"
+import MemberActivityReport from "./components/MemberActivityReport"
+import SiteButton from "./components/SiteButton"
 
 function Coordinatorsportal() {
   return (
-    <Header />
+    <div className="min-h-screen w-full  transition-colors duration-300">
+      <div className="fixed top-2 left-0 right-0 z-50  shadow-md">
+        <Header />
+      </div>
+      <MemberActivityReport />
+      <LowAttendanceAlert />
+    </div>
   )
 }
 

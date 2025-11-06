@@ -1,6 +1,5 @@
 import SiteButtonUI from "./Components/SiteButtonUI"
 import useFetch from "../hooks/useFetch";
-import Loading from "../Components/Loading";
 
 function SiteInfo() {
   const { data, loading, error } = useFetch(
