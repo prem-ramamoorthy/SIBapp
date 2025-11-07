@@ -5,10 +5,6 @@ const AlertSystem = ({ onAlertSent }) => {
     type: "Announcement",
     title: "",
     message: "",
-    recipients: {
-      allMembers: true,
-      coordinators: false,
-    },
     notificationMethods: {
       email: true,
       sms: false,
@@ -31,16 +27,6 @@ const AlertSystem = ({ onAlertSent }) => {
     }))
   }
 
-  const handleRecipientChange = (recipient) => {
-    setFormData(prev => ({
-      ...prev,
-      recipients: {
-        ...prev.recipients,
-        [recipient]: !prev.recipients[recipient]
-      }
-    }))
-  }
-
   const handleNotificationChange = (method) => {
     setFormData(prev => ({
       ...prev,
@@ -58,10 +44,6 @@ const AlertSystem = ({ onAlertSent }) => {
     }
     if (!formData.message.trim()) {
       setError('Alert message is required')
-      return false
-    }
-    if (!formData.recipients.allMembers && !formData.recipients.coordinators) {
-      setError('Please select at least one recipient group')
       return false
     }
     if (!formData.notificationMethods.email && !formData.notificationMethods.sms) {
@@ -89,10 +71,6 @@ const AlertSystem = ({ onAlertSent }) => {
         type: "Announcement",
         title: "",
         message: "",
-        recipients: {
-          allMembers: true,
-          coordinators: false,
-        },
         notificationMethods: {
           email: true,
           sms: false,
@@ -101,6 +79,7 @@ const AlertSystem = ({ onAlertSent }) => {
       
       onAlertSent?.()
     } catch (err) {
+      console.log(err)
       setError('Failed to send alert')
     } finally {
       setLoading(false)
@@ -120,7 +99,8 @@ const AlertSystem = ({ onAlertSent }) => {
       setSuccess('Alert scheduled successfully!')
       setTimeout(() => setSuccess(null), 3000)
     } catch (err) {
-      setError('Failed to schedule alert')
+      console.log(err)
+      setError('Failed to schedule alert :')
     } finally {
       setLoading(false)
     }
@@ -212,32 +192,6 @@ const AlertSystem = ({ onAlertSent }) => {
             transition-all duration-200 resize-none
           "
         />
-      </div>
-
-      <div className="mb-6">
-        <label className="block mb-3 font-semibold text-gray-800 dark:text-gray-200 text-sm">
-          Recipients:
-        </label>
-        <div className="flex flex-wrap gap-4 sm:gap-6">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input 
-              type="checkbox" 
-              checked={formData.recipients.allMembers} 
-              onChange={() => handleRecipientChange('allMembers')}
-              className="accent-blue-500 scale-110"
-            />
-            <span className="text-gray-900 dark:text-gray-100 text-sm">All Members</span>
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input 
-              type="checkbox" 
-              checked={formData.recipients.coordinators} 
-              onChange={() => handleRecipientChange('coordinators')}
-              className="accent-blue-500 scale-110"
-            />
-            <span className="text-gray-900 dark:text-gray-100 text-sm">Coordinators Only</span>
-          </label>
-        </div>
       </div>
 
       <div className="mb-8">

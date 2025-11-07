@@ -1,7 +1,7 @@
 import React from "react"
 
 const EventCard = ({
-  id = null,
+  id = "" ,
   title = 'Workshop - "The Future of AI"',
   date = "15 Nov 2025",
   time = "3:00 PM",
@@ -41,6 +41,7 @@ const EventCard = ({
         ${onClick ? 'cursor-pointer hover:scale-105' : ''}
         flex flex-col gap-3
       `}
+      key={id}
     >
       <div className="flex items-center justify-between gap-2">
         <span className={`

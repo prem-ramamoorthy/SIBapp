@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import EventCard from './components/EventCard'
 import SIBbutton from './components/SIBbutton'
+import CreateEvent from './components/CreateEvent'
 
 function EventManagement({ refreshTrigger }) {
   const [events, setEvents] = useState([
@@ -82,12 +83,7 @@ function EventManagement({ refreshTrigger }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-          <SIBbutton 
-            content="Create New Event" 
-            onClick={handleCreateEvent}
-            disabled={loading}
-
-          />
+          <CreateEvent />
           <SIBbutton 
             content="View All Events" 
             onClick={handleViewAllEvents}

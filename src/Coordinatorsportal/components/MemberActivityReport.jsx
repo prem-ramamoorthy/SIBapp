@@ -2,15 +2,15 @@ import { useState, useMemo } from 'react'
 import SiteButton from "./SiteButton"
 
 const TABLE_COLUMNS = [
-    { key: 'rank', label: 'RANK', sortable: true, width: 'w-12' },
-    { key: 'name', label: 'MEMBER NAME', sortable: true, width: 'flex-1 min-w-[140px]' },
-    { key: 'company', label: 'COMPANY', sortable: true, width: 'flex-1 min-w-[150px]' },
-    { key: 'referralsGiven', label: 'REFERRALS GIVEN', sortable: true, width: 'w-24' },
-    { key: 'businessMade', label: 'BUSINESS MADE', sortable: true, width: 'w-28' },
-    { key: 'visitorsBrought', label: 'VISITORS BROUGHT', sortable: true, width: 'w-24' },
-    { key: 'mToM', label: 'M TO M', sortable: true, width: 'w-16' },
-    { key: 'approvalStatus', label: 'APPROVAL STATUS', sortable: true, width: 'w-32' },
-    { key: 'attendance', label: 'ATTENDANCE', sortable: true, width: 'w-28' },
+    { key: 'rank', label: '↑↓ RANK', sortable: true, width: 'w-12' },
+    { key: 'name', label: '↑↓ MEMBER NAME', sortable: true, width: 'flex-1 min-w-[140px]' },
+    { key: 'company', label: '↑↓ COMPANY', sortable: true, width: 'flex-1 min-w-[150px]' },
+    { key: 'referralsGiven', label: '↑↓REFERRALS GIVEN', sortable: true, width: 'w-24' },
+    { key: 'businessMade', label: '↑↓ BUSINESS MADE', sortable: true, width: 'w-28' },
+    { key: 'visitorsBrought', label: '↑↓VISITORS BROUGHT', sortable: true, width: 'w-24' },
+    { key: 'mToM', label: '↑↓ M TO M', sortable: true, width: 'w-16' },
+    { key: 'approvalStatus', label: '↑↓ APPROVAL STATUS', sortable: true, width: 'w-32' },
+    { key: 'attendance', label: '↑↓ ATTENDANCE', sortable: true, width: 'w-28' },
     { key: 'actions', label: 'ACTIONS', sortable: false, width: 'w-40' },
 ]
 
@@ -22,8 +22,7 @@ const SORT_OPTIONS = [
     { value: 'rank', label: 'Roster' },
 ]
 
-const APPROVAL_STATUS_OPTIONS = ['APPROVED', 'PENDING', 'REJECTED']
-const ATTENDANCE_OPTIONS = ['Present', 'Absent', 'Not Selected']
+const ATTENDANCE_OPTIONS = ['Present', 'Absent']
 
 function parseBusinessValue(value) {
     if (typeof value !== 'string') return 0
@@ -56,83 +55,83 @@ const getSortValue = (value, columnKey) => {
     return value || 0
 }
 
-const MemberActivityReport = ({ members = [
-    {
-        id: 1,
-        rank: 1,
-        name: 'Deepak',
-        company: 'Trading House',
-        referralsGiven: 8,
-        businessMade: '₹80 Lakhs',
-        visitorsBrought: 2,
-        mToM: 5,
-        approvalStatus: 'APPROVED',
-        attendance: 'Present',
-    },
-    {
-        id: 2,
-        rank: 2,
-        name: 'Gnanavel',
-        company: 'Export Services',
-        referralsGiven: 7,
-        businessMade: '₹70 Lakhs',
-        visitorsBrought: 3,
-        mToM: 4,
-        approvalStatus: 'APPROVED',
-        attendance: 'Present',
-    },
-    {
-        id: 3,
-        rank: 3,
-        name: 'Sedhu',
-        company: 'Consulting Firm',
-        referralsGiven: 6,
-        businessMade: '₹60 Lakhs',
-        visitorsBrought: 1,
-        mToM: 3,
-        approvalStatus: 'PENDING',
-        attendance: 'Absent',
-    },
-    {
-        id: 4,
-        rank: 4,
-        name: 'Balaji UPVC',
-        company: 'UPVC Solutions',
-        referralsGiven: 4,
-        businessMade: '₹50 Lakhs',
-        visitorsBrought: 4,
-        mToM: 6,
-        approvalStatus: 'APPROVED',
-        attendance: 'Present',
-    },
-    {
-        id: 5,
-        rank: 5,
-        name: 'Madhu',
-        company: 'Services',
-        referralsGiven: 5,
-        businessMade: '₹40 Lakhs',
-        visitorsBrought: 2,
-        mToM: 2,
-        approvalStatus: 'PENDING',
-        attendance: 'Present',
-    },
-    {
-        id: 6,
-        rank: 6,
-        name: 'Sathishkumar',
-        company: 'Education Services',
-        referralsGiven: 4,
-        businessMade: '₹35 Lakhs',
-        visitorsBrought: 1,
-        mToM: 3,
-        approvalStatus: 'APPROVED',
-        attendance: 'Present',
-    },
-], onMeetingSelect = () => { }, onApprove = () => { }, onReject = () => { } }) => {
+const MemberActivityReport = (
+    { members = [
+        {
+            id: 1,
+            rank: 1,
+            name: 'Deepak',
+            company: 'Trading House',
+            referralsGiven: 8,
+            businessMade: '₹80 Lakhs',
+            visitorsBrought: 2,
+            mToM: 5,
+            approvalStatus: 'APPROVED',
+            attendance: 'Present',
+        },
+        {
+            id: 2,
+            rank: 2,
+            name: 'Gnanavel',
+            company: 'Export Services',
+            referralsGiven: 7,
+            businessMade: '₹70 Lakhs',
+            visitorsBrought: 3,
+            mToM: 4,
+            approvalStatus: 'APPROVED',
+            attendance: 'Present',
+        },
+        {
+            id: 3,
+            rank: 3,
+            name: 'Sedhu',
+            company: 'Consulting Firm',
+            referralsGiven: 6,
+            businessMade: '₹60 Lakhs',
+            visitorsBrought: 1,
+            mToM: 3,
+            approvalStatus: 'PENDING',
+            attendance: 'Absent',
+        },
+        {
+            id: 4,
+            rank: 4,
+            name: 'Balaji UPVC',
+            company: 'UPVC Solutions',
+            referralsGiven: 4,
+            businessMade: '₹50 Lakhs',
+            visitorsBrought: 4,
+            mToM: 6,
+            approvalStatus: 'APPROVED',
+            attendance: 'Present',
+        },
+        {
+            id: 5,
+            rank: 5,
+            name: 'Madhu',
+            company: 'Services',
+            referralsGiven: 5,
+            businessMade: '₹40 Lakhs',
+            visitorsBrought: 2,
+            mToM: 2,
+            approvalStatus: 'PENDING',
+            attendance: 'Present',
+        },
+        {
+            id: 6,
+            rank: 6,
+            name: 'Sathishkumar',
+            company: 'Education Services',
+            referralsGiven: 4,
+            businessMade: '₹35 Lakhs',
+            visitorsBrought: 1,
+            mToM: 3,
+            approvalStatus: 'APPROVED',
+            attendance: 'Present',
+        },
+    ], onMeetingSelect = () => { }, onApprove = () => { } }) => {
     const [selectedMeeting, setSelectedMeeting] = useState('all')
     const [selectedRows, setSelectedRows] = useState(new Set())
-    const [sortBy, setSortBy] = useState('businessMade')
     const [sortConfig, setSortConfig] = useState({
         key: 'businessMade',
         direction: 'desc'
@@ -152,7 +151,6 @@ const MemberActivityReport = ({ members = [
     const filteredAndSortedData = useMemo(() => {
         let result = [...memberData]
 
-        // Apply sorting
         result.sort((a, b) => {
             const aValue = getSortValue(a[sortConfig.key], sortConfig.key)
             const bValue = getSortValue(b[sortConfig.key], sortConfig.key)
@@ -213,17 +211,10 @@ const MemberActivityReport = ({ members = [
         }
     }
 
-    const handleRejectAll = async () => {
+    const handleSubmit = async () => {
         setLoading(true)
         try {
-            const updated = memberData.map(m =>
-                selectedRows.has(m.id) ? { ...m, approvalStatus: 'REJECTED' } : m
-            )
-            setMemberData(updated)
-            setSelectedRows(new Set())
-            setSuccess(`${selectedRows.size} member(s) rejected successfully`)
-            setTimeout(() => setSuccess(null), 2000)
-            onReject(Array.from(selectedRows))
+            //Submit trigerring d=will be done here
         } finally {
             setLoading(false)
         }
@@ -319,51 +310,42 @@ const MemberActivityReport = ({ members = [
                             </label>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                Sort by:
-                            </label>
-                            <select
-                                value={sortConfig.key}
-                                onChange={(e) => handleSort(e.target.value)}
-                                className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-red-500"
-                            >
-                                {SORT_OPTIONS.map(opt => (
-                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className="text-right text-sm text-gray-600 dark:text-gray-400">
-                            <p className="font-semibold">Selected: <span className="text-blue-600 dark:text-blue-400">{selectedRows.size} member{selectedRows.size !== 1 ? 's' : ''}</span></p>
-                        </div>
                     </div>
-
-                    <div className="flex flex-col sm:flex-row gap-3">
+                    <div className='flex flex-wrap justify-between gap-3'>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <button
+                                onClick={handleApproveAll}
+                                disabled={selectedRows.size === 0 || loading}
+                                className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-yellow-400 hover:bg-yellow-500 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Approve All Selected
+                            </button>
+                            <button
+                                onClick={() => setSelectedRows(new Set())}
+                                className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-semibold text-sm bg-gray-300 hover:bg-gray-400 text-gray-900 transition-colors"
+                            >
+                                Clear Selection
+                            </button>
+                        </div>
                         <button
-                            onClick={handleApproveAll}
-                            disabled={selectedRows.size === 0 || loading}
-                            className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-yellow-400 hover:bg-yellow-500 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            onClick={handleSubmit}
+                            className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-green-500 hover:bg-green-600 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors max-h-12"
                         >
-                            Approve All Selected
-                        </button>
-                        <button
-                            onClick={handleRejectAll}
-                            disabled={selectedRows.size === 0 || loading}
-                            className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-red-500 hover:bg-red-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                            Reject Selected
-                        </button>
-                        <button
-                            onClick={() => setSelectedRows(new Set())}
-                            className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-semibold text-sm bg-gray-300 hover:bg-gray-400 text-gray-900 transition-colors"
-                        >
-                            Clear Selection
+                            Submit Form
                         </button>
                     </div>
                 </div>
+                <div className='flex flex-wrap justify-between'>
+                    <div className="text-left text-sm text-gray-600 mb-2 dark:text-gray-400">
+                        <p className="font-semibold">Selected: <span className="text-blue-600 dark:text-blue-400">{selectedRows.size} member{selectedRows.size !== 1 ? 's' : ''}</span></p>
+                    </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <p className="text-gray-900 dark:text-gray-100 text-md mb-2">
+                        <span className='font-bold'>Note* : </span>Fields with (↑↓) can be sorted in ascending or descending order.
+                    </p>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-[800px]">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>

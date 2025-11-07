@@ -1,82 +1,83 @@
 import { useState, useMemo } from 'react'
 
 const TABLE_COLUMNS = [
-    { key: 'name', label: 'MEMBER NAME', sortable: true, width: 'flex-1 min-w-[150px]' },
-    { key: 'attendance', label: 'CURRENT ATTENDANCE %', sortable: true, width: 'w-32' },
+    { key: 'name', label: ' ↑↓ MEMBER NAME', sortable: true, width: 'flex-1 min-w-[150px]' },
+    { key: 'attendance', label: '↑↓ CURRENT ATTENDANCE %', sortable: true, width: 'w-32' },
     { key: 'trend', label: 'TREND', sortable: false, width: 'w-16' },
-    { key: 'lastPresent', label: 'LAST PRESENT DATE', sortable: true, width: 'w-32' },
+    { key: 'lastPresent', label: '↑↓ LAST PRESENT DATE', sortable: true, width: 'w-32' },
     { key: 'contact', label: 'CONTACT INFORMATION', sortable: false, width: 'w-40' },
     { key: 'actions', label: 'ACTIONS', sortable: false, width: 'w-52' },
 ]
 
 const ATTENDANCE_THRESHOLD = 75
 
-const LowAttendanceAlert = ({ members = [
-    {
-        id: 1,
-        name: 'Rajesh Kumar',
-        attendance: 72,
-        trend: 'down',
-        lastPresent: '26 Oct 2025',
-        contact: '+91 98765 11111',
-    },
-    {
-        id: 2,
-        name: 'Priya Singh',
-        attendance: 65,
-        trend: 'down',
-        lastPresent: '12 Oct 2025',
-        contact: '+91 98765 22222',
-    },
-    {
-        id: 3,
-        name: 'Amit Patel',
-        attendance: 58,
-        trend: 'down',
-        lastPresent: '28 Sep 2025',
-        contact: '+91 98765 33333',
-    },
-    {
-        id: 4,
-        name: 'Neha Sharma',
-        attendance: 68,
-        trend: 'down',
-        lastPresent: '15 Oct 2025',
-        contact: '+91 98765 44444',
-    },
-    {
-        id: 5,
-        name: 'Vikram Desai',
-        attendance: 55,
-        trend: 'down',
-        lastPresent: '05 Sep 2025',
-        contact: '+91 98765 55555',
-    },
-    {
-        id: 6,
-        name: 'Anjali Gupta',
-        attendance: 70,
-        trend: 'down',
-        lastPresent: '20 Oct 2025',
-        contact: '+91 98765 66666',
-    },
-    {
-        id: 7,
-        name: 'Rohan Singh',
-        attendance: 60,
-        trend: 'down',
-        lastPresent: '08 Oct 2025',
-        contact: '+91 98765 77777',
-    },
-    {
-        id: 8,
-        name: 'Maya Patel',
-        attendance: 62,
-        trend: 'down',
-        lastPresent: '18 Oct 2025',
-        contact: '+91 98765 88888',
-    },
-], onSendAlert = () => {}, onCall = () => {}, onScheduleCall = () => {}, onExportList = () => {} }) => {
+const LowAttendanceAlert = (
+    { members = [
+        {
+            id: 1,
+            name: 'Rajesh Kumar',
+            attendance: 72,
+            trend: 'down',
+            lastPresent: '26 Oct 2025',
+            contact: '+91 98765 11111',
+        },
+        {
+            id: 2,
+            name: 'Priya Singh',
+            attendance: 65,
+            trend: 'down',
+            lastPresent: '12 Oct 2025',
+            contact: '+91 98765 22222',
+        },
+        {
+            id: 3,
+            name: 'Amit Patel',
+            attendance: 58,
+            trend: 'down',
+            lastPresent: '28 Sep 2025',
+            contact: '+91 98765 33333',
+        },
+        {
+            id: 4,
+            name: 'Neha Sharma',
+            attendance: 68,
+            trend: 'down',
+            lastPresent: '15 Oct 2025',
+            contact: '+91 98765 44444',
+        },
+        {
+            id: 5,
+            name: 'Vikram Desai',
+            attendance: 55,
+            trend: 'down',
+            lastPresent: '05 Sep 2025',
+            contact: '+91 98765 55555',
+        },
+        {
+            id: 6,
+            name: 'Anjali Gupta',
+            attendance: 70,
+            trend: 'down',
+            lastPresent: '20 Oct 2025',
+            contact: '+91 98765 66666',
+        },
+        {
+            id: 7,
+            name: 'Rohan Singh',
+            attendance: 60,
+            trend: 'down',
+            lastPresent: '08 Oct 2025',
+            contact: '+91 98765 77777',
+        },
+        {
+            id: 8,
+            name: 'Maya Patel',
+            attendance: 62,
+            trend: 'down',
+            lastPresent: '18 Oct 2025',
+            contact: '+91 98765 88888',
+        },
+    ], onSendAlert = () => { }, onCall = () => { } }) => {
     const [selectedRows, setSelectedRows] = useState(new Set())
     const [sortConfig, setSortConfig] = useState({
         key: 'attendance',
@@ -179,19 +180,6 @@ const LowAttendanceAlert = ({ members = [
         }
     }
 
-    const handleScheduleCall = async () => {
-        setLoading(true)
-        try {
-            setTimeout(() => {
-                setSuccess('1-on-1 calls scheduled for all low attendance members')
-                setTimeout(() => setSuccess(null), 2000)
-            }, 500)
-            onScheduleCall(Array.from(selectedRows))
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const handleExportList = async () => {
         setLoading(true)
         try {
@@ -245,45 +233,8 @@ const LowAttendanceAlert = ({ members = [
                             Members Below {ATTENDANCE_THRESHOLD}% Threshold
                         </p>
                     </div>
-                    <div className="inline-flex items-center gap-3 bg-red-500 text-white px-6 py-3 rounded-full font-bold shadow-lg">
-                        <span className="text-lg">⚠️</span>
-                        <span>Critical ({criticalCount} members)</span>
-                    </div>
                 </div>
 
-                {success && (
-                    <div className="mb-4 p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
-                        <p className="text-sm text-green-700 dark:text-green-200">{success}</p>
-                    </div>
-                )}
-
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-6 border border-gray-200 dark:border-gray-700">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                        <div className="lg:col-span-2">
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                Search Member or Phone
-                            </label>
-                            <input
-                                type="text"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Type member name or phone number..."
-                                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                Sort by Attendance:
-                            </label>
-                            <button
-                                onClick={() => handleSort('attendance')}
-                                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                            >
-                                {sortConfig.direction === 'asc' ? '↑ Lowest First' : '↓ Highest First'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
                         <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Low Attendance Members</p>
@@ -302,7 +253,31 @@ const LowAttendanceAlert = ({ members = [
                         </p>
                     </div>
                 </div>
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-6 border border-gray-200 dark:border-gray-700">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div className="lg:col-span-2">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Search Member or Phone
+                            </label>
+                            <input
+                                type="text"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Type member name or phone number..."
+                                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                        </div>
+                    </div>
+                </div>
+                {success && (
+                    <div className="mb-4 p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
+                        <p className="text-sm text-green-700 dark:text-green-200">{success}</p>
+                    </div>
+                )}
+                <p className="text-gray-900 dark:text-gray-100 text-md mb-2">
+                    <span className='font-bold'>Note* : </span>Fields with (↑↓) can be sorted in ascending or descending order.
+                </p>
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-[600px]">
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
@@ -420,13 +395,6 @@ const LowAttendanceAlert = ({ members = [
 
                     <div className="flex flex-col sm:flex-row gap-3">
                         <button
-                            onClick={handleScheduleCall}
-                            disabled={selectedRows.size === 0 || loading}
-                            className="flex-1 px-6 py-3 rounded-lg font-semibold text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-gray-300 dark:border-gray-600"
-                        >
-                            Schedule 1-on-1 Call
-                        </button>
-                        <button
                             onClick={handleExportList}
                             disabled={loading}
                             className="flex-1 px-6 py-3 rounded-lg font-semibold text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-gray-300 dark:border-gray-600"
@@ -436,19 +404,6 @@ const LowAttendanceAlert = ({ members = [
                     </div>
                 </div>
 
-                <div className="mt-8 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 sm:p-6">
-                    <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100 uppercase mb-2">Recommended Actions:</h3>
-                    <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-                        <li>✓ Send engagement alerts to members below 60% attendance</li>
-                        <li>✓ Schedule 1-on-1 calls with critical members (less than 60%)</li>
-                        <li>✓ Review attendance trends and identify barriers to participation</li>
-                        <li>✓ Follow up on members who haven't been present in the last 2 weeks</li>
-                    </ul>
-                </div>
-
-                <div className="mt-6 text-center text-xs text-gray-600 dark:text-gray-400">
-                    <p>Last updated: {new Date().toLocaleString()}</p>
-                </div>
             </div>
         </div>
     )
