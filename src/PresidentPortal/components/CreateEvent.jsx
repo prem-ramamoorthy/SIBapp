@@ -1,15 +1,6 @@
 import { Modal, ModalBody, ModalHeader } from "flowbite-react";
 import { useState, useRef, useEffect } from "react";
-import { FileText, Clock, Calendar as CalendarIcon, MapPin, Flag, ClosedCaption, ExternalLinkIcon, X } from "lucide-react";
-
-const durationOptions = [
-  { value: 30, label: "30 minutes" },
-  { value: 60, label: "1 hour" },
-  { value: 90, label: "1.5 hours" },
-  { value: 120, label: "2 hours" },
-  { value: 150, label: "2.5 hours" },
-  { value: 180, label: "3 hours" },
-];
+import { FileText, Clock, Calendar as CalendarIcon, MapPin, Flag, X } from "lucide-react";
 
 const meetingTypes = ["Weekly", "Monthly", "Others"];
 
@@ -20,13 +11,13 @@ export default function CreateEvent() {
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
-  const [duration, setDuration] = useState("");
   const [location, setLocation] = useState("");
   const [meetingType, setMeetingType] = useState("Weekly");
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [company , setcompany ] = useState("") ;
+  const [company, setCompany] = useState("");
+  const [id, setId] = useState("");
 
   useEffect(() => {
     if (!openModal) {
@@ -44,9 +35,8 @@ export default function CreateEvent() {
     if (!company.trim()) newErrors.company = "Event organizer company is required.";
     if (!date) newErrors.date = "Date is required.";
     if (!time) newErrors.time = "Time is required.";
-    if (!duration) newErrors.duration = "Duration is required.";
     if ((meetingType === "Weekly" || meetingType === "Monthly") && !location.trim())
-      newErrors.location = "Location is required for selected meeting type.";
+      newErrors.location = "Location is required for selected event type.";
     return newErrors;
   };
 
@@ -55,23 +45,61 @@ export default function CreateEvent() {
     setDescription("");
     setDate("");
     setTime("");
-    setDuration("");
     setLocation("");
     setMeetingType("Weekly");
+    setCompany("");
     setErrors({});
     setSuccess(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
-      setTimeout(() => {
+      const eventObj = {
+        event_title: title,
+        event_date: date,
+        event_time: time,
+        location,
+        event_type: meetingType.toLowerCase(),
+        event_description: description,
+        event_status: "upcoming",
+        organizer_company: company
+      };
+
+      try {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/event/createevent`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify(eventObj)
+        });
+        const result = await res.json();
+        if (result?.message === "success") {
+          setId(result.id);
+          setIsSubmitting(false);
+          setSuccess(true);
+        } else if (result?.errors) {
+          const errMsg = result?.errors?.[0]
+            ? `${result.errors[0].path} : ${result.errors[0].msg}`
+            : (result?.message || "An error occurred.");
+          setErrors({ api: errMsg });
+          setIsSubmitting(false);
+          setSuccess(false);
+        } else {
+          setErrors({ api: "An unknown error occurred." });
+          setIsSubmitting(false);
+          setSuccess(false);
+        }
+      } catch (err) {
+        setErrors({ api: err.message || "Network error" });
         setIsSubmitting(false);
-        setSuccess(true);
-      }, 1500);
+        setSuccess(false);
+      }
     }
   };
 
@@ -91,25 +119,17 @@ export default function CreateEvent() {
       </button>
 
       <Modal show={openModal} size="md" onClose={handler} popup initialFocus={initialFocusRef} className="bg-gray-900/50">
-
         <ModalHeader className="border-b-4 border-amber-300 px-8 py-5 bg-gradient-to-r from-amber-50 to-white dark:from-gray-900 dark:to-gray-800">
+          <div className="flex justify-between items-center">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Create Event</h3>
+            <button className="text-black dark:text-white" onClick={handler} aria-label="Close modal">
+              <X />
+            </button>
+          </div>
         </ModalHeader>
+
         <ModalBody className="px-6 py-6 bg-white dark:bg-gray-900 rounded-xl">
-          <form onSubmit={handleSubmit} noValidate className="space-y-5 mt-30">
-            <div className="flex items-center gap-4 w-full mt-5 justify-between">
-              <div className="p-3 bg-gradient-to-br bg-amber-300 rounded-xl shadow-lg">
-                <FileText className="w-7 h-7 text-gray-900" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Create Event
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Schedule a new Event</p>
-              </div>
-              <button className="text-black dark:text-white" onClick={handler}>
-                <X />
-              </button>
-            </div>
+          <form onSubmit={handleSubmit} noValidate className="space-y-5 mt-5">
             <div>
               <label htmlFor="title" className="block font-semibold text-gray-800 dark:text-gray-100 mb-2">
                 Event Title <span className="text-red-500">*</span>
@@ -119,10 +139,9 @@ export default function CreateEvent() {
                 type="text"
                 placeholder="Enter Event title"
                 ref={initialFocusRef}
-                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.title
-                  ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                  : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
+                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
+                  errors.title ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                } focus:outline-none focus:ring-2 transition`}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={errors.title ? "true" : "false"}
@@ -131,20 +150,19 @@ export default function CreateEvent() {
             </div>
 
             <div>
-              <label htmlFor="Organizer Company Name" className="block font-semibold text-gray-800 dark:text-gray-100 mb-2">
+              <label htmlFor="company" className="block font-semibold text-gray-800 dark:text-gray-100 mb-2">
                 Organizer Company Name <span className="text-red-500">*</span>
               </label>
               <input
-                id="title"
+                id="company"
                 type="text"
                 placeholder="Enter Organizer Company Name"
-                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.company
-                  ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                  : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
+                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
+                  errors.company ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                } focus:outline-none focus:ring-2 transition`}
                 value={company}
-                onChange={(e) => setcompany(e.target.value)}
-                aria-invalid={errors.title ? "true" : "false"}
+                onChange={(e) => setCompany(e.target.value)}
+                aria-invalid={errors.company ? "true" : "false"}
               />
               {errors.company && <p className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">{errors.company}</p>}
             </div>
@@ -172,10 +190,9 @@ export default function CreateEvent() {
                 <input
                   id="date"
                   type="date"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.date
-                    ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                    : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                    } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
+                    errors.date ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                  } focus:outline-none focus:ring-2 transition`}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   aria-invalid={errors.date ? "true" : "false"}
@@ -191,40 +208,15 @@ export default function CreateEvent() {
                 <input
                   id="time"
                   type="time"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.time
-                    ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                    : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                    } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
+                    errors.time ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                  } focus:outline-none focus:ring-2 transition`}
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   aria-invalid={errors.time ? "true" : "false"}
                 />
                 {errors.time && <p className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">{errors.time}</p>}
               </div>
-            </div>
-
-            <div>
-              <label htmlFor="duration" className="block font-semibold text-gray-800 dark:text-gray-100 mb-2">
-                Duration <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="duration"
-                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.duration
-                  ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                  : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                aria-invalid={errors.duration ? "true" : "false"}
-              >
-                <option value="">Select duration</option>
-                {durationOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              {errors.duration && <p className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">{errors.duration}</p>}
             </div>
 
             <div>
@@ -258,10 +250,9 @@ export default function CreateEvent() {
                   id="location"
                   type="text"
                   placeholder="Enter Event location"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.location
-                    ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                    : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                    } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
+                    errors.location ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                  } focus:outline-none focus:ring-2 transition`}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   aria-invalid={errors.location ? "true" : "false"}
@@ -270,19 +261,24 @@ export default function CreateEvent() {
               </div>
             )}
 
+            {errors.api && (
+              <p className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">{errors.api}</p>
+            )}
+
             {success && (
               <div className="p-4 bg-green-100 dark:bg-green-900 border-l-4 border-green-500 rounded-lg">
                 <p className="text-green-700 dark:text-green-300 font-semibold flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
                   </svg>
-                  Event created successfully!
+                  Event created successfully with id : {id}!
                 </p>
               </div>
             )}
 
             <div className="flex justify-end gap-3 pt-2">
               <button
+                type="button"
                 color="gray"
                 onClick={handler}
                 className="px-6 py-2 rounded-lg border-2 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition font-medium"
@@ -303,17 +299,16 @@ export default function CreateEvent() {
                 className="px-8 py-3 bg-amber-300 text-gray-900 dark:text-gray-900 rounded-lg hover:from-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
               >
                 {isSubmitting && (
-                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
                   </svg>
                 )}
                 Create Event
               </button>
-
             </div>
           </form>
-        </ModalBody> 
+        </ModalBody>
       </Modal>
     </>
   );

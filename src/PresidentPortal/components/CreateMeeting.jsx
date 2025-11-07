@@ -1,6 +1,6 @@
-import { Button, Modal, ModalBody, ModalHeader } from "flowbite-react";
+import { Modal, ModalBody, ModalHeader } from "flowbite-react";
 import { useState, useRef, useEffect } from "react";
-import { FileText, Clock, Calendar as CalendarIcon, MapPin, Flag, ClosedCaption, ExternalLinkIcon, X } from "lucide-react";
+import { Clock, Calendar as CalendarIcon, MapPin, Flag, X } from "lucide-react";
 
 const durationOptions = [
   { value: 30, label: "30 minutes" },
@@ -28,6 +28,7 @@ export default function ModalViewer() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [id, setId] = useState("");
 
   useEffect(() => {
     if (!openModal) {
@@ -63,16 +64,54 @@ export default function ModalViewer() {
     setSuccess(false);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validate();
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length === 0) {
       setIsSubmitting(true);
-      setTimeout(() => {
+      const meetingObj = {
+        title,
+        meeting_date: date,
+        meeting_time: time,
+        duration: parseInt(duration, 10),
+        location,
+        meeting_type: meetingType.toLowerCase(),
+        meeting_notes: description,
+        meeting_status: "upcoming"
+      };
+
+      try {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/createmeeting`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify(meetingObj)
+        });
+        const result = await res.json();
+        if (result?.message === "success") {
+          setId(result.id);
+          setIsSubmitting(false);
+          setSuccess(true);
+        } else if (result?.errors) {
+          const errMsg = result?.errors?.[0]
+            ? `${result.errors[0].path} : ${result.errors[0].msg}`
+            : (result?.message || "An error occurred.");
+          setErrors({ api: errMsg });
+          setIsSubmitting(false);
+          setSuccess(false);
+        } else {
+          setErrors({ api: "An unknown error occurred." });
+          setIsSubmitting(false);
+          setSuccess(false);
+        }
+      } catch (err) {
+        setErrors({ api: err.message || "Network error" });
         setIsSubmitting(false);
-        setSuccess(true);
-      }, 1500);
+        setSuccess(false);
+      }
     }
   };
 
@@ -81,36 +120,28 @@ export default function ModalViewer() {
       <button
         onClick={() => setOpenModal(true)}
         className="bg-yellow-400 text-black font-semibold
-                    hover:bg-yellow-500 rounded-lg
-                    focus:ring-4 focus:ring-yellow-300
-                    dark:bg-yellow-500 dark:text-gray-900 
-                    dark:hover:bg-yellow-400 
-                    dark:focus:ring-yellow-600
-                    shadow-md hover:shadow-lg min-h-[40px]"
+                  hover:bg-yellow-500 rounded-lg
+                  focus:ring-4 focus:ring-yellow-300
+                  dark:bg-yellow-500 dark:text-gray-900 
+                  dark:hover:bg-yellow-400 
+                  dark:focus:ring-yellow-600
+                  shadow-md hover:shadow-lg min-h-[40px]"
       >
-        Create New Meeeting
+        Create New Meeting
       </button>
 
       <Modal show={openModal} size="md" onClose={handler} popup initialFocus={initialFocusRef} className="bg-gray-900/50">
-
         <ModalHeader className="border-b-4 border-amber-300 px-8 py-5 bg-gradient-to-r from-amber-50 to-white dark:from-gray-900 dark:to-gray-800">
+          <div className="flex justify-between items-center">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Create Meeting</h3>
+            <button className="text-black dark:text-white" onClick={handler} aria-label="Close modal">
+              <X />
+            </button>
+          </div>
         </ModalHeader>
+
         <ModalBody className="px-6 py-6 bg-white dark:bg-gray-900 rounded-xl">
-          <form onSubmit={handleSubmit} noValidate className="space-y-5 mt-30">
-            <div className="flex items-center gap-4 w-full mt-5 justify-between">
-              <div className="p-3 bg-gradient-to-br bg-amber-300 rounded-xl shadow-lg">
-                <FileText className="w-7 h-7 text-gray-900" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  Create Meeting
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Schedule a new meeting</p>
-              </div>
-              <button className="text-black dark:text-white" onClick={handler}>
-                <X />
-              </button>
-            </div>
+          <form onSubmit={handleSubmit} noValidate className="space-y-5 mt-5">
             <div>
               <label htmlFor="title" className="block font-semibold text-gray-800 dark:text-gray-100 mb-2">
                 Meeting Title <span className="text-red-500">*</span>
@@ -120,10 +151,9 @@ export default function ModalViewer() {
                 type="text"
                 placeholder="Enter Meeting title"
                 ref={initialFocusRef}
-                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.title
-                  ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                  : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
+                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
+                  errors.title ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                } focus:outline-none focus:ring-2 transition`}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={errors.title ? "true" : "false"}
@@ -138,7 +168,7 @@ export default function ModalViewer() {
               <textarea
                 id="description"
                 rows={3}
-                placeholder="Optional description or notes about the Metting"
+                placeholder="Optional description or notes about the Meeting"
                 className="w-full rounded-lg border-2 border-amber-200 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-500 transition resize-none"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -154,10 +184,9 @@ export default function ModalViewer() {
                 <input
                   id="date"
                   type="date"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.date
-                    ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                    : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                    } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
+                    errors.date ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                  } focus:outline-none focus:ring-2 transition`}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   aria-invalid={errors.date ? "true" : "false"}
@@ -173,10 +202,9 @@ export default function ModalViewer() {
                 <input
                   id="time"
                   type="time"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.time
-                    ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                    : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                    } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
+                    errors.time ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                  } focus:outline-none focus:ring-2 transition`}
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   aria-invalid={errors.time ? "true" : "false"}
@@ -191,10 +219,9 @@ export default function ModalViewer() {
               </label>
               <select
                 id="duration"
-                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.duration
-                  ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                  : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
+                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
+                  errors.duration ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                } focus:outline-none focus:ring-2 transition`}
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 aria-invalid={errors.duration ? "true" : "false"}
@@ -240,10 +267,9 @@ export default function ModalViewer() {
                   id="location"
                   type="text"
                   placeholder="Enter meeting location"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.location
-                    ? "border-red-500 dark:border-red-400 focus:ring-red-300"
-                    : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                    } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
+                    errors.location ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                  } focus:outline-none focus:ring-2 transition`}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   aria-invalid={errors.location ? "true" : "false"}
@@ -270,19 +296,30 @@ export default function ModalViewer() {
               </select>
             </div>
 
+            {errors.api && (
+              <p className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">
+                {errors.api}
+              </p>
+            )}
+
             {success && (
               <div className="p-4 bg-green-100 dark:bg-green-900 border-l-4 border-green-500 rounded-lg">
                 <p className="text-green-700 dark:text-green-300 font-semibold flex items-center gap-2">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
                   </svg>
-                  Meeting created successfully!
+                  Meeting created successfully with id : {id}!
                 </p>
               </div>
             )}
 
             <div className="flex justify-end gap-3 pt-2">
               <button
+                type="button"
                 color="gray"
                 onClick={handler}
                 className="px-6 py-2 rounded-lg border-2 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition font-medium"
@@ -303,17 +340,16 @@ export default function ModalViewer() {
                 className="px-8 py-3 bg-amber-300 text-gray-900 dark:text-gray-900 rounded-lg hover:from-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
               >
                 {isSubmitting && (
-                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
                   </svg>
                 )}
                 Create Meeting
               </button>
-
             </div>
           </form>
-        </ModalBody> 
+        </ModalBody>
       </Modal>
     </>
   );
