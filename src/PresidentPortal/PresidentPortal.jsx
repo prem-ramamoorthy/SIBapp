@@ -5,6 +5,7 @@ import EventManagement from './EventManagement'
 import Hero from './Hero'
 import MemberRenewalManagement from './MemberRenewalManagement'
 
+
 function PresidentPortal() {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
 
