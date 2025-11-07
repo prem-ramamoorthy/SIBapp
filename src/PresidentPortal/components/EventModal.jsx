@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { HiX, HiPencil, HiCheck, HiClock, HiCalendar, HiLocationMarker, HiUserGroup } from "react-icons/hi";
 
@@ -25,11 +23,44 @@ export function EventsModal({ events = [], isOpen, onClose }) {
     setEditedEvent({ ...editedEvent, [field]: value });
   };
 
-  const handleSave = () => {
-    setSelectedEvent(editedEvent);
-    setIsEditing(false);
-    console.log("Saved event:", editedEvent);
+  const [errors, setErrors] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setErrors(null);
+    setIsSaving(true);
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/event/updateevent`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify(editedEvent)
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.message || "Failed to update event");
+      }
+
+      if (result.message === "success") {
+        setSelectedEvent(editedEvent);
+        setIsEditing(false);
+        console.log("Saved event:", editedEvent);
+      } else {
+        throw new Error(result.message || "Failed to update event");
+      }
+    } catch (error) {
+      console.error("Error saving event:", error);
+      setErrors(error.message || "An unexpected error occurred");
+    } finally {
+      setIsSaving(false);
+    }
   };
+
 
   const handleCloseDetail = () => {
     setSelectedEvent(null);
@@ -40,6 +71,12 @@ export function EventsModal({ events = [], isOpen, onClose }) {
     setSelectedEvent(null);
     setIsEditing(false);
     onClose();
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
   };
 
   if (!isOpen) return null;
@@ -70,26 +107,26 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                 </div>
               ) : (
                 <div className="max-h-96 overflow-y-auto space-y-3">
-                  {events.map((event, index) => (
+                  {events.map((event) => (
                     <div
-                      key={index}
+                      key={event._id}
                       className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-700"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                            {event.title}
+                            {event.event_title}
                           </h4>
                           <div className="space-y-1.5">
                             <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                               <HiUserGroup className="mr-2 h-4 w-4 text-amber-300" />
-                              <span>{event.organizerCompany || "Not specified"}</span>
+                              <span>{event.organizer_company || "Not specified"}</span>
                             </div>
                             <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                               <HiCalendar className="mr-2 h-4 w-4 text-amber-300" />
-                              <span>{event.date}</span>
+                              <span>{formatDate(event.event_date)}</span>
                               <HiClock className="ml-4 mr-2 h-4 w-4 text-amber-300" />
-                              <span>{event.time} ({event.duration})</span>
+                              <span>{event.event_time}</span>
                             </div>
                             <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                               <HiLocationMarker className="mr-2 h-4 w-4 text-amber-300" />
@@ -97,7 +134,7 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                             </div>
                             <div className="flex items-center">
                               <span className="text-xs font-medium px-2.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
-                                {event.eventType}
+                                {event.event_type}
                               </span>
                             </div>
                           </div>
@@ -119,7 +156,7 @@ export function EventsModal({ events = [], isOpen, onClose }) {
       </div>
 
       {selectedEvent && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/40  bg-opacity-60 dark:bg-opacity-80">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/40 bg-opacity-60 dark:bg-opacity-80">
           <div className="relative max-h-full w-full max-w-2xl p-4">
             <div className="relative rounded-lg bg-white shadow-xl dark:bg-gray-800">
               <div className="flex items-center justify-between rounded-t border-b border-gray-200 p-4 dark:border-gray-700">
@@ -141,9 +178,18 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                       <button
                         type="button"
                         onClick={handleSave}
-                        className="inline-flex items-center rounded-lg bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300"
+                        disabled={isSaving}
+                        className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-medium ${isSaving ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+                          } text-white focus:outline-none focus:ring-4 focus:ring-green-300`}
                       >
-                        <HiCheck className="mr-1 h-4 w-4" />
+                        {isSaving ? (
+                          <svg className="animate-spin h-5 w-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                          </svg>
+                        ) : (
+                          <HiCheck className="mr-1 h-4 w-4" />
+                        )}
                         Save
                       </button>
                       <button
@@ -166,6 +212,11 @@ export function EventsModal({ events = [], isOpen, onClose }) {
               </div>
 
               <div className="space-y-6 p-6">
+                {errors && (
+                  <p className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">
+                    {errors}
+                  </p>
+                )}
                 <div>
                   <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
                     Event Title
@@ -173,12 +224,12 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                   {isEditing ? (
                     <input
                       type="text"
-                      value={editedEvent.title}
-                      onChange={(e) => handleInputChange("title", e.target.value)}
+                      value={editedEvent.event_title || ""}
+                      onChange={(e) => handleInputChange("event_title", e.target.value)}
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-300 dark:focus:ring-amber-300"
                     />
                   ) : (
-                    <p className="text-base text-gray-900 dark:text-white">{selectedEvent.title}</p>
+                    <p className="text-base text-gray-900 dark:text-white">{selectedEvent.event_title}</p>
                   )}
                 </div>
 
@@ -189,15 +240,15 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                   {isEditing ? (
                     <input
                       type="text"
-                      value={editedEvent.organizerCompany || ""}
-                      onChange={(e) => handleInputChange("organizerCompany", e.target.value)}
+                      value={editedEvent.organizer_company || ""}
+                      onChange={(e) => handleInputChange("organizer_company", e.target.value)}
                       placeholder="Organizer or company name"
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-300 dark:focus:ring-amber-300"
                     />
                   ) : (
                     <p className="text-sm text-gray-900 dark:text-white flex items-center">
                       <HiUserGroup className="mr-2 h-4 w-4 text-amber-300" />
-                      {selectedEvent.organizerCompany || "Not specified"}
+                      {selectedEvent.organizer_company || "Not specified"}
                     </p>
                   )}
                 </div>
@@ -209,13 +260,13 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                   {isEditing ? (
                     <textarea
                       rows="4"
-                      value={editedEvent.description || ""}
-                      onChange={(e) => handleInputChange("description", e.target.value)}
+                      value={editedEvent.event_description || ""}
+                      onChange={(e) => handleInputChange("event_description", e.target.value)}
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-300 dark:focus:ring-amber-300"
                     />
                   ) : (
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {selectedEvent.description || "No description provided"}
+                      {selectedEvent.event_description || "No description provided"}
                     </p>
                   )}
                 </div>
@@ -228,14 +279,14 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                     {isEditing ? (
                       <input
                         type="date"
-                        value={editedEvent.date}
-                        onChange={(e) => handleInputChange("date", e.target.value)}
+                        value={formatDate(editedEvent.event_date)}
+                        onChange={(e) => handleInputChange("event_date", e.target.value)}
                         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-amber-300 dark:focus:ring-amber-300"
                       />
                     ) : (
                       <p className="text-sm text-gray-900 dark:text-white flex items-center">
                         <HiCalendar className="mr-2 h-4 w-4 text-amber-300" />
-                        {selectedEvent.date}
+                        {formatDate(selectedEvent.event_date)}
                       </p>
                     )}
                   </div>
@@ -246,14 +297,14 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                     {isEditing ? (
                       <input
                         type="time"
-                        value={editedEvent.time}
-                        onChange={(e) => handleInputChange("time", e.target.value)}
+                        value={editedEvent.event_time || ""}
+                        onChange={(e) => handleInputChange("event_time", e.target.value)}
                         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-amber-300 dark:focus:ring-amber-300"
                       />
                     ) : (
                       <p className="text-sm text-gray-900 dark:text-white flex items-center">
                         <HiClock className="mr-2 h-4 w-4 text-amber-300" />
-                        {selectedEvent.time}
+                        {selectedEvent.event_time}
                       </p>
                     )}
                   </div>
@@ -262,41 +313,21 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                      Duration
-                    </label>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={editedEvent.duration}
-                        onChange={(e) => handleInputChange("duration", e.target.value)}
-                        placeholder="e.g., 2 hours"
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-300 dark:focus:ring-amber-300"
-                      />
-                    ) : (
-                      <p className="text-sm text-gray-900 dark:text-white">{selectedEvent.duration}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
                       Event Type
                     </label>
                     {isEditing ? (
                       <select
-                        value={editedEvent.eventType}
-                        onChange={(e) => handleInputChange("eventType", e.target.value)}
+                        value={editedEvent.event_type || ""}
+                        onChange={(e) => handleInputChange("event_type", e.target.value)}
                         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-amber-300 dark:focus:ring-amber-300"
                       >
-                        <option value="Conference">Conference</option>
-                        <option value="Seminar">Seminar</option>
-                        <option value="Workshop">Workshop</option>
-                        <option value="Webinar">Webinar</option>
-                        <option value="Networking">Networking</option>
-                        <option value="Trade Show">Trade Show</option>
-                        <option value="Other">Other</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="others">Others</option>
                       </select>
                     ) : (
                       <span className="inline-block rounded bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-300">
-                        {selectedEvent.eventType}
+                        {selectedEvent.event_type}
                       </span>
                     )}
                   </div>
@@ -327,59 +358,5 @@ export function EventsModal({ events = [], isOpen, onClose }) {
         </div>
       )}
     </>
-  );
-}
-
-export function EventsExample() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const sampleEvents = [
-    {
-      title: "Annual Tech Conference 2025",
-      organizerCompany: "Tech Summit Inc.",
-      description: "Join industry leaders for discussions on emerging technologies, AI trends, and digital transformation strategies.",
-      date: "2025-11-20",
-      time: "09:00",
-      duration: "2 days",
-      eventType: "Conference",
-      location: "Convention Center, New York"
-    },
-    {
-      title: "React Advanced Patterns Workshop",
-      organizerCompany: "Dev Academy",
-      description: "Learn advanced React patterns including hooks, context, and performance optimization techniques.",
-      date: "2025-11-25",
-      time: "10:00",
-      duration: "4 hours",
-      eventType: "Workshop",
-      location: "Online - Zoom"
-    },
-    {
-      title: "Web Development Seminar",
-      organizerCompany: "Code Masters",
-      description: "Comprehensive seminar covering latest web development practices and tools for 2025.",
-      date: "2025-11-18",
-      time: "14:00",
-      duration: "3 hours",
-      eventType: "Seminar",
-      location: "Tech Hub, Bangalore"
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center p-4">
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="rounded-lg bg-amber-300 px-6 py-3 text-base font-medium text-gray-900 hover:bg-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-300 dark:focus:ring-amber-800"
-      >
-        View All Events
-      </button>
-      
-      <EventsModal 
-        events={sampleEvents}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
-    </div>
   );
 }

@@ -29,6 +29,12 @@ const EventCard = ({
   const selectedStatusColor = statusColors[status] || statusColors.upcoming
   const selectedStatusTextColor = statusTextColors[status] || statusTextColors.upcoming
 
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  }
+
   return (
     <div
       onClick={onClick}
@@ -64,7 +70,7 @@ const EventCard = ({
       <div className="flex flex-col gap-1 text-xs sm:text-sm">
         <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
           <span>📅</span>
-          <span>{date}</span>
+          <span>{formatDate(date)}</span>
         </div>
         <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
           <span>🕐</span>
