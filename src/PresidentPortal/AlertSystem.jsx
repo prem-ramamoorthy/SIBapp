@@ -6,8 +6,8 @@ const AlertSystem = ({ onAlertSent }) => {
     title: "",
     message: "",
     notificationMethods: {
-      email: true,
-      sms: false,
+      inapp: true,
+      email: false,
     }
   })
 
@@ -46,7 +46,7 @@ const AlertSystem = ({ onAlertSent }) => {
       setError('Alert message is required')
       return false
     }
-    if (!formData.notificationMethods.email && !formData.notificationMethods.sms) {
+    if (!formData.notificationMethods.inapp && !formData.notificationMethods.email) {
       setError('Please select at least one notification method')
       return false
     }
@@ -81,26 +81,6 @@ const AlertSystem = ({ onAlertSent }) => {
     } catch (err) {
       console.log(err)
       setError('Failed to send alert')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSchedule = async () => {
-    if (!validateForm()) return
-    
-    setLoading(true)
-    setError(null)
-    
-    try {
-      // API call placeholder
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      setSuccess('Alert scheduled successfully!')
-      setTimeout(() => setSuccess(null), 3000)
-    } catch (err) {
-      console.log(err)
-      setError('Failed to schedule alert :')
     } finally {
       setLoading(false)
     }
@@ -206,7 +186,7 @@ const AlertSystem = ({ onAlertSent }) => {
               onChange={() => handleNotificationChange('email')}
               className="accent-blue-500 scale-110"
             />
-            <span className="text-gray-900 dark:text-gray-100 text-sm">Notify via Email</span>
+            <span className="text-gray-900 dark:text-gray-100 text-sm">In-App Notification</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input 
@@ -215,7 +195,7 @@ const AlertSystem = ({ onAlertSent }) => {
               onChange={() => handleNotificationChange('sms')}
               className="accent-blue-500 scale-110"
             />
-            <span className="text-gray-900 dark:text-gray-100 text-sm">Notify via SMS</span>
+            <span className="text-gray-900 dark:text-gray-100 text-sm">Notify via Email</span>
           </label>
         </div>
       </div>
@@ -265,20 +245,6 @@ const AlertSystem = ({ onAlertSent }) => {
         </button>
       </div>
 
-      <button 
-        onClick={handleSchedule}
-        disabled={loading}
-        className="
-          w-full mt-3 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600
-          font-semibold bg-gray-100 dark:bg-gray-900 
-          text-gray-900 dark:text-gray-100
-          hover:bg-gray-200 dark:hover:bg-gray-800
-          disabled:opacity-50 disabled:cursor-not-allowed
-          transition-colors duration-200 text-sm
-        "
-      >
-        {loading ? 'Scheduling...' : 'Schedule'}
-      </button>
     </div>
   )
 }

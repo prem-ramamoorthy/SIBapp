@@ -2,9 +2,42 @@ import { useState } from 'react'
 import SIBbutton from './components/SIBbutton'
 import CreateMeeting from './components/CreateMeeting'
 import EventCard from './components/EventCard'
-
+import { MeetingsModal } from './components/MeetingModal'
 
 function Hero() {
+  const meetingslist = [
+    {
+      title: "Project Kickoff Meeting",
+      description: "Initial meeting to discuss project scope, timeline, and team responsibilities. We'll review the requirements document and establish communication protocols.",
+      date: "2025-11-10",
+      time: "10:00",
+      duration: "1 hour",
+      meetingType: "Virtual",
+      location: "Zoom - https://zoom.us/j/123456789",
+      status: "Pending"
+    },
+    {
+      title: "Client Presentation",
+      description: "Present the final deliverables and demo the completed features to the client stakeholders.",
+      date: "2025-11-15",
+      time: "14:30",
+      duration: "2 hours",
+      meetingType: "In-Person",
+      location: "Conference Room A, 5th Floor",
+      status: "Pending"
+    },
+    {
+      title: "Weekly Team Sync",
+      description: "Regular weekly standup to discuss progress, blockers, and upcoming tasks for the sprint.",
+      date: "2025-11-05",
+      time: "09:00",
+      duration: "30 minutes",
+      meetingType: "Virtual",
+      location: "Google Meet",
+      status: "Completed"
+    }
+  ];
+  const [isOpen, setIsOpen] = useState(false);
   const [meetings, setMeetings] = useState([
     {
       id: 1,
@@ -32,7 +65,7 @@ function Hero() {
         transition-colors duration-300
       ">
         <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50 mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50 mb-4 max-w-full break-words">
             Meeting Management
           </h1>
 
@@ -58,12 +91,15 @@ function Hero() {
 
         <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
           <CreateMeeting />
-          {/* <SIBbutton 
-            content="View Calendar" 
-          /> */}
           <SIBbutton
-            content="View All Meetings"
+            content="View Meetings"
             variant="secondary"
+            onClick={() => setIsOpen(true)}
+          />
+          <MeetingsModal
+            meetings={meetingslist}
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
           />
           <SIBbutton
             content="Send Meeting Reminder"

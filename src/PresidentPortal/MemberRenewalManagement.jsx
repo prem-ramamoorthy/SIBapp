@@ -177,7 +177,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         </div>
       )}
 
-      <div className="mb-6">
+      <div className="mb-6 max-h-[320px] overflow-auto">
         {members.length > 0 ? (
           <div>
             {members.map(member => (

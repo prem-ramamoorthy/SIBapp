@@ -33,7 +33,7 @@ const EventCard = ({
     <div
       onClick={onClick}
       className={`
-        w-full sm:min-w-[280px] rounded-lg border-2
+        w-full sm:min-w-[280px] min-w-0 rounded-lg border-2
         p-4 sm:p-5
         shadow-md hover:shadow-lg
         transition-all duration-200
@@ -57,7 +57,7 @@ const EventCard = ({
         )}
       </div>
 
-      <h3 className="font-bold text-sm sm:text-base text-gray-900 dark:text-gray-50 line-clamp-2">
+      <h3 className="font-bold text-sm sm:text-base text-gray-900 dark:text-gray-50 whitespace-normal break-words max-w-full overflow-hidden">
         {title}
       </h3>
 
