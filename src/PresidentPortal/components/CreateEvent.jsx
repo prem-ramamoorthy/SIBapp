@@ -95,7 +95,7 @@ export default function CreateEvent() {
         <ModalHeader className="border-b-4 border-amber-300 px-8 py-5 bg-gradient-to-r from-amber-50 to-white dark:from-gray-900 dark:to-gray-800">
         </ModalHeader>
         <ModalBody className="px-6 py-6 bg-white dark:bg-gray-900 rounded-xl">
-          <form onSubmit={handleSubmit} noValidate className="space-y-5">
+          <form onSubmit={handleSubmit} noValidate className="space-y-5 mt-30">
             <div className="flex items-center gap-4 w-full mt-5 justify-between">
               <div className="p-3 bg-gradient-to-br bg-amber-300 rounded-xl shadow-lg">
                 <FileText className="w-7 h-7 text-gray-900" />
