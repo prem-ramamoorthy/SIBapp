@@ -1,5 +1,5 @@
 function Events({
-  company = "The Future of AI in Everyday Life",
+  title = "The Future of AI in Everyday Life",
   date = "July 15, 2024",
   time = "3:00 PM - 4:00 PM",
 }) {
@@ -15,7 +15,7 @@ function Events({
       "
     >
       <h3 className="text-gray-600 dark:text-gray-300">
-        <span className="font-semibold text-gray-800 dark:text-gray-100">Company :</span> {company}
+        <span className="font-semibold text-gray-800 dark:text-gray-100">Title :</span> {title}
       </h3>
       <p className="text-gray-600 dark:text-gray-300">
         <span className="font-semibold text-gray-800 dark:text-gray-100">Date :</span> {date} |{" "}

@@ -1,10 +1,36 @@
-import { useState } from "react";
-import { HiX, HiPencil, HiCheck, HiClock, HiCalendar, HiLocationMarker, HiUserGroup } from "react-icons/hi";
+import { useEffect, useState } from "react";
+import useFetch from "../../hooks/useFetch";
+import {
+  HiX,
+  HiPencil,
+  HiCheck,
+  HiClock,
+  HiCalendar,
+  HiLocationMarker,
+  HiUserGroup,
+} from "react-icons/hi";
 
 export function EventsModal({ events = [], isOpen, onClose }) {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedEvent, setEditedEvent] = useState(null);
+  const [errors, setErrors] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [canedit, setCanedit] = useState(false);
+
+  const { data: access } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/caneditevents`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
+  useEffect(() => {
+    if (access && typeof access.hasaccess === "boolean") {
+      setCanedit(access.hasaccess);
+    }
+  }, [access]);
 
   const handleViewDetails = (event) => {
     setSelectedEvent(event);
@@ -23,9 +49,6 @@ export function EventsModal({ events = [], isOpen, onClose }) {
     setEditedEvent({ ...editedEvent, [field]: value });
   };
 
-  const [errors, setErrors] = useState(null);
-  const [isSaving, setIsSaving] = useState(false);
-
   const handleSave = async () => {
     setErrors(null);
     setIsSaving(true);
@@ -34,10 +57,10 @@ export function EventsModal({ events = [], isOpen, onClose }) {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/event/updateevent`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(editedEvent)
+        body: JSON.stringify(editedEvent),
       });
 
       const result = await res.json();
@@ -49,18 +72,15 @@ export function EventsModal({ events = [], isOpen, onClose }) {
       if (result.message === "success") {
         setSelectedEvent(editedEvent);
         setIsEditing(false);
-        console.log("Saved event:", editedEvent);
       } else {
         throw new Error(result.message || "Failed to update event");
       }
     } catch (error) {
-      console.error("Error saving event:", error);
       setErrors(error.message || "An unexpected error occurred");
     } finally {
       setIsSaving(false);
     }
   };
-
 
   const handleCloseDetail = () => {
     setSelectedEvent(null);
@@ -76,7 +96,7 @@ export function EventsModal({ events = [], isOpen, onClose }) {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    return date.toISOString().split("T")[0];
   };
 
   if (!isOpen) return null;
@@ -94,11 +114,12 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                 type="button"
                 onClick={handleMainClose}
                 className="ml-auto inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white"
+                aria-label="Close modal"
               >
                 <HiX className="h-5 w-5" />
               </button>
             </div>
-
+            
             <div className="space-y-4 p-6">
               {events.length === 0 ? (
                 <div className="text-center py-8">
@@ -132,9 +153,22 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                               <HiLocationMarker className="mr-2 h-4 w-4 text-amber-300" />
                               <span>{event.location || "Not specified"}</span>
                             </div>
-                            <div className="flex items-center">
-                              <span className="text-xs font-medium px-2.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-medium px-2.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 capitalize">
                                 {event.event_type}
+                              </span>
+                              <span
+                                className={`inline-block rounded px-2.5 py-0.5 text-xs font-medium capitalize ${
+                                  event.event_status === "completed"
+                                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                                    : event.event_status === "cancelled"
+                                    ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                    : event.event_status === "upcoming"
+                                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                                    : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300"
+                                }`}
+                              >
+                                {event.event_status || "upcoming"}
                               </span>
                             </div>
                           </div>
@@ -164,7 +198,7 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                   {isEditing ? "Edit Event" : "Event Details"}
                 </h3>
                 <div className="flex items-center space-x-2">
-                  {!isEditing ? (
+                  {!isEditing && canedit ? (
                     <button
                       type="button"
                       onClick={handleEditToggle}
@@ -173,19 +207,36 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                       <HiPencil className="mr-1 h-4 w-4" />
                       Edit
                     </button>
-                  ) : (
+                  ) : canedit ? (
                     <>
                       <button
                         type="button"
                         onClick={handleSave}
                         disabled={isSaving}
-                        className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-medium ${isSaving ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
-                          } text-white focus:outline-none focus:ring-4 focus:ring-green-300`}
+                        className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-medium ${
+                          isSaving ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
+                        } text-white focus:outline-none focus:ring-4 focus:ring-green-300`}
                       >
                         {isSaving ? (
-                          <svg className="animate-spin h-5 w-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                          <svg
+                            className="animate-spin h-5 w-5 mr-1"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                            />
                           </svg>
                         ) : (
                           <HiCheck className="mr-1 h-4 w-4" />
@@ -200,11 +251,12 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                         Cancel
                       </button>
                     </>
-                  )}
+                  ) : null}
                   <button
                     type="button"
                     onClick={handleCloseDetail}
                     className="ml-2 inline-flex items-center rounded-lg bg-transparent p-1.5 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-white"
+                    aria-label="Close details modal"
                   >
                     <HiX className="h-5 w-5" />
                   </button>
@@ -213,10 +265,9 @@ export function EventsModal({ events = [], isOpen, onClose }) {
 
               <div className="space-y-6 p-6">
                 {errors && (
-                  <p className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">
-                    {errors}
-                  </p>
+                  <p className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">{errors}</p>
                 )}
+
                 <div>
                   <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
                     Event Title
@@ -226,7 +277,7 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                       type="text"
                       value={editedEvent.event_title || ""}
                       onChange={(e) => handleInputChange("event_title", e.target.value)}
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-300 dark:focus:ring-amber-300"
+                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
                   ) : (
                     <p className="text-base text-gray-900 dark:text-white">{selectedEvent.event_title}</p>
@@ -242,8 +293,7 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                       type="text"
                       value={editedEvent.organizer_company || ""}
                       onChange={(e) => handleInputChange("organizer_company", e.target.value)}
-                      placeholder="Organizer or company name"
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-300 dark:focus:ring-amber-300"
+                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
                   ) : (
                     <p className="text-sm text-gray-900 dark:text-white flex items-center">
@@ -262,7 +312,7 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                       rows="4"
                       value={editedEvent.event_description || ""}
                       onChange={(e) => handleInputChange("event_description", e.target.value)}
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-300 dark:focus:ring-amber-300"
+                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
                   ) : (
                     <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -281,7 +331,7 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                         type="date"
                         value={formatDate(editedEvent.event_date)}
                         onChange={(e) => handleInputChange("event_date", e.target.value)}
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-amber-300 dark:focus:ring-amber-300"
+                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       />
                     ) : (
                       <p className="text-sm text-gray-900 dark:text-white flex items-center">
@@ -290,6 +340,7 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                       </p>
                     )}
                   </div>
+
                   <div>
                     <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
                       Time
@@ -299,7 +350,7 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                         type="time"
                         value={editedEvent.event_time || ""}
                         onChange={(e) => handleInputChange("event_time", e.target.value)}
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-amber-300 dark:focus:ring-amber-300"
+                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       />
                     ) : (
                       <p className="text-sm text-gray-900 dark:text-white flex items-center">
@@ -319,37 +370,69 @@ export function EventsModal({ events = [], isOpen, onClose }) {
                       <select
                         value={editedEvent.event_type || ""}
                         onChange={(e) => handleInputChange("event_type", e.target.value)}
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-amber-300 dark:focus:ring-amber-300"
+                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       >
                         <option value="weekly">Weekly</option>
                         <option value="monthly">Monthly</option>
                         <option value="others">Others</option>
                       </select>
                     ) : (
-                      <span className="inline-block rounded bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-300">
+                      <span className="inline-block rounded bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-300 capitalize">
                         {selectedEvent.event_type}
                       </span>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+                      Location
+                    </label>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={editedEvent.location || ""}
+                        onChange={(e) => handleInputChange("location", e.target.value)}
+                        placeholder="Event location or link"
+                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      />
+                    ) : (
+                      <p className="text-sm text-gray-900 dark:text-white flex items-center">
+                        <HiLocationMarker className="mr-2 h-4 w-4 text-amber-300" />
+                        {selectedEvent.location || "Not specified"}
+                      </p>
                     )}
                   </div>
                 </div>
 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
-                    Location
+                    Event Status
                   </label>
                   {isEditing ? (
-                    <input
-                      type="text"
-                      value={editedEvent.location || ""}
-                      onChange={(e) => handleInputChange("location", e.target.value)}
-                      placeholder="Event location or link"
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-amber-300 dark:focus:ring-amber-300"
-                    />
+                    <select
+                      value={editedEvent.event_status || "upcoming"}
+                      onChange={(e) => handleInputChange("event_status", e.target.value)}
+                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    >
+                      <option value="upcoming">Upcoming</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                      <option value="inprogress">In Progress</option>
+                    </select>
                   ) : (
-                    <p className="text-sm text-gray-900 dark:text-white flex items-center">
-                      <HiLocationMarker className="mr-2 h-4 w-4 text-amber-300" />
-                      {selectedEvent.location || "Not specified"}
-                    </p>
+                    <span
+                      className={`inline-block rounded px-2.5 py-1 text-xs font-medium capitalize ${
+                        selectedEvent.event_status === "completed"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                          : selectedEvent.event_status === "cancelled"
+                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                          : selectedEvent.event_status === "inprogress"
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                      }`}
+                    >
+                      {selectedEvent.event_status}
+                    </span>
                   )}
                 </div>
               </div>

@@ -1,9 +1,11 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import Events from "./Components/Events";
 import { NavLink } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import Loading from "../Components/Loading";
 import { useEffect, useState } from "react";
+import { BiErrorCircle } from "react-icons/bi";
+import { EventsModal } from "../PresidentPortal/components/EventModal";
 
 const coordinators = [
   { name: "Yogibalu", role: "President" },
@@ -17,6 +19,16 @@ function UpcomingEvents() {
 
   const { data, loading, error } = useFetch(
     `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/getupcomingevents`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { data: events, loading: eventloading, error: eventerror } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/event/getallevents`,
     {
       method: "GET",
       credentials: "include",
@@ -60,19 +72,26 @@ function UpcomingEvents() {
         <div className="w-1/2">
           <div className="flex items-center justify-between py-3 sm:px-6 sm:py-4 shrink-0 border-b border-gray-200 dark:border-gray-700 ">
             <h2 className="text-[16px] sm:text-xl font-bold text-gray-900 dark:text-gray-100 m-0">
-              Upcoming Events
+              Upcoming Event
             </h2>
-            <NavLink
+          {eventloading ? <Loader2 /> : eventerror ? <BiErrorCircle /> : events ? (
+          <>
+            <button
               className="
             flex items-center gap-2 p-2 rounded-md
             hover:bg-gray-100 dark:hover:bg-gray-800
             transition-colors duration-200
-          "
+          " onClick={() => setIsModalOpen(true)}
               aria-label="See all events"
-              to={"/events"}
             >
               <ArrowRight className="h-4 w-4 text-gray-700 dark:text-gray-300" />
-            </NavLink>
+            </button>
+            <EventsModal
+              events={events}
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+            />
+          </>) : null}
           </div>
 
           {error && (
@@ -99,7 +118,7 @@ function UpcomingEvents() {
             ) : hasEvent ? (
               <div className="w-full overflow-auto">
                 <Events
-                  company={event.companyName}
+                  title={event.companyName}
                   date={event.date}
                   time={event.time}
                   vatNumber={event.VATnumber}

@@ -137,7 +137,7 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                               <span>{formatDate(meeting.meeting_date)}</span>
                               <HiClock className="ml-4 mr-2 h-4 w-4 text-amber-300" />
                               <span>
-                                {meeting.meeting_time} ({meeting.duration || "N/A"})
+                                {meeting.meeting_time} ({meeting.duration || "N/A"}) Minutes
                               </span>
                             </div>
                             <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
