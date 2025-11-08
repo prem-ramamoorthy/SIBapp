@@ -24,20 +24,20 @@ function ButtonUI({ label, description, component }) {
       <button
         onClick={handleToggle}
         className="
-          bg-yellow-300  dark:bg-yellow-500
-          hover:bg-yellow-500 dark:hover:bg-yellow-500/80
+          bg-yellow-300  dark:bg-yellow-400
+          hover:bg-yellow-500 dark:hover:bg-yellow-400/80
           rounded-2xl
           hover:scale-105 transition-transform duration-200 ease-in-out
           flex flex-col items-center justify-center
           h-4/5 w-full p-2
           lg:h-auto lg:w-60 md:h-auto md:w-40
-          text-black dark:text-white
+          text-black
         "
         type="button"
       >
         <div>
           <h4 className="text-[0.9rem] font-semibold mt-1">{label}</h4>
-          <p className="text-[0.8rem] font-semibold mb-2 text-gray-600 dark:text-gray-300">{description}</p>
+          <p className="text-[0.8rem] font-semibold mb-2 text-gray-600">{description}</p>
         </div>
       </button>
 
