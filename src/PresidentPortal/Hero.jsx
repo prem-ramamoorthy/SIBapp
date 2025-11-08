@@ -82,9 +82,9 @@ function Hero() {
   return (
     <div className="w-full">
       <div className="
-        bg-white dark:bg-gray-800 
+        bg-white dark:bg-gray-900 
         rounded-2xl shadow-lg 
-        border border-gray-200 dark:border-gray-700
+        border border-gray-200 dark:border-gray-900
         p-4 sm:p-6 lg:p-8
         transition-colors duration-300
       ">

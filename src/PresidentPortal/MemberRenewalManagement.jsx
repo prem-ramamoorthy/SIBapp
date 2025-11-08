@@ -340,7 +340,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
   const filteredMembers = getFilteredMembers();
 
   return (
-    <div className="w-full rounded-2xl p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+    <div className="w-full rounded-2xl p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
       <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-gray-50">
         Member Renewal Management
       </h2>
@@ -436,7 +436,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         </div>
       )}
 
-      <div className="mb-6 max-h-[500px] overflow-auto">
+      <div className="mb-6 max-h-[280px] overflow-auto">
         {filteredMembers.length > 0 ? (
           <div>
             {filteredMembers.map((member) => (
