@@ -80,6 +80,22 @@ export default function CreateEvent() {
         });
         const result = await res.json();
         if (result?.message === "success") {
+          const notificationData = {
+            header: `A new Event has been scheduled.`,
+            content: `A new Event titled ${title} has been scheduled for ${date} at ${time} in ${location}. Please review the meeting details and ensure your availability. Please mark your calendar and be prepared to attend.
+            Thank you!`,
+            read: false,
+          };
+
+          await fetch(
+            `${import.meta.env.VITE_BACKEND_SERVER}/notification/createbulknotifications`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(notificationData),
+              credentials: "include",
+            }
+          );
           setId(result.id);
           setIsSubmitting(false);
           setSuccess(true);
@@ -139,9 +155,8 @@ export default function CreateEvent() {
                 type="text"
                 placeholder="Enter Event title"
                 ref={initialFocusRef}
-                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
-                  errors.title ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                } focus:outline-none focus:ring-2 transition`}
+                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.title ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                  } focus:outline-none focus:ring-2 transition`}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={errors.title ? "true" : "false"}
@@ -157,9 +172,8 @@ export default function CreateEvent() {
                 id="company"
                 type="text"
                 placeholder="Enter Organizer Company Name"
-                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
-                  errors.company ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                } focus:outline-none focus:ring-2 transition`}
+                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.company ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                  } focus:outline-none focus:ring-2 transition`}
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 aria-invalid={errors.company ? "true" : "false"}
@@ -190,9 +204,8 @@ export default function CreateEvent() {
                 <input
                   id="date"
                   type="date"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
-                    errors.date ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.date ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                    } focus:outline-none focus:ring-2 transition`}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   aria-invalid={errors.date ? "true" : "false"}
@@ -208,9 +221,8 @@ export default function CreateEvent() {
                 <input
                   id="time"
                   type="time"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
-                    errors.time ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.time ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                    } focus:outline-none focus:ring-2 transition`}
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   aria-invalid={errors.time ? "true" : "false"}
@@ -250,9 +262,8 @@ export default function CreateEvent() {
                   id="location"
                   type="text"
                   placeholder="Enter Event location"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
-                    errors.location ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.location ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                    } focus:outline-none focus:ring-2 transition`}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   aria-invalid={errors.location ? "true" : "false"}

@@ -7,6 +7,8 @@ import useFetch from '../hooks/useFetch';
 
 function Hero() {
   const [isOpen, setIsOpen] = useState(false);
+  const [reminderStatus, setReminderStatus] = useState(null);
+  const [sending, setSending] = useState(false);
 
   const { data: meetings, loading, error } = useFetch(
     `${import.meta.env.VITE_BACKEND_SERVER}/meeting/getmeetings`,
@@ -16,17 +18,76 @@ function Hero() {
     }
   );
 
+  function reminderHeader(meeting) {
+    return `Meeting Reminder: ${meeting.title}`;
+  }
+
+  function reminderContent(meeting) {
+    return `This is a reminder for your upcoming meeting "${meeting.title}" scheduled on ${new Date(meeting.meeting_date).toLocaleDateString()} at ${meeting.meeting_time} in ${meeting.location || "the designated location"}.\nMeeting type: ${meeting.meeting_type}. Duration: ${meeting.duration} minutes.\n${meeting.meeting_notes ? "\nNotes: " + meeting.meeting_notes : ""}`;
+  }
+
+  const sendRemainder = async () => {
+    setReminderStatus(null);
+    setSending(true);
+
+    try {
+      const meetingRes = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/meeting/getlatestmeeting`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      );
+      if (!meetingRes.ok) {
+        const errMsg = (await meetingRes.json()).message || "Failed to fetch meeting";
+        throw new Error(errMsg);
+      }
+      const meeting = await meetingRes.json();
+
+      const payload = {
+        header: reminderHeader(meeting),
+        content: reminderContent(meeting),
+      };
+
+      const notifRes = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/notification/createbulknotifications`, {
+          method: 'POST',
+          headers: {"Content-Type": "application/json"},
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        }
+      );
+
+      const result = await notifRes.json();
+      if (!notifRes.ok) {
+        throw new Error(result.error || "Failed to send notifications");
+      }
+
+      setReminderStatus({
+        success: true,
+        count: result.count,
+        message: result.message,
+      });
+
+    } catch (err) {
+      setReminderStatus({
+        success: false,
+        message: err.message || "Error while sending reminder.",
+      });
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div className="w-full">
-      <div
-        className="
-          bg-white dark:bg-gray-800 
-          rounded-2xl shadow-lg 
-          border border-gray-200 dark:border-gray-700
-          p-4 sm:p-6 lg:p-8
-          transition-colors duration-300
-        "
-      >
+      <div className="
+        bg-white dark:bg-gray-800 
+        rounded-2xl shadow-lg 
+        border border-gray-200 dark:border-gray-700
+        p-4 sm:p-6 lg:p-8
+        transition-colors duration-300
+      ">
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50 mb-4 max-w-full break-words">
             Meeting Management
@@ -76,10 +137,21 @@ function Hero() {
             onClose={() => setIsOpen(false)}
           />
           <SIBbutton
-            content="Send Meeting Reminder"
+            content={sending ? "Sending..." : "Send latest Meeting Reminder"}
             variant="secondary"
+            onClick={sendRemainder}
+            disabled={sending}
           />
         </div>
+
+        {reminderStatus && (
+          <div className={`mt-6 p-4 rounded-lg ${reminderStatus.success ? "bg-green-300 dark:bg-green-500/80 text-black" : "bg-red-400 dark:bg-red-500/80 text-black"}`}>
+            {reminderStatus.success
+              ? `Success! ${reminderStatus.message}${reminderStatus.count ? ` (${reminderStatus.count} users notified)` : ""}`
+              : `Error: ${reminderStatus.message}`
+            }
+          </div>
+        )}
       </div>
     </div>
   );

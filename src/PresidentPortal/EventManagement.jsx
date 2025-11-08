@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
-import EventCard from './components/EventCard'
-import SIBbutton from './components/SIBbutton'
-import CreateEvent from './components/CreateEvent'
-import { EventsModal } from './components/EventModal'
-import useFetch from '../hooks/useFetch'
+import React, { useState } from 'react';
+import EventCard from './components/EventCard';
+import SIBbutton from './components/SIBbutton';
+import CreateEvent from './components/CreateEvent';
+import { EventsModal } from './components/EventModal';
+import useFetch from '../hooks/useFetch';
 
 function EventManagement() {
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reminderStatus, setReminderStatus] = useState(null);
+  const [sending, setSending] = useState(false);
 
   const { data, loading, error } = useFetch(
     `${import.meta.env.VITE_BACKEND_SERVER}/event/getallevents`,
@@ -16,6 +17,67 @@ function EventManagement() {
       credentials: "include",
     }
   );
+
+  function reminderHeader(event) {
+    return `Event Reminder: ${event.event_title}`;
+  }
+
+  function reminderContent(event) {
+    return `This is a reminder for your upcoming event "${event.event_title}" scheduled on ${new Date(event.event_date).toLocaleDateString()} at ${event.event_time} in ${event.location || "the designated location"}.\nEvent type: ${event.event_type}. Status: ${event.event_status}.\n${event.event_description ? "\nDescription: " + event.event_description : ""}`;
+  }
+
+  const sendEventReminder = async () => {
+    setReminderStatus(null);
+    setSending(true);
+
+    try {
+      const eventRes = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/event/getlatestevent`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      );
+      if (!eventRes.ok) {
+        const errMsg = (await eventRes.json()).message || "Failed to fetch event";
+        throw new Error(errMsg);
+      }
+      const event = await eventRes.json();
+
+      const payload = {
+        header: reminderHeader(event),
+        content: reminderContent(event),
+      };
+
+      const notifRes = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/notification/createbulknotifications`,
+        {
+          method: 'POST',
+          headers: { "Content-Type": "application/json" },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        }
+      );
+
+      const result = await notifRes.json();
+      if (!notifRes.ok) {
+        throw new Error(result.error || "Failed to send notifications");
+      }
+
+      setReminderStatus({
+        success: true,
+        count: result.count,
+        message: result.message,
+      });
+    } catch (err) {
+      setReminderStatus({
+        success: false,
+        message: err.message || "Error while sending reminder.",
+      });
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -71,10 +133,21 @@ function EventManagement() {
             onClose={() => setIsModalOpen(false)}
           />
           <SIBbutton
-            content="Send Event Reminder"
+            content={sending ? "Sending..." : "Send latest Event Reminder"}
             variant="secondary"
+            onClick={sendEventReminder}
+            disabled={sending}
           />
         </div>
+
+        {reminderStatus && (
+          <div className={`mt-6 p-4 rounded-lg ${reminderStatus.success ? "bg-green-300 dark:bg-green-500/80 text-black" : "bg-red-400 dark:bg-red-500/80 text-black"}`}>
+            {reminderStatus.success
+              ? `Success! ${reminderStatus.message}${reminderStatus.count ? ` (${reminderStatus.count} users notified)` : ""}`
+              : `Error: ${reminderStatus.message}`
+            }
+          </div>
+        )}
 
         {loading && (
           <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -83,7 +156,7 @@ function EventManagement() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default EventManagement
+export default EventManagement;

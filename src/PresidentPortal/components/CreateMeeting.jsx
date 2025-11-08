@@ -92,6 +92,22 @@ export default function ModalViewer() {
         });
         const result = await res.json();
         if (result?.message === "success") {
+          const notificationData = {
+            header: `A new chapter meeting has been scheduled.`,
+            content: `A new meeting titled ${title} has been scheduled for ${date} at ${time} in ${location}. Please review the meeting details and ensure your availability. Please mark your calendar and be prepared to attend.
+            Thank you!`,
+            read: false,
+          };
+
+          await fetch(
+            `${import.meta.env.VITE_BACKEND_SERVER}/notification/createbulknotifications`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(notificationData),
+              credentials: "include",
+            }
+          );
           setId(result.id);
           setIsSubmitting(false);
           setSuccess(true);
@@ -151,9 +167,8 @@ export default function ModalViewer() {
                 type="text"
                 placeholder="Enter Meeting title"
                 ref={initialFocusRef}
-                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
-                  errors.title ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                } focus:outline-none focus:ring-2 transition`}
+                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.title ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                  } focus:outline-none focus:ring-2 transition`}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 aria-invalid={errors.title ? "true" : "false"}
@@ -184,9 +199,8 @@ export default function ModalViewer() {
                 <input
                   id="date"
                   type="date"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
-                    errors.date ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.date ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                    } focus:outline-none focus:ring-2 transition`}
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   aria-invalid={errors.date ? "true" : "false"}
@@ -202,9 +216,8 @@ export default function ModalViewer() {
                 <input
                   id="time"
                   type="time"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
-                    errors.time ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.time ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                    } focus:outline-none focus:ring-2 transition`}
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   aria-invalid={errors.time ? "true" : "false"}
@@ -219,9 +232,8 @@ export default function ModalViewer() {
               </label>
               <select
                 id="duration"
-                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
-                  errors.duration ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                } focus:outline-none focus:ring-2 transition`}
+                className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.duration ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                  } focus:outline-none focus:ring-2 transition`}
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 aria-invalid={errors.duration ? "true" : "false"}
@@ -267,9 +279,8 @@ export default function ModalViewer() {
                   id="location"
                   type="text"
                   placeholder="Enter meeting location"
-                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${
-                    errors.location ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
-                  } focus:outline-none focus:ring-2 transition`}
+                  className={`w-full rounded-lg border-2 px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 ${errors.location ? "border-red-500 dark:border-red-400 focus:ring-red-300" : "border-amber-200 dark:border-gray-700 focus:ring-amber-300"
+                    } focus:outline-none focus:ring-2 transition`}
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   aria-invalid={errors.location ? "true" : "false"}
