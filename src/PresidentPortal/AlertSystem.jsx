@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState } from "react";
 
 const AlertSystem = ({ onAlertSent }) => {
   const [formData, setFormData] = useState({
@@ -9,23 +9,23 @@ const AlertSystem = ({ onAlertSent }) => {
       inapp: true,
       email: false,
     }
-  })
+  });
 
-  const [loading, setLoading] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(null)
+  const [loading, setLoading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const handleTypeChange = (type) => {
-    setFormData(prev => ({ ...prev, type }))
-  }
+    setFormData(prev => ({ ...prev, type }));
+  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
-    }))
-  }
+    }));
+  };
 
   const handleNotificationChange = (method) => {
     setFormData(prev => ({
@@ -34,63 +34,83 @@ const AlertSystem = ({ onAlertSent }) => {
         ...prev.notificationMethods,
         [method]: !prev.notificationMethods[method]
       }
-    }))
-  }
+    }));
+  };
 
   const validateForm = () => {
     if (!formData.title.trim()) {
-      setError('Alert title is required')
-      return false
+      setError('Alert title is required');
+      return false;
     }
     if (!formData.message.trim()) {
-      setError('Alert message is required')
-      return false
+      setError('Alert message is required');
+      return false;
     }
     if (!formData.notificationMethods.inapp && !formData.notificationMethods.email) {
-      setError('Please select at least one notification method')
-      return false
+      setError('Please select at least one notification method');
+      return false;
     }
-    return true
-  }
+    return true;
+  };
 
   const handleSendNow = async () => {
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
-    setLoading(true)
-    setError(null)
-    
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
     try {
-      // API call placeholder
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      setSuccess('Alert sent successfully!')
-      setTimeout(() => setSuccess(null), 3000)
-      
-      // Reset form
+      const payload = {
+        header: `[${formData.type}] ${formData.title}`,
+        content: formData.message,
+        type: formData.type,
+        methods: {
+          inapp: formData.notificationMethods.inapp,
+          email: formData.notificationMethods.email
+        }
+      };
+
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/notification/createbulknotifications`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send alert.");
+      }
+      setSuccess('Alert sent successfully!');
+      setTimeout(() => setSuccess(null), 3000);
+
       setFormData({
         type: "Announcement",
         title: "",
         message: "",
         notificationMethods: {
-          email: true,
-          sms: false,
+          inapp: true,
+          email: false
         }
-      })
-      
-      onAlertSent?.()
+      });
+
+      onAlertSent?.();
     } catch (err) {
-      console.log(err)
-      setError('Failed to send alert')
+      setError(err.message || "Failed to send alert");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const alertTypeColors = {
     Announcement: 'border-blue-300 bg-blue-50 dark:bg-blue-950',
     Urgent: 'border-red-300 bg-red-50 dark:bg-red-950',
     'Event Info': 'border-green-300 bg-green-50 dark:bg-green-950'
-  }
+  };
 
   return (
     <div className="
@@ -181,18 +201,18 @@ const AlertSystem = ({ onAlertSent }) => {
         <div className="flex flex-wrap gap-4 sm:gap-6">
           <label className="flex items-center gap-2 cursor-pointer">
             <input 
-              type="checkbox" 
-              checked={formData.notificationMethods.email} 
-              onChange={() => handleNotificationChange('email')}
+              type="checkbox"
+              checked={formData.notificationMethods.inapp}
+              onChange={() => handleNotificationChange('inapp')}
               className="accent-blue-500 scale-110"
             />
             <span className="text-gray-900 dark:text-gray-100 text-sm">In-App Notification</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
             <input 
-              type="checkbox" 
-              checked={formData.notificationMethods.sms} 
-              onChange={() => handleNotificationChange('sms')}
+              type="checkbox"
+              checked={formData.notificationMethods.email}
+              onChange={() => handleNotificationChange('email')}
               className="accent-blue-500 scale-110"
             />
             <span className="text-gray-900 dark:text-gray-100 text-sm">Notify via Email</span>
@@ -206,7 +226,7 @@ const AlertSystem = ({ onAlertSent }) => {
           ${alertTypeColors[formData.type]}
         `}>
           <h3 className="font-bold mb-2 text-gray-900 dark:text-gray-50">Preview:</h3>
-          <p className="font-semibold mb-2 text-gray-900 dark:text-gray-50">{formData.title}</p>
+          <p className="font-semibold mb-2 text-gray-900 dark:text-gray-50">{`[${formData.type}] ${formData.title}`}</p>
           <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{formData.message}</p>
         </div>
       )}
@@ -226,7 +246,6 @@ const AlertSystem = ({ onAlertSent }) => {
         >
           {showPreview ? 'Hide Preview' : 'Preview Alert'}
         </button>
-        
         <button 
           onClick={handleSendNow}
           disabled={loading}
@@ -244,9 +263,8 @@ const AlertSystem = ({ onAlertSent }) => {
           {loading ? 'Sending...' : 'Send Now'}
         </button>
       </div>
-
     </div>
-  )
-}
+  );
+};
 
-export default AlertSystem
+export default AlertSystem;

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { HiChevronDown, HiArrowUp, HiArrowDown } from "react-icons/hi";
+import { HiArrowUp, HiArrowDown } from "react-icons/hi";
 
 const MemberCard = ({ member, onSendReminder, loading }) => (
   <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 mb-3 shadow-sm transition-colors duration-200">
     <div className="flex-1 mb-4 sm:mb-0">
       <div className="font-bold text-lg text-gray-900 dark:text-gray-50">
         {member.name}
+      </div>
+      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        Email: {member.email}
       </div>
       <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
         Due: {member.dueDate}
@@ -15,7 +18,7 @@ const MemberCard = ({ member, onSendReminder, loading }) => (
       </div>
     </div>
     <button
-      onClick={() => onSendReminder(member.id)}
+      onClick={() => onSendReminder(member)}
       disabled={loading}
       className="ml-4 px-4 py-2 rounded-lg font-medium text-sm border border-amber-300 bg-amber-300 text-gray-900 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
     >
@@ -44,29 +47,41 @@ const FilterButton = ({ label, value, isActive, onClick, isAlert }) => (
   </button>
 );
 
-const MemberRenewalManagement = ({ refreshTrigger }) => {
-  const [members, setMembers] = useState([
-    {
-      id: 1,
-      name: "John Smith",
-      dueDate: "5 Nov 2025",
-      status: "Pending notification",
-    },
-    {
-      id: 2,
-      name: "Jane Doe",
-      dueDate: "10 Nov 2025",
-      status: "Pending notification",
-    },
-    {
-      id: 3,
-      name: "Mike Johnson",
-      dueDate: "3 Nov 2025",
-      status: "Overdue",
-    },
-  ]);
+function getStatus(renewal, active) {
+  if (!active) return "Inactive";
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const renewDate = new Date(renewal);
+  renewDate.setHours(0, 0, 0, 0);
+  if (renewDate < now) return "Overdue";
+  return "Pending notification";
+}
 
+function formatDate(d) {
+  if (!d) return "";
+  return new Date(d).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  });
+}
+
+function getStartOfDay(date) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function getEndOfDay(date) {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+
+const MemberRenewalManagement = ({ refreshTrigger }) => {
+  const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
   const [selectedReminder, setSelectedReminder] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -75,20 +90,63 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
   const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
-    console.log("Members data refreshed");
+    fetchMembers();
   }, [refreshTrigger]);
 
+  const fetchMembers = async () => {
+    setFetching(true);
+    setError(null);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/chapter/membership/getallmemberships`, {
+        credentials: "include",
+        method: "GET"
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to load memberships");
+      }
+      const list = await res.json();
+      setMembers(list.map(m => ({
+        id: m._id,
+        name: m.user?.username || "Unknown",
+        userId: m.user?._id,
+        email: m.user?.email || "N/A",
+        dueDate: formatDate(m.renewal_date),
+        rawDueDate: m.renewal_date,
+        status: getStatus(m.renewal_date, m.membership_status),
+        chapter: m.chapter?.chapter_name || "",
+        membershipStatus: m.membership_status,
+      })));
+    } catch (err) {
+      setError(err.message || "Failed to fetch members");
+    } finally {
+      setFetching(false);
+    }
+  };
+
   const getFilteredMembers = () => {
+    const now = new Date();
+    const today = getStartOfDay(now);
+    const endOfWeek = new Date(today);
+    endOfWeek.setDate(endOfWeek.getDate() + 7);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
     let filtered = members;
 
     if (activeFilter === "thisMonth") {
-      filtered = members.filter(m => m.status === "Pending notification" || m.status === "Overdue");
+      filtered = members.filter(m => {
+        if (m.status !== "Pending notification" && m.status !== "Overdue") return false;
+        if (!m.rawDueDate) return false;
+        const dueDate = getStartOfDay(new Date(m.rawDueDate));
+        return dueDate >= startOfMonth && dueDate <= endOfMonth;
+      });
     } else if (activeFilter === "thisWeek") {
       filtered = members.filter(m => {
-        const dueDate = new Date(m.dueDate);
-        const today = new Date();
-        const weekFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-        return dueDate <= weekFromNow && dueDate >= today;
+        if (m.status !== "Pending notification" && m.status !== "Overdue") return false;
+        if (!m.rawDueDate) return false;
+        const dueDate = getStartOfDay(new Date(m.rawDueDate));
+        return dueDate >= today && dueDate <= endOfWeek;
       });
     } else if (activeFilter === "overdue") {
       filtered = members.filter(m => m.status === "Overdue");
@@ -106,38 +164,57 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         compareA = a.name.toLowerCase();
         compareB = b.name.toLowerCase();
       } else if (sortBy === "dueDate") {
-        compareA = new Date(a.dueDate);
-        compareB = new Date(b.dueDate);
+        compareA = new Date(a.rawDueDate || 0);
+        compareB = new Date(b.rawDueDate || 0);
       } else if (sortBy === "status") {
         compareA = a.status.toLowerCase();
         compareB = b.status.toLowerCase();
       }
 
       if (sortOrder === "asc") {
-        return compareA > compareB ? 1 : -1;
+        return compareA > compareB ? 1 : compareA < compareB ? -1 : 0;
       } else {
-        return compareA < compareB ? 1 : -1;
+        return compareA < compareB ? 1 : compareA > compareB ? -1 : 0;
       }
     });
 
     return sorted;
   };
 
-  const handleSendReminder = async (memberId) => {
-    setSelectedReminder(memberId);
+  const handleSendReminder = async (member) => {
+    setSelectedReminder(member.id);
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      const member = members.find((m) => m.id === memberId);
+      const payload = {
+        receiver: member.name,
+        header: "Membership Renewal Reminder",
+        content: `Hello ${member.name},\n\nThis is a reminder that your membership renewal is due on ${member.dueDate}.\n\nChapter: ${member.chapter}\n\nPlease complete your renewal at your earliest convenience.\n\nThank you!`
+      };
+
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to send reminder");
+      }
+
       setSuccess(`Reminder sent to ${member.name}`);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.log(err);
-      setError(
-        `Failed to send reminder to ${members.find((m) => m.id === memberId)?.name}`
-      );
+      setError(`Failed to send reminder to ${member.name}: ${err.message}`);
+      setTimeout(() => setError(null), 4000);
     } finally {
       setLoading(false);
       setSelectedReminder(null);
@@ -147,15 +224,57 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
   const handleAutoSendReminders = async () => {
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      const visibleMembers = getFilteredMembers();
-      setSuccess(`Reminders sent to ${visibleMembers.length} members`);
-      setTimeout(() => setSuccess(null), 3000);
+      const currentList = getFilteredMembers();
+
+      if (currentList.length === 0) {
+        setError("No members to send reminders to");
+        return;
+      }
+
+      let sentCount = 0;
+      let failedCount = 0;
+
+      for (let member of currentList) {
+        try {
+          const payload = {
+            receiver: member.name,
+            header: "Membership Renewal Reminder",
+            content: `Hello ${member.name},\n\nThis is a reminder that your membership renewal is due on ${member.dueDate}.\n\nChapter: ${member.chapter}\n\nPlease complete your renewal at your earliest convenience.\n\nThank you!`
+          };
+
+          const res = await fetch(
+            `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`,
+            {
+              method: "POST",
+              credentials: "include",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload)
+            }
+          );
+
+          if (res.ok) {
+            sentCount += 1;
+          } else {
+            failedCount += 1;
+          }
+        } catch (err) {
+          failedCount += 1;
+        }
+      }
+
+      if (sentCount > 0) {
+        setSuccess(`Reminders sent to ${sentCount} member(s)${failedCount > 0 ? ` (${failedCount} failed)` : ''}`);
+      } else {
+        setError("Failed to send reminders to any members");
+      }
+
+      setTimeout(() => setSuccess(null), 4000);
     } catch (err) {
-      console.log(err);
-      setError("Failed to send reminders");
+      setError("Failed to process bulk reminders");
+      setTimeout(() => setError(null), 4000);
     } finally {
       setLoading(false);
     }
@@ -164,38 +283,58 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
   const handleExportList = () => {
     try {
       const visibleMembers = getFilteredMembers();
+
+      if (visibleMembers.length === 0) {
+        setError("No members to export");
+        return;
+      }
+
       const csvContent = [
-        ["Name", "Due Date", "Status"],
-        ...visibleMembers.map((m) => [m.name, m.dueDate, m.status]),
+        ["Name", "Email", "Due Date", "Status", "Chapter"],
+        ...visibleMembers.map((m) => [m.name, m.email, m.dueDate, m.status, m.chapter]),
       ]
-        .map((row) => row.join(","))
+        .map((row) => row.map(cell => `"${cell}"`).join(","))
         .join("\n");
 
-      const blob = new Blob([csvContent], { type: "text/csv" });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "member_renewals.csv";
-      a.click();
-      window.URL.revokeObjectURL(url);
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `member_renewals_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
       setSuccess("Export completed successfully");
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      console.log(err);
       setError("Failed to export list");
+      setTimeout(() => setError(null), 3000);
     }
   };
 
+  const now = new Date();
+  const today = getStartOfDay(now);
+  const endOfWeek = new Date(today);
+  endOfWeek.setDate(endOfWeek.getDate() + 7);
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
   const overdueCount = members.filter((m) => m.status === "Overdue").length;
-  const dueThisMonthCount = members.filter(
-    (m) => m.status === "Pending notification" || m.status === "Overdue"
-  ).length;
+
+  const dueThisMonthCount = members.filter((m) => {
+    if (m.status !== "Pending notification" && m.status !== "Overdue") return false;
+    if (!m.rawDueDate) return false;
+    const dueDate = getStartOfDay(new Date(m.rawDueDate));
+    return dueDate >= startOfMonth && dueDate <= endOfMonth;
+  }).length;
+
   const dueThisWeekCount = members.filter((m) => {
-    const dueDate = new Date(m.dueDate);
-    const today = new Date();
-    const weekFromNow = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-    return dueDate <= weekFromNow && dueDate >= today;
+    if (m.status !== "Pending notification" && m.status !== "Overdue") return false;
+    if (!m.rawDueDate) return false;
+    const dueDate = getStartOfDay(new Date(m.rawDueDate));
+    return dueDate >= today && dueDate <= endOfWeek;
   }).length;
 
   const filteredMembers = getFilteredMembers();
@@ -236,7 +375,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         />
       </div>
 
-      <div className="mb-6 flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+      <div className="mb-6 flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-gray-900 dark:text-gray-100">
             Sort By:
@@ -253,9 +392,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         </div>
 
         <button
-          onClick={() =>
-            setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-          }
+          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
           className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
         >
           {sortOrder === "asc" ? (
@@ -281,6 +418,12 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         )}
       </div>
 
+      {fetching && (
+        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <p className="text-sm text-blue-700 dark:text-blue-200">Loading members...</p>
+        </div>
+      )}
+
       {error && (
         <div className="mb-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
           <p className="text-sm text-red-700 dark:text-red-200">{error}</p>
@@ -293,7 +436,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         </div>
       )}
 
-      <div className="mb-6 max-h-[400px] overflow-auto">
+      <div className="mb-6 max-h-[500px] overflow-auto">
         {filteredMembers.length > 0 ? (
           <div>
             {filteredMembers.map((member) => (
@@ -306,7 +449,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8">
+          <div className="text-center py-12">
             <p className="text-gray-600 dark:text-gray-400">
               {activeFilter ? "No members match this filter" : "No members found"}
             </p>
@@ -314,21 +457,21 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         <button
           onClick={handleAutoSendReminders}
-          disabled={loading || filteredMembers.length === 0}
+          disabled={loading || filteredMembers.length === 0 || fetching}
           className="w-full px-4 py-3 rounded-lg border border-amber-300 font-medium bg-amber-300 text-gray-900 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
         >
-          {loading ? "Sending..." : "Auto-Send Reminders"}
+          {loading ? "Sending..." : `Auto-Send Reminders (${filteredMembers.length})`}
         </button>
 
         <button
           onClick={handleExportList}
-          disabled={loading || filteredMembers.length === 0}
+          disabled={loading || filteredMembers.length === 0 || fetching}
           className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 font-medium bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
         >
-          Export Renewal List
+          Export List ({filteredMembers.length})
         </button>
       </div>
     </div>
