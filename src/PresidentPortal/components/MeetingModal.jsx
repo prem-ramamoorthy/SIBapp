@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   HiOutlineExclamationCircle,
   HiX,
@@ -8,11 +8,29 @@ import {
   HiCalendar,
   HiLocationMarker,
 } from "react-icons/hi";
+import useFetch from "../../hooks/useFetch";
 
 export function MeetingsModal({ meetings = [], isOpen, onClose }) {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedMeeting, setEditedMeeting] = useState(null);
+  const [canedit, setCanedit] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
+  const { data: access } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/caneditevents`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
+  useEffect(() => {
+    if (access && typeof access.hasaccess === "boolean") {
+      setCanedit(access.hasaccess);
+    }
+  }, [access]);
 
   const handleViewDetails = (meeting) => {
     setSelectedMeeting(meeting);
@@ -31,21 +49,22 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
     setEditedMeeting({ ...editedMeeting, [field]: value });
   };
 
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState(null);
-
   const handleSave = async () => {
     setSaveError(null);
     setIsSaving(true);
+
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/updatemeeting`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        credentials: "include",
-        body: JSON.stringify(editedMeeting)
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/meeting/updatemeeting`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(editedMeeting),
+        }
+      );
 
       const result = await res.json();
 
@@ -56,27 +75,26 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
       if (result.message === "success") {
         setSelectedMeeting(editedMeeting);
         setIsEditing(false);
-        console.log("Saved meeting:", editedMeeting);
       } else {
         throw new Error(result.message || "Failed to update meeting");
       }
     } catch (error) {
-      console.error("Error updating meeting:", error);
       setSaveError(error.message || "An unexpected error occurred");
     } finally {
       setIsSaving(false);
     }
   };
 
-
   const handleCloseDetail = () => {
     setSelectedMeeting(null);
     setIsEditing(false);
+    setSaveError(null);
   };
 
   const handleMainClose = () => {
     setSelectedMeeting(null);
     setIsEditing(false);
+    setSaveError(null);
     onClose();
   };
 
@@ -115,9 +133,9 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                 </div>
               ) : (
                 <div className="max-h-96 overflow-y-auto space-y-3">
-                  {meetings.map((meeting, index) => (
+                  {meetings.map((meeting) => (
                     <div
-                      key={meeting._id || index}
+                      key={meeting._id}
                       className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md dark:border-gray-700 dark:bg-gray-700"
                     >
                       <div className="flex items-start justify-between">
@@ -149,14 +167,15 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                                 {meeting.meeting_type}
                               </span>
                               <span
-                                className={`ml-2 text-xs font-medium px-2.5 py-0.5 rounded ${meeting.meeting_status === "completed"
-                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                                  : meeting.meeting_status === "cancelled"
+                                className={`text-xs font-medium px-2.5 py-0.5 rounded capitalize ${
+                                  meeting.meeting_status === "completed"
+                                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                                    : meeting.meeting_status === "cancelled"
                                     ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                                     : meeting.meeting_status === "upcoming"
-                                      ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                                      : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300"
-                                  } capitalize`}
+                                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                                    : "bg-gray-100 text-gray-800 dark:bg-gray-600 dark:text-gray-300"
+                                }`}
                               >
                                 {meeting.meeting_status}
                               </span>
@@ -188,7 +207,7 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                   {isEditing ? "Edit Meeting" : "Meeting Details"}
                 </h3>
                 <div className="flex items-center space-x-2">
-                  {!isEditing ? (
+                  {!isEditing && canedit && (
                     <button
                       type="button"
                       onClick={handleEditToggle}
@@ -197,19 +216,40 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                       <HiPencil className="mr-1 h-4 w-4" />
                       Edit
                     </button>
-                  ) : (
+                  )}
+                  {isEditing && canedit && (
                     <>
                       <button
                         type="button"
                         onClick={handleSave}
                         disabled={isSaving}
-                        className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-medium ${isSaving ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
-                          } text-white focus:outline-none focus:ring-4 focus:ring-green-300`}
+                        className={`inline-flex items-center rounded-lg px-3 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-4 focus:ring-green-300 ${
+                          isSaving
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-green-600 hover:bg-green-700"
+                        }`}
                       >
                         {isSaving ? (
-                          <svg className="animate-spin h-5 w-5 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                          <svg
+                            className="animate-spin h-5 w-5 mr-1"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                            />
                           </svg>
                         ) : (
                           <HiCheck className="mr-1 h-4 w-4" />
@@ -238,7 +278,9 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
 
               <div className="space-y-6 p-6">
                 {saveError && (
-                  <p className="mt-2 text-red-600 dark:text-red-400 text-sm font-medium">{saveError}</p>
+                  <div className="p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-700 dark:text-red-400">{saveError}</p>
+                  </div>
                 )}
 
                 <div>
@@ -253,7 +295,9 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
                   ) : (
-                    <p className="text-base text-gray-900 dark:text-white">{selectedMeeting.title}</p>
+                    <p className="text-base text-gray-900 dark:text-white">
+                      {selectedMeeting.title}
+                    </p>
                   )}
                 </div>
 
@@ -265,11 +309,15 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                     <textarea
                       rows="4"
                       value={editedMeeting.meeting_notes || ""}
-                      onChange={(e) => handleInputChange("meeting_notes", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("meeting_notes", e.target.value)
+                      }
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     />
                   ) : (
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{selectedMeeting.meeting_notes || "No description provided"}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {selectedMeeting.meeting_notes || "No description provided"}
+                    </p>
                   )}
                 </div>
 
@@ -282,7 +330,9 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                       <input
                         type="date"
                         value={formatDate(editedMeeting.meeting_date)}
-                        onChange={(e) => handleInputChange("meeting_date", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("meeting_date", e.target.value)
+                        }
                         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       />
                     ) : (
@@ -301,7 +351,9 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                       <input
                         type="time"
                         value={editedMeeting.meeting_time || ""}
-                        onChange={(e) => handleInputChange("meeting_time", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("meeting_time", e.target.value)
+                        }
                         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       />
                     ) : (
@@ -321,7 +373,9 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                     {isEditing ? (
                       <select
                         value={editedMeeting.meeting_type || ""}
-                        onChange={(e) => handleInputChange("meeting_type", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("meeting_type", e.target.value)
+                        }
                         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       >
                         <option value="weekly">Weekly</option>
@@ -343,7 +397,9 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                       <input
                         type="text"
                         value={editedMeeting.location || ""}
-                        onChange={(e) => handleInputChange("location", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("location", e.target.value)
+                        }
                         placeholder="Meeting location or link"
                         className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       />
@@ -363,7 +419,9 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                   {isEditing ? (
                     <select
                       value={editedMeeting.meeting_status || "upcoming"}
-                      onChange={(e) => handleInputChange("meeting_status", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("meeting_status", e.target.value)
+                      }
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-amber-300 focus:ring-amber-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     >
                       <option value="upcoming">Upcoming</option>
@@ -373,14 +431,15 @@ export function MeetingsModal({ meetings = [], isOpen, onClose }) {
                     </select>
                   ) : (
                     <span
-                      className={`inline-block rounded px-2.5 py-1 text-xs font-medium capitalize ${selectedMeeting.meeting_status === "completed"
-                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                        : selectedMeeting.meeting_status === "cancelled"
+                      className={`inline-block rounded px-2.5 py-1 text-xs font-medium capitalize ${
+                        selectedMeeting.meeting_status === "completed"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                          : selectedMeeting.meeting_status === "cancelled"
                           ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                           : selectedMeeting.meeting_status === "inprogress"
-                            ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                            : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                        }`}
+                          ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                          : "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                      }`}
                     >
                       {selectedMeeting.meeting_status}
                     </span>
