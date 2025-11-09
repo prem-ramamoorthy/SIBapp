@@ -1,31 +1,25 @@
 import { RotateCcw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CompletionRing } from "./CompletionRing";
 
 const ProfileStrip = ({
-  name = "Esthera Jackson",
-  email = "esthera@simmpple.com",
+  name = "Refresh the page to see your details",
+  email = "Kindly update your profile...",
   avatarUrl = null,
   shareText = "I'm excited to share my professional profile with you! Please check it out to know more about my background, expertise, and how we can connect or collaborate.",
   user_id = "",
   chapter = "",
   profile_id = "",
-  editable = false ,
+  editable = false,
   completionPercentage = 0
 }) => {
   const [copied, setCopied] = useState(false);
-
-  const getInitials = (name) =>
-    name
-      .trim()
-      .split(' ')
-      .map(n => n[0] || '')
-      .join('')
-      .toUpperCase();
-
-  const [initials, setInitials] = useState(getInitials(name));
-
+  const [initials, setInitials] = useState("");
   const [url, setUrl] = useState("");
+  const [avatar, setAvatar] = useState(avatarUrl);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     setInitials(getInitials(name));
@@ -33,9 +27,22 @@ const ProfileStrip = ({
 
   useEffect(() => {
     const origin = window.location.origin;
-    const path = "/profile/"+profile_id+"?user=" + user_id ;
+    const path = "/profile/" + profile_id + "?user=" + user_id;
     setUrl(`${origin}${path}`);
   }, [user_id, profile_id]);
+
+  useEffect(() => {
+    setAvatar(avatarUrl);
+  }, [avatarUrl]);
+
+  function getInitials(name) {
+    return name
+      .trim()
+      .split(' ')
+      .map(n => n[0] || '')
+      .join('')
+      .toUpperCase();
+  }
 
   const handleShare = async () => {
     const shareData = {
@@ -43,7 +50,6 @@ const ProfileStrip = ({
       text: shareText,
       url: url,
     };
-
     try {
       if (navigator.share) {
         await navigator.share(shareData);
@@ -58,33 +64,96 @@ const ProfileStrip = ({
   };
 
   const openFileSelector = () => {
-    document.getElementById("avatar-upload")?.click();
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    fileInputRef.current?.click();
+  };
+
+  // Main image upload and DB update logic:
+  const handleFileInput = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const formData = new FormData();
+      formData.append("photo", file);
+
+      // 1. Upload image to Firebase and get processed public URL
+      const uploadRes = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/auth/upload/photo`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: formData
+        }
+      );
+      if (!uploadRes.ok) throw new Error("Image upload failed");
+      const { url: imageUrl } = await uploadRes.json();
+      if (!imageUrl) throw new Error("Server did not return photo URL");
+
+      // 2. Save photo URL to user profile in DB
+      const updateRes = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/profile/updateprofile`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ profile_image_url: imageUrl })
+        }
+      );
+      if (!updateRes.ok) throw new Error("Profile update failed");
+      const updatedProfile = await updateRes.json();
+
+      // 3. Set new avatar URL state for immediate UI update
+      setAvatar(updatedProfile.profile_image_url || imageUrl);
+    } catch (err) {
+      setUploadError(err.message);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   return (
     <div className="w-full rounded-2xl border border-sky-200 bg-gradient-to-r from-white to-amber-100 dark:from-gray-800 dark:to-gray-700 shadow-sm my-2">
       <div className="flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="relative h-12 w-12 shrink-0 rounded-xl bg-red-500 md:h-14 md:w-14">
+          <div className="relative h-12 w-12 shrink-0 rounded-xl bg-red-500 md:h-14 md:w-14 transition-all">
             <span className="absolute inset-0 flex items-center justify-center text-white font-bold dark:text-gray-200">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="ProfilePhoto" className="h-full w-full border-x-fuchsia-100 rounded-xl object-cover" />
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt="ProfilePhoto"
+                  className="h-full w-full border-x-fuchsia-100 rounded-xl object-cover"
+                  loading="lazy"
+                />
               ) : initials}
             </span>
-            {editable && <button
-              type="button"
-              onClick={openFileSelector}
-              className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full border-2 border-white text-white shadow bg-cyan-500 hover:bg-cyan-600 dark:border-gray-800"
-              aria-label="Edit profile photo"
-              title="Change Photo"
-            >
-              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-            </button>}
+            {editable &&
+              <button
+                type="button"
+                onClick={openFileSelector}
+                className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full border-2 border-white text-white shadow bg-cyan-500 hover:bg-cyan-600 dark:border-gray-800"
+                aria-label="Edit profile photo"
+                title="Change Photo"
+                disabled={uploading}
+              >
+                {uploading
+                  ? <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                    <circle className="opacity-20" cx="12" cy="12" r="10" stroke="white" strokeWidth="4" fill="none"></circle>
+                    <path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z"></path>
+                  </svg>
+                  : <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />}
+              </button>
+            }
             <input
               id="avatar-upload"
+              ref={fileInputRef}
               type="file"
               accept="image/*"
               className="sr-only"
+              disabled={uploading}
+              onChange={handleFileInput}
             />
           </div>
           <div className="min-w-0">
@@ -96,7 +165,6 @@ const ProfileStrip = ({
             </p>
           </div>
         </div>
-
         <div className="flex flex-row-reverse items-center justify-center gap-2 md:gap-3">
           <div className="flex items-center gap-2">
             <button
@@ -120,9 +188,14 @@ const ProfileStrip = ({
           <span className="hidden text-sm text-slate-700 dark:text-gray-300 sm:inline">
             {chapter || ""}
           </span>
-           {editable &&<CompletionRing percentage={completionPercentage} />}
+          {editable && <CompletionRing percentage={completionPercentage} />}
         </div>
       </div>
+      {uploadError && (
+        <div className="px-4 pb-2 text-xs text-red-600 dark:text-red-300">
+          {uploadError}
+        </div>
+      )}
     </div>
   );
 };

@@ -18,8 +18,8 @@ function MemberCard({
       <div className="bg-white dark:bg-gray-800 h-[370px] w-full rounded-t-[2rem] rounded-b-2xl flex flex-col justify-start items-center transition-colors duration-300">
         <div className="relative h-[140px] w-[140px] bg-gray-300 dark:bg-gray-700 rounded-full -top-[60px] shadow-2xl border-3 border-gray-400 dark:border-gray-600">
           <img
-            src="/assets/19.jpg"
-            alt= " image NotFound"
+            src={member.profile_image_url}
+            alt= ""
             className="h-full w-[200px] rounded-full object-cover object-top"
           />
           <div className="h-[30px] w-[30px] rounded-full bg-red-500 absolute bottom-2 right-2 font-bold border-2 border-white">

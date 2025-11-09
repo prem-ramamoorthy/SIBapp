@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import classNames from "../../utils/classname";
 
 export function HeaderAvatar({
-  src,
+  src = "../../../public/assets/19.jpg",
   alt = "User avatar",
   initials = "UA",
   status = "online",

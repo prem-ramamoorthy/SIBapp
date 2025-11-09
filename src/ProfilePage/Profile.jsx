@@ -147,6 +147,7 @@ function Profile() {
           <ProfileStrip
             name={profileData?.user?.username}
             email={profileData?.user?.email}
+            avatarUrl={profileData?.profile_image_url}
             chapter={profileData?.chaptername}
             user_id={profileData?.user?._id}
             profile_id={profileData?._id}
