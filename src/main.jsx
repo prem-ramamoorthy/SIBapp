@@ -40,7 +40,6 @@ const router = createBrowserRouter([
       { path: '/slips', element: <AnimatedRoute><FunctionalPage /></AnimatedRoute> },
       { path: '/profile', element: <AnimatedRoute><Profile /></AnimatedRoute> },
       { path: '/allnotifications', element: <AnimatedRoute><NotificationsPage /></AnimatedRoute> },
-      { path: '/memberdetailedanalytics', element: <AnimatedRoute><MembersAnalytics /></AnimatedRoute> },
       { path: '/coordinatorsportal', element: <AnimatedRoute><Coordinatorsportal /></AnimatedRoute> },
     ]
   },
@@ -48,6 +47,7 @@ const router = createBrowserRouter([
     element: <PresidentRoute />,
     children: [
       { path: '/presidentportal', element: <AnimatedRoute><PresidentPortal /></AnimatedRoute> },
+      { path: '/memberdetailedanalytics', element: <AnimatedRoute><MembersAnalytics /></AnimatedRoute> },
     ]
   },
   { path: '/profile/:id', element: <AnimatedRoute><Profile /></AnimatedRoute> },

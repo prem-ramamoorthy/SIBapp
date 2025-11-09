@@ -13,7 +13,6 @@ export default function HeaderAvatar({
     { name: "Referral Slips", icon: "fileText", path: "/slips" },
     { name: "Notifications", icon: "messageSquareDot", path: "/allnotifications" },
     { name: "Coordinators Portal", icon: "users", path: "/coordinatorsportal" },
-    { name: "Members Analytics", icon: "chartLine", path: "/memberdetailedanalytics" },
     { name: "Visitors", icon: "userPlus", path: "/visitors" },
     { name: "Substitutes", icon: "clock4", path: "/substitutes" }
   ]
@@ -36,7 +35,7 @@ export default function HeaderAvatar({
       setItems(prevItems => {
         const presidentExists = prevItems.some(item => item.path === "/presidentportal");
         if (!presidentExists) {
-          return [...prevItems, { name: "President Portal", icon: "users", path: "/presidentportal" }];
+          return [...prevItems,{ name: "Members Analytics", icon: "chartLine", path: "/memberdetailedanalytics" }, { name: "President Portal", icon: "users", path: "/presidentportal" }];
         }
         return prevItems;
       });
