@@ -339,7 +339,7 @@ function ReferralsTable() {
                                         <button
                                             key={pageNum}
                                             onClick={() => setCurrentPage(pageNum)}
-                                            className={`px-3 py-2 rounded text-sm font-medium transition-colors duration-200 ${currentPage === pageNum ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                                            className={`px-3 py-2 rounded text-sm font-medium transition-colors duration-200 ${currentPage === pageNum ? 'bg-red-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
                                         >
                                             {pageNum}
                                         </button>

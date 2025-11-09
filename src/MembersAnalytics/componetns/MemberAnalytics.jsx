@@ -216,7 +216,7 @@ const MemberDetailedAnalyticsReport = () => {
     ]
 
     return (
-        <div className="min-w-full min-h-screen mt-20 p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+        <div className="min-w-full min-h-screen p-4 sm:p-6 lg:p-8 transition-colors duration-300">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8">
                     <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 mb-2">
@@ -430,7 +430,7 @@ const MemberDetailedAnalyticsReport = () => {
                                         <button
                                             key={pageNum}
                                             onClick={() => setCurrentPage(pageNum)}
-                                            className={`px-3 py-2 rounded text-sm font-medium transition-colors duration-200 ${currentPage === pageNum ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                                            className={`px-3 py-2 rounded text-sm font-medium transition-colors duration-200 ${currentPage === pageNum ? 'bg-red-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'}`}
                                         >
                                             {pageNum}
                                         </button>

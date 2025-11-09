@@ -7,10 +7,10 @@ import One2OneMeetingsTable from './componetns/M2moverview'
 function MemberDetailedAnalytics() {
   return (
     <div className='w-full flex flex-col justify-center items-center'>
+      <div className='top-2 sticky w-[98vw]'>
+        <Header />
+      </div>
       <div className='flex flex-col justify-center w-max items-middle'>
-        <div className='top-2 absolute w-full left-0'>
-          <Header />
-        </div>
         <MemberDetailedAnalyticsReport />
         <ReferralsTable />
         <TYFTBTable />

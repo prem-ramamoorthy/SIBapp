@@ -311,7 +311,7 @@ function One2OneMeetingsTable() {
                             <td key={col.key} className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium ${col.width}`}>
                               <button
                                 onClick={() => openModal(row)}
-                                className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs font-semibold transition"
+                                className="px-3 py-1 bg-amber-300 hover:bg-amber-400 text-black rounded text-xs font-semibold transition"
                               >
                                 View
                               </button>
@@ -389,7 +389,7 @@ function One2OneMeetingsTable() {
                       onClick={() => setCurrentPage(pageNum)}
                       className={`px-3 py-2 rounded text-sm font-medium transition-colors duration-200 ${
                         currentPage === pageNum
-                          ? 'bg-blue-500 text-white'
+                          ? 'bg-red-500 text-white'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
