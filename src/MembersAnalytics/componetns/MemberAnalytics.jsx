@@ -1,9 +1,8 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 
 const TABLE_COLUMNS = [
     { key: 'rank', label: 'RANK', sortable: true, width: 'w-12' },
     { key: 'name', label: 'MEMBER NAME', sortable: true, width: 'flex-1 min-w-[120px]' },
-    { key: 'company', label: 'COMPANY', sortable: true, width: 'flex-1 min-w-[140px]' },
     { key: 'referralsGiven', label: 'REFERRALS GIVEN', sortable: true, width: 'w-24' },
     { key: 'referralsReceived', label: 'REFERRALS RECEIVED', sortable: true, width: 'w-24' },
     { key: 'tyftbGiven', label: 'TYFB GIVEN', sortable: true, width: 'w-20' },
@@ -16,131 +15,72 @@ const TABLE_COLUMNS = [
 
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 25, 50]
 
-function parseBusiness(value) {
+function parseNumber(value) {
+    if (typeof value === 'number') return value
     if (typeof value !== 'string') return 0
-    const match = value.match(/₹([\d.]+)cr/)
-    return match ? parseFloat(match[1]) : 0
+    if (value.includes('₹') && value.includes('cr')) {
+        return parseFloat(value.replace(/[₹,cr\s]/g, '')) * 10000000
+    }
+    if (value.includes('₹') && value.includes('L')) {
+        return parseFloat(value.replace(/[₹,L\s]/g, '')) * 100000
+    }
+    return parseFloat(value.replace(/[₹,]/g, '')) || 0
 }
 
-function getTotalRow(data) {
-    return {
+function formatToCr(val) {
+    let n = parseNumber(val)
+    if (isNaN(n) || n === 0) return "₹0"
+    return `₹${(n / 10000000).toFixed(1)}cr`
+}
+
+function getTotalRow(data, visibleColumns) {
+    const totals = {
         rank: null,
         name: 'TOTAL',
-        company: '(All Members)',
-        referralsGiven: data.reduce((a, b) => a + (Number(b.referralsGiven) || 0), 0),
-        referralsReceived: data.reduce((a, b) => a + (Number(b.referralsReceived) || 0), 0),
-        tyftbGiven: data.reduce((a, b) => a + (Number(b.tyftbGiven) || 0), 0),
-        tyftbReceived: data.reduce((a, b) => a + (Number(b.tyftbReceived) || 0), 0),
-        businessMade: `₹${data.reduce((a, b) => a + parseBusiness(b.businessMade), 0).toFixed(1)}cr`,
-        businessGiven: `₹${data.reduce((a, b) => a + parseBusiness(b.businessGiven), 0).toFixed(1)}cr`,
-        mToM: data.reduce((a, b) => a + (Number(b.mToM) || 0), 0),
-        visitorsBrought: data.reduce((a, b) => a + (Number(b.visitorsBrought) || 0), 0),
+        referralsGiven: 0,
+        referralsReceived: 0,
+        tyftbGiven: 0,
+        tyftbReceived: 0,
+        businessMade: 0,
+        businessGiven: 0,
+        mToM: 0,
+        visitorsBrought: 0,
     }
+    data.forEach(row => {
+        Object.keys(totals).forEach(key => {
+            if (key === 'name' || key === 'rank') return
+            totals[key] += parseNumber(row[key])
+        })
+    })
+    let result = {}
+    TABLE_COLUMNS.forEach(col => {
+        if (!visibleColumns[col.key]) return
+        if (col.key === 'rank') result[col.key] = ''
+        else if (col.key === 'name') result[col.key] = 'TOTAL'
+        else if (col.key === 'businessMade' || col.key === 'businessGiven')
+            result[col.key] = formatToCr(totals[col.key])
+        else
+            result[col.key] = totals[col.key]
+    })
+    return result
 }
 
 const getSortValue = (value, columnKey) => {
-    if (columnKey.includes('business')) {
-        return parseBusiness(value)
-    }
-    if (typeof value === 'string') {
-        return value.toLowerCase()
-    }
+    if (columnKey === 'businessMade' || columnKey === 'businessGiven')
+        return parseNumber(value)
+    if (typeof value === 'string') return value.toLowerCase()
     return value
 }
 
-const MemberDetailedAnalyticsReport = (
-    { members = [
-        {
-            id: 1,
-            rank: 1,
-            name: 'Deepak',
-            company: 'Trading House',
-            referralsGiven: 145,
-            referralsReceived: 32,
-            tyftbGiven: 89,
-            tyftbReceived: 45,
-            businessMade: '₹8.9cr',
-            businessGiven: '₹7.2cr',
-            mToM: 156,
-            visitorsBrought: 28,
-        },
-        {
-            id: 2,
-            rank: 2,
-            name: 'Gnanavel',
-            company: 'Export Services',
-            referralsGiven: 128,
-            referralsReceived: 48,
-            tyftbGiven: 76,
-            tyftbReceived: 52,
-            businessMade: '₹7.8cr',
-            businessGiven: '₹6.4cr',
-            mToM: 142,
-            visitorsBrought: 35,
-        },
-        {
-            id: 3,
-            rank: 3,
-            name: 'Sedhu',
-            company: 'Consulting Firm',
-            referralsGiven: 115,
-            referralsReceived: 38,
-            tyftbGiven: 68,
-            tyftbReceived: 42,
-            businessMade: '₹6.9cr',
-            businessGiven: '₹5.8cr',
-            mToM: 128,
-            visitorsBrought: 22,
-        },
-        {
-            id: 4,
-            rank: 4,
-            name: 'Balaji UPVC',
-            company: 'UPVC Solutions',
-            referralsGiven: 98,
-            referralsReceived: 67,
-            tyftbGiven: 52,
-            tyftbReceived: 68,
-            businessMade: '₹6.2cr',
-            businessGiven: '₹5.1cr',
-            mToM: 134,
-            visitorsBrought: 41,
-        },
-        {
-            id: 5,
-            rank: 5,
-            name: 'Madhu',
-            company: 'Services',
-            referralsGiven: 92,
-            referralsReceived: 45,
-            tyftbGiven: 48,
-            tyftbReceived: 38,
-            businessMade: '₹5.8cr',
-            businessGiven: '₹4.9cr',
-            mToM: 118,
-            visitorsBrought: 18,
-        },
-        {
-            id: 6,
-            rank: 6,
-            name: 'Sathishkumar',
-            company: 'Education Services',
-            referralsGiven: 108,
-            referralsReceived: 52,
-            tyftbGiven: 72,
-            tyftbReceived: 58,
-            businessMade: '₹7.1cr',
-            businessGiven: '₹5.9cr',
-            mToM: 145,
-            visitorsBrought: 32,
-        },
-    ] }) => {
+const MemberDetailedAnalyticsReport = () => {
+    const [members, setMembers] = useState([])
     const [timePeriod, setTimePeriod] = useState('lifetime')
     const [searchTerm, setSearchTerm] = useState('')
     const [itemsPerPage, setItemsPerPage] = useState(10)
     const [currentPage, setCurrentPage] = useState(1)
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(null)
+    const [error, setError] = useState(null)
     const [visibleColumns, setVisibleColumns] = useState(
         TABLE_COLUMNS.reduce((acc, col) => ({ ...acc, [col.key]: true }), {})
     )
@@ -149,26 +89,44 @@ const MemberDetailedAnalyticsReport = (
         direction: 'asc'
     })
 
+    useEffect(() => {
+        async function fetchData() {
+            setLoading(true)
+            setError(null)
+            try {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/activity/getactivityofusers`, {
+                    credentials: 'include'
+                })
+                if (!response.ok) throw new Error(`Error: ${response.status}`)
+                let data = await response.json()
+                data = data.map((item, i) => ({
+                    ...item,
+                    rank: i + 1,
+                    businessMade: formatToCr(item.businessMade),
+                    businessGiven: formatToCr(item.businessGiven)
+                }))
+                setMembers(data)
+            } catch (err) {
+                setError('Unable to load analytics: ' + err.message)
+            } finally {
+                setLoading(false)
+            }
+        }
+        fetchData()
+    }, [])
+
     const filteredAndSortedData = useMemo(() => {
         let result = members.filter(row =>
-            row.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            row.company.toLowerCase().includes(searchTerm.toLowerCase())
+            row.name?.toLowerCase().includes(searchTerm.toLowerCase())
         )
-
         result = [...result].sort((a, b) => {
             const aValue = getSortValue(a[sortConfig.key], sortConfig.key)
             const bValue = getSortValue(b[sortConfig.key], sortConfig.key)
-
             let comparison = 0
-            if (aValue < bValue) {
-                comparison = -1
-            } else if (aValue > bValue) {
-                comparison = 1
-            }
-
+            if (aValue < bValue) comparison = -1
+            else if (aValue > bValue) comparison = 1
             return sortConfig.direction === 'asc' ? comparison : -comparison
         })
-
         return result
     }, [members, searchTerm, sortConfig])
 
@@ -178,18 +136,16 @@ const MemberDetailedAnalyticsReport = (
     }, [filteredAndSortedData, currentPage, itemsPerPage])
 
     const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage)
-    const TOTAL_ROW = getTotalRow(filteredAndSortedData)
+    const TOTAL_ROW = getTotalRow(filteredAndSortedData, visibleColumns)
 
     const handleTimePeriod = (period) => {
         setTimePeriod(period)
         setCurrentPage(1)
     }
-
     const handleSearch = (e) => {
         setSearchTerm(e.target.value)
         setCurrentPage(1)
     }
-
     const handleSort = (columnKey) => {
         setSortConfig(prev => ({
             key: columnKey,
@@ -197,7 +153,6 @@ const MemberDetailedAnalyticsReport = (
         }))
         setCurrentPage(1)
     }
-
     const handleExport = () => {
         setLoading(true)
         try {
@@ -218,32 +173,41 @@ const MemberDetailedAnalyticsReport = (
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
-
             setSuccess('Data exported successfully')
             setTimeout(() => setSuccess(null), 2000)
         } catch (err) {
-            console.log(err)
+            setError('Export failed')
         } finally {
             setLoading(false)
         }
     }
-
     const toggleColumn = (key) => {
-        setVisibleColumns(prev => ({
-            ...prev,
-            [key]: !prev[key]
-        }))
+        setVisibleColumns(prev => ({ ...prev, [key]: !prev[key] }))
     }
-
-    const handleRefresh = () => {
+    const handleRefresh = async () => {
         setLoading(true)
-        setTimeout(() => {
-            setLoading(false)
+        setError(null)
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/activity/getactivityofusers`, {
+                credentials: 'include'
+            })
+            if (!response.ok) throw new Error(`Error: ${response.status}`)
+            let data = await response.json()
+            data = data.map((item, i) => ({
+                ...item,
+                rank: i + 1,
+                businessMade: formatToCr(item.businessMade),
+                businessGiven: formatToCr(item.businessGiven)
+            }))
+            setMembers(data)
             setSuccess('Data refreshed successfully')
             setTimeout(() => setSuccess(null), 2000)
-        }, 800)
+        } catch (err) {
+            setError('Unable to refresh: ' + err.message)
+        } finally {
+            setLoading(false)
+        }
     }
-
     const TIME_PERIOD_OPTIONS = [
         { value: 'lifetime', label: 'Lifetime' },
         { value: 'last6months', label: 'Last 6 Months' },
@@ -252,7 +216,7 @@ const MemberDetailedAnalyticsReport = (
     ]
 
     return (
-        <div className="w-full min-h-screen  p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+        <div className="min-w-full min-h-screen mt-20 p-4 sm:p-6 lg:p-8 transition-colors duration-300">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8">
                     <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 mb-2">
@@ -262,13 +226,16 @@ const MemberDetailedAnalyticsReport = (
                         Track and analyze member performance metrics and referral data
                     </p>
                 </div>
-
-                {success && (
+                {error && (
+                    <div className="mb-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
+                        <p className="text-sm text-red-700 dark:text-red-200">{error}</p>
+                    </div>
+                )}
+                {success &&
                     <div className="mb-4 p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
                         <p className="text-sm text-green-700 dark:text-green-200">{success}</p>
                     </div>
-                )}
-
+                }
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-6 border border-gray-200 dark:border-gray-700">
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -294,7 +261,7 @@ const MemberDetailedAnalyticsReport = (
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase">
-                                    Search Member or Company
+                                    Search Member
                                 </label>
                                 <input
                                     type="text"
@@ -305,7 +272,6 @@ const MemberDetailedAnalyticsReport = (
                                 />
                             </div>
                         </div>
-
                         <div className="flex flex-col sm:flex-row gap-3 justify-end items-start sm:items-end">
                             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                                 <button
@@ -326,26 +292,6 @@ const MemberDetailedAnalyticsReport = (
                         </div>
                     </div>
                 </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Total Members</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-50">{filteredAndSortedData.length}</p>
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Total Referrals</p>
-                        <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{TOTAL_ROW.referralsGiven}</p>
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Business Made</p>
-                        <p className="text-2xl font-bold text-green-600 dark:text-green-400">{TOTAL_ROW.businessMade}</p>
-                    </div>
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-                        <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Visitors Brought</p>
-                        <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">{TOTAL_ROW.visitorsBrought}</p>
-                    </div>
-                </div>
-
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <div className="bg-gray-100 dark:bg-gray-900 px-4 py-3 border-b border-gray-300 dark:border-gray-600">
                         <details className="cursor-pointer">
@@ -397,7 +343,9 @@ const MemberDetailedAnalyticsReport = (
                                 </tr>
                             </thead>
                             <tbody>
-                                {paginatedData.length > 0 ? (
+                                {loading ? (
+                                    <tr><td colSpan={TABLE_COLUMNS.filter(c => visibleColumns[c.key]).length} className="py-8 text-center">Loading...</td></tr>
+                                ) : paginatedData.length > 0 ? (
                                     paginatedData.map((row, idx) => (
                                         <tr
                                             key={row.id}
@@ -430,13 +378,6 @@ const MemberDetailedAnalyticsReport = (
                                         </td>
                                     </tr>
                                 )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div className="overflow-x-auto border-t-2 border-gray-300 dark:border-gray-600">
-                        <table className="w-full">
-                            <tbody>
                                 <tr className="bg-gray-100 dark:bg-gray-900">
                                     {TABLE_COLUMNS.map(col => {
                                         if (!visibleColumns[col.key]) return null
@@ -451,7 +392,6 @@ const MemberDetailedAnalyticsReport = (
                         </table>
                     </div>
                 </div>
-
                 <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                         Showing <span className="font-semibold">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
@@ -482,15 +422,10 @@ const MemberDetailedAnalyticsReport = (
                             <div className="flex gap-1 items-center">
                                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                                     let pageNum
-                                    if (totalPages <= 5) {
-                                        pageNum = i + 1
-                                    } else if (currentPage <= 3) {
-                                        pageNum = i + 1
-                                    } else if (currentPage >= totalPages - 2) {
-                                        pageNum = totalPages - 4 + i
-                                    } else {
-                                        pageNum = currentPage - 2 + i
-                                    }
+                                    if (totalPages <= 5) pageNum = i + 1
+                                    else if (currentPage <= 3) pageNum = i + 1
+                                    else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i
+                                    else pageNum = currentPage - 2 + i
                                     return (
                                         <button
                                             key={pageNum}
@@ -511,10 +446,6 @@ const MemberDetailedAnalyticsReport = (
                             </button>
                         </div>
                     </div>
-                </div>
-
-                <div className="mt-6 text-center text-xs text-gray-600 dark:text-gray-400">
-                    <p>Last updated: {new Date().toLocaleString()}</p>
                 </div>
             </div>
         </div>
