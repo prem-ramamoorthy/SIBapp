@@ -10,7 +10,7 @@ function SiteButton({
             className="
         px-4 py-2
         bg-yellow-50 dark:bg-yellow-200/20
-        rounded-xl
+        rounded-xl text-nowrap
         hover:bg-yellow-100/40 dark:hover:bg-yellow-200/30
         w-full h-full 
         border-2 border-gray-400/50 dark:border-gray-500/40

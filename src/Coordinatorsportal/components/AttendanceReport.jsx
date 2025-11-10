@@ -2,44 +2,41 @@ import { useState, useMemo, useEffect } from 'react';
 import { HiX } from 'react-icons/hi';
 
 const TABLE_COLUMNS = [
-  { key: 'name', label: ' ↑↓ MEMBER NAME', sortable: true, width: 'flex-1 min-w-[150px]' },
-  { key: 'attendance', label: '↑↓ CURRENT ATTENDANCE %', sortable: true, width: 'w-32' },
-  { key: 'trend', label: 'TREND', sortable: false, width: 'w-16' },
+  { key: 'name', label: '↑↓ MEMBER NAME', sortable: true, width: 'flex-1 min-w-[150px]' },
+  { key: 'attendance', label: '↑↓ ATTENDANCE %', sortable: true, width: 'w-32' },
+  { key: 'presentCount', label: '↑↓ PRESENT', sortable: true, width: 'w-20' },
+  { key: 'totalMeetings', label: '↑↓ TOTAL MEETINGS', sortable: true, width: 'w-28' },
   { key: 'lastPresent', label: '↑↓ LAST PRESENT DATE', sortable: true, width: 'w-32' },
-  { key: 'contact', label: 'CONTACT INFORMATION', sortable: false, width: 'w-40' },
-  { key: 'actions', label: 'ACTIONS', sortable: false, width: 'w-52' },
+  { key: 'contact', label: 'CONTACT', sortable: false, width: 'w-40' },
+  { key: 'actions', label: 'ACTIONS', sortable: false, width: 'w-32' },
 ];
 
-const ATTENDANCE_THRESHOLD = 75;
-
-const LowAttendanceAlert = () => {
-  const [rawData, setRawData] = useState([]);
+const AttendanceOverview = () => {
   const [members, setMembers] = useState([]);
-  const [selectedRows, setSelectedRows] = useState(new Set());
-  const [sortConfig, setSortConfig] = useState({ key: 'attendance', direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: 'attendance', direction: 'desc' });
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [fetchLoading, setFetchLoading] = useState(true);
-  const [success, setSuccess] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     async function fetchAttendance() {
-      setFetchLoading(true);
+      setLoading(true);
       try {
         const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/attendance/getallattendances`, {
           credentials: 'include'
         });
         if (!res.ok) throw new Error('Failed to fetch attendance');
         const data = await res.json();
-        setRawData(data);
         processAttendanceData(data);
       } catch (err) {
         setError(err.message);
       } finally {
-        setFetchLoading(false);
+        setLoading(false);
       }
     }
     fetchAttendance();
@@ -71,7 +68,6 @@ const LowAttendanceAlert = () => {
     const processedMembers = Object.values(userMap).map(user => ({
       ...user,
       attendance: user.totalMeetings > 0 ? Math.round((user.presentCount / user.totalMeetings) * 100) : 0,
-      trend: user.attendance < 75 ? 'down' : 'up',
       lastPresent: user.lastPresentDate
         ? new Date(user.lastPresentDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
         : 'N/A'
@@ -79,12 +75,8 @@ const LowAttendanceAlert = () => {
     setMembers(processedMembers);
   }
 
-  const lowAttendanceMembers = useMemo(() => {
-    return members.filter(m => m.attendance < ATTENDANCE_THRESHOLD);
-  }, [members]);
-
   const filteredAndSortedData = useMemo(() => {
-    let result = lowAttendanceMembers.filter(
+    let result = members.filter(
       row =>
         row.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         row.contact.includes(searchTerm)
@@ -101,59 +93,25 @@ const LowAttendanceAlert = () => {
       return sortConfig.direction === 'asc' ? comparison : -comparison;
     });
     return result;
-  }, [lowAttendanceMembers, searchTerm, sortConfig]);
+  }, [members, searchTerm, sortConfig]);
 
-  const criticalCount = lowAttendanceMembers.filter(m => m.attendance < 60).length;
+  const paginatedData = useMemo(() => {
+    const startIdx = (currentPage - 1) * itemsPerPage;
+    return filteredAndSortedData.slice(startIdx, startIdx + itemsPerPage);
+  }, [filteredAndSortedData, currentPage, itemsPerPage]);
 
-  const handleSelectAll = checked => {
-    if (checked) {
-      setSelectedRows(new Set(filteredAndSortedData.map(m => m.id)));
-    } else {
-      setSelectedRows(new Set());
-    }
-  };
+  const totalPages = Math.ceil(filteredAndSortedData.length / itemsPerPage);
 
-  const handleSelectRow = id => {
-    const newSelected = new Set(selectedRows);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
-    setSelectedRows(newSelected);
-  };
+  const averageAttendance = members.length > 0
+    ? Math.round(members.reduce((a, b) => a + b.attendance, 0) / members.length)
+    : 0;
 
   const handleSort = columnKey => {
     setSortConfig(prev => ({
       key: columnKey,
       direction: prev.key === columnKey && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
-  };
-
-  const handleSendAlert = async (ids = null) => {
-    setLoading(true);
-    try {
-      const targetIds = ids || Array.from(selectedRows);
-      const targetMembers = members.filter(m => targetIds.includes(m.id));
-      for (const member of targetMembers) {
-        await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            receiver: member.name,
-            header: 'Low Attendance Alert',
-            content: `Hello ${member.name}, your attendance is ${member.attendance}%. Please improve your participation.`
-          })
-        });
-      }
-      setSuccess(`Alert sent to ${targetMembers.length} member(s)`);
-      setTimeout(() => setSuccess(null), 2000);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    setCurrentPage(1);
   };
 
   const handleViewHistory = async userId => {
@@ -173,29 +131,27 @@ const LowAttendanceAlert = () => {
     }
   };
 
-  const handleCall = phoneNumber => {
-    window.location.href = `tel:${phoneNumber}`;
-  };
-
-  const handleExportList = () => {
+  const handleExport = () => {
     setLoading(true);
     try {
       const csv = [
-        ['MEMBER NAME', 'ATTENDANCE %', 'LAST PRESENT DATE', 'CONTACT INFORMATION'].join(','),
+        ['MEMBER NAME', 'ATTENDANCE %', 'PRESENT', 'TOTAL MEETINGS', 'LAST PRESENT DATE', 'CONTACT'].join(','),
         ...filteredAndSortedData.map(row =>
-          [row.name, row.attendance, row.lastPresent, row.contact].map(v => `"${v}"`).join(',')
+          [row.name, row.attendance, row.presentCount, row.totalMeetings, row.lastPresent, row.contact]
+            .map(v => `"${v}"`)
+            .join(',')
         )
       ].join('\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `low-attendance-alert-${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `attendance-overview-${new Date().toISOString().split('T')[0]}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      setSuccess('List exported successfully');
+      setSuccess('Attendance data exported successfully');
       setTimeout(() => setSuccess(null), 2000);
     } finally {
       setLoading(false);
@@ -208,44 +164,48 @@ const LowAttendanceAlert = () => {
     return 'text-red-600 bg-red-50';
   };
 
-  const getTrendIcon = trend => (trend === 'down' ? '▼' : '▲');
-  const getTrendColor = trend => (trend === 'down' ? 'text-red-600' : 'text-green-600');
-
-  if (fetchLoading) return <div className="w-full min-h-screen flex items-center justify-center">Loading...</div>;
-  if (error) return <div className="w-full min-h-screen flex items-center justify-center text-red-600">{error}</div>;
+  if (loading && members.length === 0) return <div className="w-full min-h-screen flex items-center justify-center">Loading...</div>;
+  if (error && members.length === 0) return <div className="w-full min-h-screen flex items-center justify-center text-red-600">{error}</div>;
 
   return (
     <div className="w-full min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">Low Attendance Alert</h1>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Members Below {ATTENDANCE_THRESHOLD}% Threshold</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">Attendance Overview</h1>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">Track attendance details for all members</p>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-            <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Low Attendance Members</p>
-            <p className="text-3xl font-bold text-red-600 dark:text-red-400">{filteredAndSortedData.length}</p>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
-            <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Critical (&lt;60%)</p>
-            <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">{criticalCount}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Total Members</p>
+            <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{members.length}</p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
             <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Average Attendance</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-gray-50">
-              {filteredAndSortedData.length > 0
-                ? (filteredAndSortedData.reduce((a, b) => a + b.attendance, 0) / filteredAndSortedData.length).toFixed(1)
-                : 0}
-              %
+            <p className="text-3xl font-bold text-green-600 dark:text-green-400">{averageAttendance}%</p>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">High Attendance (75%+)</p>
+            <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+              {members.filter(m => m.attendance >= 75).length}
+            </p>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 shadow-sm">
+            <p className="text-xs text-gray-600 dark:text-gray-400 font-semibold uppercase mb-1">Low Attendance (&lt;75%)</p>
+            <p className="text-3xl font-bold text-red-600 dark:text-red-400">
+              {members.filter(m => m.attendance < 75).length}
             </p>
           </div>
         </div>
+
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 mb-6 border border-gray-200 dark:border-gray-700">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Search Member or Phone</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Search Member or Phone
+              </label>
               <input
                 type="text"
                 value={searchTerm}
@@ -254,45 +214,33 @@ const LowAttendanceAlert = () => {
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-            <div className="flex flex-row w-full mt-3 gap-3 justify-end items-end">
+            <div className="flex flex-col sm:flex-row gap-3 items-end">
               <button
-                onClick={() => handleSendAlert()}
-                disabled={selectedRows.size === 0 || loading}
-                className="flex-1 max-h-10 px-6 py-3 rounded-lg font-bold text-sm bg-yellow-400 hover:bg-yellow-500 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
-              >
-                <p className="-mt-1 text-nowrap">Send Alert to Selected</p>
-              </button>
-              <button
-                onClick={handleExportList}
+                onClick={handleExport}
                 disabled={loading}
                 className="flex-1 max-h-10 px-6 py-3 rounded-lg font-semibold text-sm bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-gray-300 dark:border-gray-600"
               >
-                <p className="-mt-1">Export List</p>
+                Export Data
               </button>
             </div>
           </div>
         </div>
+
         {success && (
           <div className="mb-4 p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
             <p className="text-sm text-green-700 dark:text-green-200">{success}</p>
           </div>
         )}
+
         <p className="text-gray-900 dark:text-gray-100 text-md mb-2">
           <span className="font-bold">Note*: </span>Fields with (↑↓) can be sorted in ascending or descending order.
         </p>
+
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-[600px]">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-900 sticky top-0 dark:bg-black border-b border-white dark:border-gray-700">
-                  <th className="px-4 py-4 text-left w-8">
-                    <input
-                      type="checkbox"
-                      checked={selectedRows.size === filteredAndSortedData.length && filteredAndSortedData.length > 0}
-                      onChange={e => handleSelectAll(e.target.checked)}
-                      className="rounded accent-blue-500 w-4 h-4"
-                    />
-                  </th>
                   {TABLE_COLUMNS.map(col => (
                     <th
                       key={col.key}
@@ -307,65 +255,39 @@ const LowAttendanceAlert = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredAndSortedData.length > 0 ? (
-                  filteredAndSortedData.map((row, idx) => (
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((row, idx) => (
                     <tr
                       key={row.id}
                       className={`border-b border-gray-200 dark:border-gray-700 ${
                         idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'
                       } hover:bg-gray-100 dark:hover:bg-gray-900/50 transition-colors`}
                     >
-                      <td className="px-4 py-4">
-                        <input
-                          type="checkbox"
-                          checked={selectedRows.has(row.id)}
-                          onChange={() => handleSelectRow(row.id)}
-                          className="rounded accent-blue-500 w-4 h-4"
-                        />
-                      </td>
                       <td className="px-4 py-4 text-sm font-semibold text-gray-900 dark:text-gray-50">{row.name}</td>
                       <td className="px-4 py-4 text-sm font-bold">
                         <span className={`inline-block px-3 py-1 rounded-full text-sm font-bold ${getAttendanceColor(row.attendance)}`}>
                           {row.attendance}%
                         </span>
                       </td>
-                      <td className="px-4 py-4 text-lg font-bold">
-                        <span className={getTrendColor(row.trend)}>{getTrendIcon(row.trend)}</span>
-                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-900 dark:text-gray-50 font-semibold">{row.presentCount}</td>
+                      <td className="px-4 py-4 text-sm text-gray-900 dark:text-gray-50 font-semibold">{row.totalMeetings}</td>
                       <td className="px-4 py-4 text-sm text-gray-900 dark:text-gray-50">{row.lastPresent}</td>
                       <td className="px-4 py-4 text-sm text-gray-900 dark:text-gray-50 font-mono">{row.contact}</td>
                       <td className="px-4 py-4">
-                        <div className="flex flex-col gap-2">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleSendAlert([row.id])}
-                              disabled={loading}
-                              className="flex-1 px-3 py-1 rounded text-xs font-semibold bg-amber-300 hover:bg-amber-400 text-black disabled:opacity-50 transition-colors"
-                            >
-                              Send Alert
-                            </button>
-                            <button
-                              onClick={() => handleCall(row.contact)}
-                              disabled={loading}
-                              className="px-3 py-1 rounded text-xs font-semibold bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 transition-colors"
-                            >
-                              Call
-                            </button>
-                          </div>
-                          <button
-                            className="w-full px-3 py-1 rounded text-xs font-semibold bg-gray-300 hover:bg-gray-400 text-gray-900 transition-colors"
-                            onClick={() => handleViewHistory(row.id)}
-                          >
-                            View History
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => handleViewHistory(row.id)}
+                          disabled={loading}
+                          className="px-4 py-2 rounded text-xs font-semibold bg-amber-300 hover:bg-amber-200 text-black disabled:opacity-50 transition-colors"
+                        >
+                          View Details
+                        </button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={TABLE_COLUMNS.length + 1} className="px-4 py-8 text-center text-gray-600 dark:text-gray-400 text-sm">
-                      No members with low attendance found
+                    <td colSpan={TABLE_COLUMNS.length} className="px-4 py-8 text-center text-gray-600 dark:text-gray-400 text-sm">
+                      No members found
                     </td>
                   </tr>
                 )}
@@ -373,23 +295,98 @@ const LowAttendanceAlert = () => {
             </table>
           </div>
         </div>
+
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
+            Showing <span className="font-semibold">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
+            <span className="font-semibold">{Math.min(currentPage * itemsPerPage, filteredAndSortedData.length)}</span> of{' '}
+            <span className="font-semibold">{filteredAndSortedData.length}</span> results
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 items-center w-full sm:w-auto">
+            <select
+              value={itemsPerPage}
+              onChange={e => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:ring-2 focus:ring-blue-500"
+            >
+              {[5, 10, 25, 50].map(option => (
+                <option key={option} value={option}>
+                  {option} per page
+                </option>
+              ))}
+            </select>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                ← Previous
+              </button>
+              <div className="flex gap-1 items-center">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) pageNum = i + 1;
+                  else if (currentPage <= 3) pageNum = i + 1;
+                  else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                  else pageNum = currentPage - 2 + i;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`px-3 py-2 rounded text-sm font-medium transition-colors duration-200 ${
+                        currentPage === pageNum
+                          ? 'bg-red-500 text-white'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next →
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
+
       {showModal && modalData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Attendance History</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Attendance Details</h2>
               <button onClick={() => setShowModal(false)} className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50">
                 <HiX size={24} />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-3">
               {modalData.map((record, idx) => (
                 <div key={idx} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Meeting: {record.meeting?.title}</p>
-                  <p className="text-sm text-gray-900 dark:text-gray-50">Date: {new Date(record.date).toLocaleDateString()}</p>
-                  <p className="text-sm text-gray-900 dark:text-gray-50">Status: {record.attendance_status}</p>
-                  <p className="text-sm text-gray-900 dark:text-gray-50">Location: {record.meeting?.location}</p>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Meeting: {record.meeting?.title}</p>
+                      <p className="text-sm text-gray-900 dark:text-gray-50">Date: {new Date(record.date).toLocaleDateString()}</p>
+                      <p className="text-sm text-gray-900 dark:text-gray-50">Location: {record.meeting?.location}</p>
+                    </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        record.attendance_status === 'present'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}
+                    >
+                      {record.attendance_status === 'present' ? 'Present' : 'Absent'}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -408,4 +405,4 @@ const LowAttendanceAlert = () => {
   );
 };
 
-export default LowAttendanceAlert;
+export default AttendanceOverview;

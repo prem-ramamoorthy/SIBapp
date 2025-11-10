@@ -72,11 +72,6 @@ function getStartOfDay(date) {
   return d;
 }
 
-function getEndOfDay(date) {
-  const d = new Date(date);
-  d.setHours(23, 59, 59, 999);
-  return d;
-}
 
 const MemberRenewalManagement = ({ refreshTrigger }) => {
   const [members, setMembers] = useState([]);

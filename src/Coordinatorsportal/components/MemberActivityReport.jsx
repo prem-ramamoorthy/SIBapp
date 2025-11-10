@@ -4,11 +4,10 @@ import SiteButton from "./SiteButton"
 const TABLE_COLUMNS = [
     { key: 'rank', label: '↑↓ RANK', sortable: true, width: 'w-12' },
     { key: 'name', label: '↑↓ MEMBER NAME', sortable: true, width: 'flex-1 min-w-[140px]' },
-    { key: 'company', label: '↑↓ COMPANY', sortable: true, width: 'flex-1 min-w-[150px]' },
-    { key: 'referralsGiven', label: '↑↓REFERRALS GIVEN', sortable: true, width: 'w-24' },
-    { key: 'businessMade', label: '↑↓ BUSINESS MADE', sortable: true, width: 'w-28' },
+    { key: 'referralsGiven', label: '↑↓ REFERRALS GIVEN', sortable: true, width: 'w-30' },
+    { key: 'businessMade', label: '↑↓ BUSINESS MADE', sortable: true, width: 'w-38' },
     { key: 'visitorsBrought', label: '↑↓VISITORS BROUGHT', sortable: true, width: 'w-24' },
-    { key: 'mToM', label: '↑↓ M TO M', sortable: true, width: 'w-16' },
+    { key: 'mToM', label: '↑↓ M TO M', sortable: true, width: 'w-24' },
     { key: 'approvalStatus', label: '↑↓ APPROVAL STATUS', sortable: true, width: 'w-32' },
     { key: 'attendance', label: '↑↓ ATTENDANCE', sortable: true, width: 'w-28' },
     { key: 'actions', label: 'ACTIONS', sortable: false, width: 'w-40' },
@@ -34,7 +33,6 @@ function getTotalRow(data) {
     return {
         rank: null,
         name: 'TOTAL (All Members)',
-        company: '',
         referralsGiven: data.reduce((a, b) => a + (Number(b.referralsGiven) || 0), 0),
         businessMade: `₹${data.reduce((a, b) => a + parseBusinessValue(b.businessMade), 0).toFixed(1)}cr`,
         visitorsBrought: data.reduce((a, b) => a + (Number(b.visitorsBrought) || 0), 0),
@@ -61,7 +59,6 @@ const MemberActivityReport = (
             id: 1,
             rank: 1,
             name: 'Deepak',
-            company: 'Trading House',
             referralsGiven: 8,
             businessMade: '₹80 Lakhs',
             visitorsBrought: 2,
@@ -73,7 +70,6 @@ const MemberActivityReport = (
             id: 2,
             rank: 2,
             name: 'Gnanavel',
-            company: 'Export Services',
             referralsGiven: 7,
             businessMade: '₹70 Lakhs',
             visitorsBrought: 3,
@@ -85,7 +81,6 @@ const MemberActivityReport = (
             id: 3,
             rank: 3,
             name: 'Sedhu',
-            company: 'Consulting Firm',
             referralsGiven: 6,
             businessMade: '₹60 Lakhs',
             visitorsBrought: 1,
@@ -97,7 +92,6 @@ const MemberActivityReport = (
             id: 4,
             rank: 4,
             name: 'Balaji UPVC',
-            company: 'UPVC Solutions',
             referralsGiven: 4,
             businessMade: '₹50 Lakhs',
             visitorsBrought: 4,
@@ -109,7 +103,6 @@ const MemberActivityReport = (
             id: 5,
             rank: 5,
             name: 'Madhu',
-            company: 'Services',
             referralsGiven: 5,
             businessMade: '₹40 Lakhs',
             visitorsBrought: 2,
@@ -121,7 +114,6 @@ const MemberActivityReport = (
             id: 6,
             rank: 6,
             name: 'Sathishkumar',
-            company: 'Education Services',
             referralsGiven: 4,
             businessMade: '₹35 Lakhs',
             visitorsBrought: 1,
@@ -211,7 +203,16 @@ const MemberActivityReport = (
         }
     }
 
-    const handleSubmit = async () => {
+    const handleAttendanceSubmit = async () => {
+        setLoading(true)
+        try {
+            //Submit trigerring d=will be done here
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const handleApprovalSubmit = async () => {
         setLoading(true)
         try {
             //Submit trigerring d=will be done here
@@ -327,12 +328,21 @@ const MemberActivityReport = (
                                 Clear Selection
                             </button>
                         </div>
-                        <button
-                            onClick={handleSubmit}
-                            className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-green-500 hover:bg-green-600 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors max-h-12"
-                        >
-                            Submit Form
-                        </button>
+                        <div className='flex flex-row gap-3.5'>
+                            <button
+                                onClick={handleAttendanceSubmit}
+                                className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-green-500 hover:bg-green-600 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors max-h-12"
+                            >
+                                Submit Attendances
+                            </button>
+                            <button
+                                onClick={handleApprovalSubmit}
+                                className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-green-500 hover:bg-green-600 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors max-h-12"
+                            >
+                                Submit Approvals
+                            </button>
+                        </div>
+
                     </div>
                 </div>
                 <div className='flex flex-wrap justify-between'>
@@ -362,7 +372,7 @@ const MemberActivityReport = (
                                         <th
                                             key={col.key}
                                             onClick={() => col.sortable && handleSort(col.key)}
-                                            className={`px-3 sm:px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wide ${col.width} ${col.sortable ? 'cursor-pointer hover:bg-gray-700' : ''} transition-colors`}
+                                            className={`px-3 sm:px-4 py-3 text-center text-xs font-bold text-white uppercase tracking-wide ${col.width} ${col.sortable ? 'cursor-pointer hover:bg-gray-700' : ''} transition-colors`}
                                         >
                                             {col.label}
                                         </th>
@@ -388,30 +398,28 @@ const MemberActivityReport = (
                                                 {row.rank}
                                             </span>
                                         </td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-semibold flex-1 min-w-[140px]">
+                                        <td className="px-3 sm:px-4 py-3 text-center text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-semibold flex-1 min-w-[140px]">
                                             {row.name}
                                         </td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400 flex-1 min-w-[150px]">
-                                            {row.company}
-                                        </td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-medium w-24">
+                                        
+                                        <td className="px-3 sm:px-4 text-center py-3 text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-medium w-24">
                                             {row.referralsGiven}
                                         </td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-semibold w-28">
+                                        <td className="px-3 sm:px-4 py-3 text-center text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-semibold w-28">
                                             {row.businessMade}
                                         </td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-medium w-24">
+                                        <td className="px-3 sm:px-4 py-3 text-center text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-medium w-24">
                                             {row.visitorsBrought}
                                         </td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-medium w-16">
+                                        <td className="px-3 sm:px-4 py-3 text-center text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-medium w-16">
                                             {row.mToM}
                                         </td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm w-32">
+                                        <td className="px-3 sm:px-4 py-3  text-center text-xs sm:text-sm w-32">
                                             <span className={`inline-block px-3 py-1 rounded-full font-bold text-xs border ${getStatusColor(row.approvalStatus)}`}>
                                                 {row.approvalStatus}
                                             </span>
                                         </td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm w-28">
+                                        <td className="px-3 sm:px-4 py- text-center text-xs sm:text-sm w-28">
                                             <select
                                                 value={row.attendance}
                                                 onChange={(e) => handleUpdateAttendance(row.id, e.target.value)}
@@ -422,7 +430,7 @@ const MemberActivityReport = (
                                                 ))}
                                             </select>
                                         </td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm w-40">
+                                        <td className="px-3 sm:px-4 py-3 text-xs text-center sm:text-sm w-40">
                                             <div className="flex flex-col gap-1">
                                                 <button
                                                     onClick={() => handleApproveRow(row.id)}
@@ -455,9 +463,7 @@ const MemberActivityReport = (
                                         <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-50">
                                             {TOTAL_ROW.name}
                                         </td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-50">
-                                            {TOTAL_ROW.company}
-                                        </td>
+                    
                                         <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-50">
                                             {TOTAL_ROW.referralsGiven}
                                         </td>
@@ -493,10 +499,7 @@ const MemberActivityReport = (
                                             {member?.name} Details
                                         </h2>
                                         <div className="space-y-3 mb-6">
-                                            <div>
-                                                <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold">Company</p>
-                                                <p className="text-sm text-gray-900 dark:text-gray-50">{member?.company}</p>
-                                            </div>
+                                            
                                             <div>
                                                 <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold">Referrals Given</p>
                                                 <p className="text-sm text-gray-900 dark:text-gray-50">{member?.referralsGiven}</p>

@@ -1,7 +1,7 @@
 import Header from "../MainPage/Header"
 import LowAttendanceAlert from "./components/LowAttendanceAlert"
 import MemberActivityReport from "./components/MemberActivityReport"
-import SiteButton from "./components/SiteButton"
+import AttendanceOverview from './components/AttendanceReport'
 
 function Coordinatorsportal() {
   return (
@@ -11,6 +11,7 @@ function Coordinatorsportal() {
       </div>
       <MemberActivityReport />
       <LowAttendanceAlert />
+      <AttendanceOverview />
     </div>
   )
 }

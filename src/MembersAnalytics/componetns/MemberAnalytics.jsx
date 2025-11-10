@@ -19,10 +19,10 @@ function parseNumber(value) {
     if (typeof value === 'number') return value
     if (typeof value !== 'string') return 0
     if (value.includes('₹') && value.includes('cr')) {
-        return parseFloat(value.replace(/[₹,cr\s]/g, '')) * 10000000
+        return parseFloat(value.replace(/[₹,cr\s]/g, ''))
     }
     if (value.includes('₹') && value.includes('L')) {
-        return parseFloat(value.replace(/[₹,L\s]/g, '')) * 100000
+        return parseFloat(value.replace(/[₹,L\s]/g, ''))
     }
     return parseFloat(value.replace(/[₹,]/g, '')) || 0
 }
@@ -30,7 +30,7 @@ function parseNumber(value) {
 function formatToCr(val) {
     let n = parseNumber(val)
     if (isNaN(n) || n === 0) return "₹0"
-    return `₹${(n / 10000000).toFixed(1)}cr`
+    return `₹${(n)}`
 }
 
 function getTotalRow(data, visibleColumns) {
