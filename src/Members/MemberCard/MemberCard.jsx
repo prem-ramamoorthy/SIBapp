@@ -14,7 +14,7 @@ function MemberCard({
   }, culturaldetails = {} , contactdetails = {} , link
 }) {
   return (
-  <div className="h-[400px] w-[225px] flex flex-col justify-end">
+  <div className="h-[400px] w-[200px] flex flex-col justify-end">
     <div className="bg-white dark:bg-gray-800 h-[330px] w-full rounded-t-2xl rounded-b-xl flex flex-col justify-start items-center transition-colors duration-300">
       <div className="relative h-[110px] w-[110px] bg-gray-300 dark:bg-gray-700 rounded-full -top-[48px] shadow-xl border-2 border-gray-400 dark:border-gray-600">
         <img
@@ -57,7 +57,7 @@ function MemberCard({
         <ModalViewer contactdetails={contactdetails} />
         <NavLink
           to={link}
-          className="h-[38px] cursor-pointer w-1/2 bg-white dark:bg-gray-400 p-1 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 border pl-3 pt-2.5 text-xs font-bold border-gray-400 dark:border-gray-600 transition-colors duration-300 mr-2"
+          className="h-[38px] cursor-pointer w-1/2 bg-white dark:bg-gray-400 p-1 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600 border pl-6.9 pt-2.5 text-xs font-bold border-gray-400 dark:border-gray-600 transition-colors duration-300 mr-2"
         >
           View Profile
         </NavLink>
