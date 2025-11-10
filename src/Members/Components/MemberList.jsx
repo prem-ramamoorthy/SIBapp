@@ -16,23 +16,37 @@ const MemberList = ({ members }) => {
 
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-20 place-items-center">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-8 place-items-center">
         {currentMembers.map((member, index) => (
-          <MemberCard key={index} member={{
-            profile_image_url: member.profile_image_url,
-            blood_group: member.blood_group,
-            username: member.user.username,
-            company_name: member.company_name,
-            verticals: member.verticals,
-            chapter: member.chapter,
-            region: member.region,
-          }} profileurl="" contactdetails={
-            { company_phone: member.company_phone, company_email: member.company_email, company_address: member.company_address }
-          } culturaldetails={{vagai_category : member.vagai_category , kulam_category : member.kulam_category , native_place : member.native_place , kuladeivam : member.kuladeivam}} link={`${window.location.origin}/profile/${member._id}?user=${member.user._id}`} />
+          <MemberCard
+            key={index}
+            member={{
+              profile_image_url: member.profile_image_url,
+              blood_group: member.blood_group,
+              username: member.user.username,
+              company_name: member.company_name,
+              verticals: member.verticals,
+              chapter: member.chapter,
+              region: member.region,
+            }}
+            profileurl=""
+            contactdetails={{
+              company_phone: member.company_phone,
+              company_email: member.company_email,
+              company_address: member.company_address
+            }}
+            culturaldetails={{
+              vagai_category: member.vagai_category,
+              kulam_category: member.kulam_category,
+              native_place: member.native_place,
+              kuladeivam: member.kuladeivam
+            }}
+            link={`${window.location.origin}/profile/${member._id}?user=${member.user._id}`}
+          />
         ))}
       </div>
-
       <div className="flex justify-center items-center gap-2 mt-4">
+        {/* Same pagination controls */}
         <button
           className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors duration-300"
           onClick={() => handlePageChange(currentPage - 1)}
@@ -40,7 +54,6 @@ const MemberList = ({ members }) => {
         >
           Prev
         </button>
-
         {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
           <button
             key={page}
@@ -53,7 +66,6 @@ const MemberList = ({ members }) => {
             {page}
           </button>
         ))}
-
         <button
           className="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors duration-300"
           onClick={() => handlePageChange(currentPage + 1)}
