@@ -73,6 +73,7 @@ function ButtonPage({ onClose = () => {} }) {
       comments: comments,
       hot: heatScale,
       created_at: date,
+      status:false
     };
 
     data = sanitizeReferralData(data);

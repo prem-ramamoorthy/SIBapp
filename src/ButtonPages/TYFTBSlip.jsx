@@ -1,4 +1,4 @@
-import { useState , useEffect } from "react";
+import { useState, useEffect } from "react";
 import CrossChapterSearch from "../Components/CrossSearch";
 import EntryField from "../Components/EntryField";
 import RadioButtons from "../Components/RadioButtons";
@@ -7,7 +7,7 @@ import FilterButton from "../Members/Components/FilterButton";
 import { getDate } from "../utils/getDate.mjs";
 import { X } from "lucide-react";
 
-function ButtonPage({ onClose = () => {} }) {
+function ButtonPage({ onClose = () => { } }) {
   const todaysDate = getDate();
   const [date, setDate] = useState(todaysDate);
   const [amount, setAmount] = useState("");
@@ -18,7 +18,7 @@ function ButtonPage({ onClose = () => {} }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [response, setResponse] = useState(null);
-  const [chapterName , setChapterName] = useState("loading..");
+  const [chapterName, setChapterName] = useState("loading..");
 
   useEffect(() => {
     let cancelled = false;
@@ -69,7 +69,8 @@ function ButtonPage({ onClose = () => {} }) {
       referral_type: referralType,
       business_amount: amt,
       business_description: comments.trim(),
-      created_at: date
+      created_at: date,
+      status: false
     };
 
     try {

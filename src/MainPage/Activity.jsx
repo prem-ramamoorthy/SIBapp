@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import ActivityButton from './Components/ActivityButton';
 import ActivityP from './Components/ActivityP';
-import LoadingPage from '../Components/CircularLoading'
 
 const TABS = [
   { label: 'Lifetime', value: 'full' },
@@ -12,12 +11,17 @@ const TABS = [
 function Activity() {
   const [activeTab, setActiveTab] = useState('amonth');
   const [data, setData] = useState(null);
+  const [data2, setData2] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const base = import.meta.env.VITE_BACKEND_SERVER;
   const url = useMemo(
     () => `${base}/dashboard/getactivity/${activeTab}`,
+    [base, activeTab]
+  );
+  const url2 = useMemo(
+    () => `${base}/dashboard/getactivityupcoming/${activeTab}`,
     [base, activeTab]
   );
 
@@ -34,6 +38,13 @@ function Activity() {
           throw new Error(msg);
         }
         const json = await res.json();
+        const res2 = await fetch(url2, { method: 'GET', credentials: 'include' });
+        if (!res2.ok) {
+          const msg2 = `Request failed: ${res2.status}`;
+          throw new Error(msg2);
+        }
+        const json2 = await res2.json();
+        if (!cancelled) setData2(json2);
         if (!cancelled) setData(json);
       } catch (err) {
         if (!cancelled) {
@@ -60,14 +71,20 @@ function Activity() {
     />
   ));
 
+  const extractDecimal = (v) => {
+    if (v == null) return -1;
+    if (typeof v === 'object' && v.$numberDecimal !== undefined) return v.$numberDecimal;
+    return v;
+  };
+
   const ActivityPs = [
-    { content: 'Referral Given', upcoming: 0, actual: error ? 'error' : data ? data.referral_given : -1 },
-    { content: 'Referral Received', upcoming: 0, actual: error ? 'error' : data ? data.referral_received : -1 },
-    { content: 'TYFTB Received', upcoming: 0, actual: error ? 'error' : data ? data.tyftb_received : -1 },
-    { content: 'TYFTB Given', upcoming: 0, actual: error ? 'error' : data ? data.tyftb_given : -1 },
-    { content: 'Business Made', upcoming: 0, actual: error ? 'error' : data ? data.business_made : -1 },
-    { content: 'M to M', upcoming: 0, actual: error ? 'error' : data ? data.M2Ms : -1 },
-    { content: 'Visitor', upcoming: 0, actual: error ? 'error' : data ? data.Visitors : -1 },
+    { content: 'Referral Given', upcoming: extractDecimal(data2?.referral_given), actual: error ? 'error' : extractDecimal(data?.referral_given) },
+    { content: 'Referral Received', upcoming: extractDecimal(data2?.referral_received), actual: error ? 'error' : extractDecimal(data?.referral_received) },
+    { content: 'TYFTB Received', upcoming: extractDecimal(data2?.tyftb_received), actual: error ? 'error' : extractDecimal(data?.tyftb_received) },
+    { content: 'TYFTB Given', upcoming: extractDecimal(data2?.tyftb_given), actual: error ? 'error' : extractDecimal(data?.tyftb_given) },
+    { content: 'Business Made', upcoming: extractDecimal(data2?.business_made), actual: error ? 'error' : extractDecimal(data?.business_made) },
+    { content: 'M to M', upcoming: extractDecimal(data2?.M2Ms), actual: error ? 'error' : extractDecimal(data?.M2Ms) },
+    { content: 'Visitor', upcoming: extractDecimal(data2?.Visitors), actual: error ? 'error' : extractDecimal(data?.Visitors) },
   ].map((props, index) => <ActivityP key={index} {...props} />);
 
   return (
@@ -94,10 +111,10 @@ function Activity() {
           Activity
         </h2>
         <div className="buttonContainer flex gap-2">
-          {loading && 
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-red-400"></div>
-          </div>}
+          {loading &&
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-red-400"></div>
+            </div>}
           {Buttons}
         </div>
       </div>

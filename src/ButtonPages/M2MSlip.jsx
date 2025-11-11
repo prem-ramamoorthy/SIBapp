@@ -52,7 +52,8 @@ function ButtonPage({ onClose = () => { } }) {
       meeting_date: date,
       location: location,
       discussion_points: conversationTopic,
-      created_by_username: username
+      created_by_username: username,
+      status: false
     }
 
     try {

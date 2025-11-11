@@ -42,10 +42,12 @@ function MemberActivityReport() {
     const [sortConfig, setSortConfig] = useState({ key: 'businessMade', direction: 'desc' });
     const [showDetailsModal, setShowDetailsModal] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [showApprovalConfirmModal, setShowApprovalConfirmModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(null);
     const [error, setError] = useState(null);
     const [submittedAttendances, setSubmittedAttendances] = useState(new Set());
+    const [approvedMembers, setApprovedMembers] = useState(new Set());
     const [fetchLoading, setFetchLoading] = useState(true);
 
     useEffect(() => {
@@ -175,6 +177,112 @@ function MemberActivityReport() {
         }
     };
 
+    const handleApproveAll = () => {
+        if (selectedRows.size === 0) {
+            setError('Please select members to approve');
+            return;
+        }
+        setShowApprovalConfirmModal(true);
+    };
+
+    const confirmApproveAll = async () => {
+        setLoading(true);
+        setShowApprovalConfirmModal(false);
+        try {
+            const selectedMembers = Array.from(selectedRows);
+            for (const memberId of selectedMembers) {
+                const notificationData = {
+                    receiver: memberId,
+                    header: "Approval Notification",
+                    content: `Your meeting/business activity data has been approved by the coordinator in the meeting "${selectedMeeting}".`
+                };
+                await Promise.all([
+                    fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/referral/updatereferralstatusbyreferrer/${memberId}`, {
+                        method: 'PUT',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: true }),
+                    }),
+                    fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/tyftb/updatetyftbstatusbypayer/${memberId}`, {
+                        method: 'PUT',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: true }),
+                    }),
+                    fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/one2one/updatem2mstatusbyuserid/${memberId}`, {
+                        method: 'PUT',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ status: true }),
+                    }),
+                    fetch(`${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`, {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(notificationData),
+                    }),
+                ]);
+                setApprovedMembers((prev) => new Set([...prev, memberId]));
+            }
+
+            const updated = memberData.map((m) =>
+                selectedRows.has(m.id) ? { ...m, approvalStatus: 'APPROVED' } : m
+            );
+            setMemberData(updated);
+            setSelectedRows(new Set());
+
+            setSuccess(`${selectedMembers.length} member(s) approved successfully`);
+            setTimeout(() => setSuccess(null), 2000);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleApproveRow = async (memberId) => {
+        if (approvedMembers.has(memberId)) {
+            setError('Member already approved');
+            return;
+        }
+        setLoading(true);
+        try {
+            await Promise.all([
+                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/referral/updatereferralstatusbyreferrer/${memberId}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: true }),
+                }),
+                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/tyftb/updatetyftbstatusbypayer/${memberId}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: true }),
+                }),
+                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/one2one/updatem2mstatusbyuserid/${memberId}`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: true }),
+                }),
+            ]);
+
+            const updated = memberData.map((m) =>
+                m.id === memberId ? { ...m, approvalStatus: 'APPROVED' } : m
+            );
+            setMemberData(updated);
+            setApprovedMembers((prev) => new Set([...prev, memberId]));
+
+            setSuccess('Member approved successfully');
+            setTimeout(() => setSuccess(null), 2000);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const getStatusColor = (status) => {
         switch (status) {
             case 'APPROVED':
@@ -250,6 +358,7 @@ function MemberActivityReport() {
                     <div className="flex flex-wrap justify-between gap-3">
                         <div className="flex flex-col sm:flex-row gap-3">
                             <button
+                                onClick={handleApproveAll}
                                 disabled={selectedRows.size === 0 || loading}
                                 className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-yellow-400 hover:bg-yellow-500 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
@@ -269,12 +378,6 @@ function MemberActivityReport() {
                                 className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-green-500 hover:bg-green-600 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 Submit Attendances
-                            </button>
-                            <button
-                                disabled={loading}
-                                className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-green-500 hover:bg-green-600 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                Submit Approvals
                             </button>
                         </div>
                     </div>
@@ -328,7 +431,8 @@ function MemberActivityReport() {
                                                 type="checkbox"
                                                 checked={selectedRows.has(row.id)}
                                                 onChange={() => handleSelectRow(row.id)}
-                                                className="rounded accent-amber-300 w-4 h-4"
+                                                disabled={approvedMembers.has(row.id)}
+                                                className="rounded accent-amber-300 w-4 h-4 disabled:opacity-50"
                                             />
                                         </td>
                                         <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-900 dark:text-gray-50 font-semibold w-12">
@@ -382,7 +486,11 @@ function MemberActivityReport() {
                                         </td>
                                         <td className="px-3 sm:px-4 py-3 text-xs text-center sm:text-sm w-40">
                                             <div className="flex flex-col gap-1">
-                                                <button className="px-3 py-1 rounded border-1 border-gray-600 bg-green-500/80 hover:bg-green-400/50 text-black font-semibold text-xs">
+                                                <button
+                                                    onClick={() => handleApproveRow(row.id)}
+                                                    disabled={loading || approvedMembers.has(row.id)}
+                                                    className="px-3 py-1 rounded border-1 border-gray-600 bg-green-500/80 hover:bg-green-400/50 text-black font-semibold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                >
                                                     Approve
                                                 </button>
                                                 <button
@@ -482,6 +590,32 @@ function MemberActivityReport() {
                                 </button>
                                 <button
                                     onClick={confirmSubmitAttendance}
+                                    disabled={loading}
+                                    className="flex-1 px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-black font-semibold disabled:opacity-50"
+                                >
+                                    Confirm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {showApprovalConfirmModal && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-50 mb-4">Confirm Approval</h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                                Are you sure you want to approve {selectedRows.size} member(s)? This action will update referrals, TYFTB, and M2M status.
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowApprovalConfirmModal(false)}
+                                    className="flex-1 px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmApproveAll}
                                     disabled={loading}
                                     className="flex-1 px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-black font-semibold disabled:opacity-50"
                                 >
