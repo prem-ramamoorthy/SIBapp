@@ -10,8 +10,8 @@ function Coordinatorsportal() {
         <Header />
       </div>
       <MemberActivityReport />
-      <LowAttendanceAlert />
       <AttendanceOverview />
+      <LowAttendanceAlert />
     </div>
   )
 }
