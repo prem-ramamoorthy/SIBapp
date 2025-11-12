@@ -70,9 +70,9 @@ function UpcomingEvents() {
       <div className="min-h-full w-full flex flex-row">
         <div className="w-1/2">
           <div className="flex max-h-[32px] items-center justify-between py-3 sm:px-6 sm:py-4 shrink-0 border-b border-gray-200 dark:border-gray-700 ">
-            <h2 className="text-[16px] ml-4  text-nowrap sm:text-xl font-bold text-gray-900 dark:text-gray-100 ">
+            <p className="text-sm ml-4  text-nowrap sm:text-[16px] font-bold text-gray-900 dark:text-gray-100 ">
               Upcoming Event
-            </h2>
+            </p>
             {eventloading ? <Loader2 /> : eventerror ? <BiErrorCircle /> : events ? (
               <>
                 <button
@@ -115,7 +115,7 @@ function UpcomingEvents() {
             {loading ? (
               <Loading />
             ) : hasEvent ? (
-              <div className="w-full overflow-auto">
+              <div className="w-full overflow-auto mt-3">
                 <Events
                   title={event.companyName}
                   date={event.date}
