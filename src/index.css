@@ -70,7 +70,6 @@ body {
 .loading-wave span:nth-child(8) { animation-delay: 0.7s; }
 .loading-wave span:nth-child(9) { animation-delay: 0.8s; }
 .loading-wave span:nth-child(10) { animation-delay: 0.9s; }
-
 @keyframes wave {
   0%, 100% { transform: translateY(0); }
   20% { transform: translateY(-8px); }
