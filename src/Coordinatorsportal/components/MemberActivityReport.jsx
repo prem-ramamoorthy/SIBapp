@@ -61,7 +61,7 @@ function MemberActivityReport() {
                 fetch(`${import.meta.env.VITE_BACKEND_SERVER}/activity/getactivityofusersfalse`, {
                     credentials: 'include',
                 }),
-                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/getmeetings`, {
+                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/getfalsemeetings`, {
                     credentials: 'include',
                 }),
             ]);
@@ -164,6 +164,16 @@ function MemberActivityReport() {
                         credentials: 'include',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data),
+                    });
+                    const confirm_data = {
+                        _id : selectedMeeting,
+                        attendance_status: true
+                    };
+                    await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/updatemeeting`, {
+                        method: 'PUT',
+                        credentials: 'include',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(confirm_data),
                     });
                     setSubmittedAttendances((prev) => new Set([...prev, member.id]));
                 }
