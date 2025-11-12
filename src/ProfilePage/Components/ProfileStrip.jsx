@@ -1,4 +1,4 @@
-import { RotateCcw } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { CompletionRing } from "./CompletionRing";
 
@@ -68,7 +68,6 @@ const ProfileStrip = ({
     fileInputRef.current?.click();
   };
 
-  // Main image upload and DB update logic:
   const handleFileInput = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -78,7 +77,6 @@ const ProfileStrip = ({
       const formData = new FormData();
       formData.append("photo", file);
 
-      // 1. Upload image to Firebase and get processed public URL
       const uploadRes = await fetch(
         `${import.meta.env.VITE_BACKEND_SERVER}/auth/upload/photo`,
         {
@@ -91,7 +89,6 @@ const ProfileStrip = ({
       const { url: imageUrl } = await uploadRes.json();
       if (!imageUrl) throw new Error("Server did not return photo URL");
 
-      // 2. Save photo URL to user profile in DB
       const updateRes = await fetch(
         `${import.meta.env.VITE_BACKEND_SERVER}/profile/updateprofile`,
         {
@@ -104,7 +101,6 @@ const ProfileStrip = ({
       if (!updateRes.ok) throw new Error("Profile update failed");
       const updatedProfile = await updateRes.json();
 
-      // 3. Set new avatar URL state for immediate UI update
       setAvatar(updatedProfile.profile_image_url || imageUrl);
     } catch (err) {
       setUploadError(err.message);
@@ -143,7 +139,7 @@ const ProfileStrip = ({
                     <circle className="opacity-20" cx="12" cy="12" r="10" stroke="white" strokeWidth="4" fill="none"></circle>
                     <path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z"></path>
                   </svg>
-                  : <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />}
+                  : <Upload className="h-3.5 w-3.5" aria-hidden="true" />}
               </button>
             }
             <input

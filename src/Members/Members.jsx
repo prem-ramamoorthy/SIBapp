@@ -20,7 +20,7 @@ function Members() {
   const [region, setRegion] = useState("All Regions");
   const [chapter, setChapter] = useState("All Chapters");
   const [vertical, setVertical] = useState("All Verticals");
-  const [myChapterOnly, setMyChapterOnly] = useState(false);
+  const [myChapterOnly, setMyChapterOnly] = useState(true);
   const [sort, setSort] = useState("Name A-Z");
   const [filters, setFilters] = useState({
     region: "All Regions",

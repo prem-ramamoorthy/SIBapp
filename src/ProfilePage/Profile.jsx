@@ -45,7 +45,7 @@ function Profile() {
     if (showProfileData?.editable && !id) {
       setEditable(showProfileData.editable);
     }
-  }, [showProfileData , id]);
+  }, [showProfileData, id]);
 
   useEffect(() => {
     if (!getProfileData) return;
@@ -152,7 +152,7 @@ function Profile() {
             user_id={profileData?.user?._id}
             profile_id={profileData?._id}
             editable={editable}
-            completionPercentage = {completionPercentage}
+            completionPercentage={completionPercentage}
           />
         </div>
         <section className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -194,17 +194,20 @@ function Profile() {
                 {
                   title: "GAINS Profile",
                   content: profileData?.bio,
-                  defaultOpen: true
+                  defaultOpen: true,
+                  description: "A brief summary of your goals, achievements, interests, connections, and skills."
                 },
                 {
                   title: "30-sec Pitch",
                   content: profileData?.elevator_pitch_30s,
-                  defaultOpen: false
+                  defaultOpen: false,
+                  description: "A concise introduction highlighting your business and main benefits in 30 seconds."
                 },
                 {
                   title: "Why SIB?",
                   content: profileData?.why_sib,
-                  defaultOpen: false
+                  defaultOpen: false,
+                  description: "An opportunity to grow by connecting with the Sengunthar business community."
                 }
               ]}
             />

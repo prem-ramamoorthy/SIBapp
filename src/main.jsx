@@ -21,12 +21,12 @@ import MembersAnalytics from './MembersAnalytics/MembersAnalytics';
 import Coordinatorsportal from './Coordinatorsportal/Coordinatorsportalpage';
 import PresidentRoute from './hooks/PresidentRoute';
 import NotEligibleRole from './Notfound/NotEligible';
-import ErrorDisplay from './Notfound/ErrorDisplay' ;
+import ErrorDisplay from './Notfound/ErrorDisplay';
 
 import './index.css'
 
 const router = createBrowserRouter([
-  { path: '/', element: <SignInPage />,  errorElement: <ErrorDisplay /> },
+  { path: '/', element: <SignInPage />, errorElement: <ErrorDisplay /> },
   {
     element: <ProtectedRoute />,
     errorElement: <ErrorDisplay />,
@@ -40,7 +40,6 @@ const router = createBrowserRouter([
       { path: '/slips', element: <AnimatedRoute><FunctionalPage /></AnimatedRoute> },
       { path: '/profile', element: <AnimatedRoute><Profile /></AnimatedRoute> },
       { path: '/allnotifications', element: <AnimatedRoute><NotificationsPage /></AnimatedRoute> },
-      { path: '/coordinatorsportal', element: <AnimatedRoute><Coordinatorsportal /></AnimatedRoute> },
     ]
   },
   {
@@ -48,6 +47,13 @@ const router = createBrowserRouter([
     children: [
       { path: '/presidentportal', element: <AnimatedRoute><PresidentPortal /></AnimatedRoute> },
       { path: '/memberdetailedanalytics', element: <AnimatedRoute><MembersAnalytics /></AnimatedRoute> },
+      { path: '/coordinatorsportal', element: <AnimatedRoute><Coordinatorsportal /></AnimatedRoute> },
+    ]
+  }, {
+    element: <Coordinatorsportal />,
+    children: [
+      { path: '/memberdetailedanalytics', element: <AnimatedRoute><MembersAnalytics /></AnimatedRoute> },
+      { path: '/coordinatorsportal', element: <AnimatedRoute><Coordinatorsportal /></AnimatedRoute> },
     ]
   },
   { path: '/profile/:id', element: <AnimatedRoute><Profile /></AnimatedRoute> },

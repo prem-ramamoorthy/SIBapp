@@ -6,6 +6,9 @@ import Loader from '../Members/Components/Loader';
 import ErrorComponent from '../Components/ErrorComponent';
 import CircularLoading from '../Components/CircularLoading';
 import { useEffect, useState } from 'react';
+import Zoom from 'react-medium-image-zoom';
+import 'react-medium-image-zoom/dist/styles.css';
+import { NavLink } from 'react-router-dom';
 
 function Header() {
   const [url, seturl] = useState(null);
@@ -63,33 +66,34 @@ function Header() {
       <div className="flex flex-row items-center mt-2 pl-5 gap-3">
         <Sidebar />
 
-        <h1
-          className="
-            h-[40px] w-[40px] 
-            bg-amber-400 dark:bg-amber-500
-            rounded-full font-bold flex items-center justify-center
-            text-gray-900 dark:text-gray-900
-          "
-        >
-          SIB
-        </h1>
+        <Zoom>
+          <img
+            src="/public/assets/LOGO (2).png"
+            alt="logo"
+            height={50}
+            width={50}
+            className="object-cover rounded-full"
+          />
+        </Zoom>
 
-        <h1
-          className="
+        <NavLink to={'/dashboard'}>
+          <h1
+            className="
             font-bold text-lg
             text-gray-800 dark:text-gray-100
             hidden lg:inline-block md:inline-block xl:inline-block
           "
-        >
-          SENGUNTHAR IN BUSINESS
-        </h1>
+          >
+            SENGUNTHAR IN BUSINESS
+          </h1>
+        </NavLink>
       </div>
 
       <div className="flex flex-row items-center justify-end gap-3 p-2 mx-4">
         <NotificationPanel />
 
         <span className="
-          text-gray-700 dark:text-gray-300 font-bold text-base hidden md:inline-block xl:inline-block truncate max-w-[140px] sm:max-w-xs
+          text-gray-700 dark:text-gray-300 font-bold text-base  md:inline-block xl:inline-block truncate max-w-[140px] sm:max-w-xs
         ">
           {loading2 ? <Loader /> : error2 ? <ErrorComponent /> : (chapterName?.chapterName || "Chapter Name")}
         </span>

@@ -58,7 +58,7 @@ function MemberActivityReport() {
         setFetchLoading(true);
         try {
             const [activitiesRes, meetingsRes] = await Promise.all([
-                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/activity/getactivityofusers`, {
+                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/activity/getactivityofusersfalse`, {
                     credentials: 'include',
                 }),
                 fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/getmeetings`, {
@@ -509,21 +509,36 @@ function MemberActivityReport() {
 
                     <div className="bg-gray-100 dark:bg-gray-900 border-t-2 border-gray-300 dark:border-gray-600">
                         <div className="overflow-x-auto">
-                            <table className="w-full">
+                            <table className="w-full dark:text-white">
                                 <tbody>
                                     <tr>
                                         <td className="px-4 py-3"></td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-50"></td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-50">{TOTAL_ROW.name}</td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-50">{TOTAL_ROW.referralsGiven}</td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-50">{TOTAL_ROW.businessMade}</td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-50">{TOTAL_ROW.visitorsBrought}</td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-50">{TOTAL_ROW.mToM}</td>
-                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-gray-900 dark:text-gray-50">{TOTAL_ROW.approvalStatus}</td>
-                                        <td className="px-3 sm:px-4 py-3"></td>
-                                        <td className="px-3 sm:px-4 py-3"></td>
+                                        <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm"></td>
+                                        <td className="px-3 sm:px-4 py-3 text-center text-xs sm:text-sm font-bold flex-1 min-w-[140px]">
+                                            {TOTAL_ROW.name}
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-3 text-left text-xs sm:text-sm font-bold w-24">
+                                            {TOTAL_ROW.referralsGiven}
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-3 text-center text-xs sm:text-sm font-bold w-28">
+                                            {TOTAL_ROW.businessMade}
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-3 text-center text-xs sm:text-sm font-bold w-24">
+                                            {TOTAL_ROW.visitorsBrought}
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-3 text-center text-xs sm:text-sm font-bold w-24">
+                                            {TOTAL_ROW.mToM}
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-3 text-center text-xs sm:text-sm font-bold w-32">
+                                            {TOTAL_ROW.approvalStatus}
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-3 text-center text-xs sm:text-sm font-bold w-28">
+                                            {TOTAL_ROW.attendance}
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-3 w-40"></td>
                                     </tr>
                                 </tbody>
+
                             </table>
                         </div>
                     </div>

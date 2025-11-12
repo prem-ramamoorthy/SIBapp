@@ -32,7 +32,7 @@ export function ModalViewercultural({ data = {} }) {
     <>
       <Button
         onClick={() => setOpenModal(true)}
-        className="h-[40px] cursor-pointer w-[180px] bg-gray-100 dark:bg-gray-400 p-1 rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-600 border-2 text-sm font-bold dark:text-black border-gray-400 dark:border-gray-600 relative -top-[32px] transition-colors duration-300"
+        className="h-[40px] cursor-pointer w-[180px] bg-black dark:bg-gray-400 p-1 rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-600 border-2 text-sm font-bold dark:text-black border-gray-400 dark:border-gray-600 relative -top-[32px] transition-colors duration-300"
       >
         Cultural Details
       </Button>

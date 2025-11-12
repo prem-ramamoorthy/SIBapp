@@ -1,6 +1,5 @@
 import { ArrowRight, Loader2 } from "lucide-react";
 import Events from "./Components/Events";
-import { NavLink } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import Loading from "../Components/Loading";
 import { useEffect, useState } from "react";
@@ -139,7 +138,7 @@ function UpcomingEvents() {
             {coordinators.map(({ name, role }, i) => (
               <div
                 key={i}
-                className="rounded-lg px-2 my-1 flex flex-row-reverse justify-between text-gray-900 dark:text-gray-100 "
+                className="rounded-lg px-2 flex flex-row-reverse justify-between text-gray-900 dark:text-gray-100 "
               >
                 <p className="font-semibold text-black dark:text-gray-100">{name}</p>
                 <p className="text-sm text-black dark:text-gray-300">{role}</p>
