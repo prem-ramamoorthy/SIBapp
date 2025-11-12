@@ -111,6 +111,7 @@ export default function CreateMemberForm() {
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
+                        password : form.password, 
                         username: form.username,
                         role: form.role,
                         membership_status: true,
@@ -120,19 +121,6 @@ export default function CreateMemberForm() {
                 }
             );
             const membershipJson = await membershipRes.json();
-
-            await fetch(
-                `${import.meta.env.VITE_BACKEND_SERVER}/auth/sendcredentials`,
-                {
-                    method: "POST",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        username: form.email,
-                        password: form.password
-                    })
-                }
-            );
 
             if (!membershipRes.ok) {
                 throw new Error(membershipJson.message || membershipJson.error || "Membership creation failed");
