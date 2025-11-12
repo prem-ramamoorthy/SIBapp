@@ -67,19 +67,19 @@ function Header() {
         <Sidebar />
 
         <Zoom>
-       <img
-  src="public/assets/logo.png"  // Ensure this file is a transparent .png or .svg
-  alt="logo"
-  height={60}
-  width={60}
-  style={{
-    background: "none",
-    display: "inline-block",
-    verticalAlign: "middle",
-    borderRadius: "50%", // Optional: for circular logos
-    objectFit: "contain" // Prevent stretching
-  }}
-/>
+          <img
+            src="/assets/logo.png"
+            alt="logo"
+            height={60}
+            width={60}
+            style={{
+              background: "none",
+              display: "inline-block",
+              verticalAlign: "middle",
+              borderRadius: "50%", 
+              objectFit: "contain"
+            }}
+          />
 
         </Zoom>
 

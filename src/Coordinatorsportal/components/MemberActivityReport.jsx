@@ -486,7 +486,6 @@ function MemberActivityReport() {
                                                 disabled={submittedAttendances.has(row.id)}
                                                 className="px-2 py-1 rounded border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-xs focus:ring-2 focus:ring-amber-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
-                                                <option value="">Select</option>
                                                 {ATTENDANCE_OPTIONS.map((opt) => (
                                                     <option key={opt} value={opt}>
                                                         {opt}

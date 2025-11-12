@@ -11,16 +11,16 @@ function Events({
         bg-white dark:bg-gray-800/5
         rounded-lg
         shadow-sm dark:shadow-gray-900/20
-        transition-colors duration-300
+        transition-colors duration-300 text-sm
       "
     >
       <h3 className="text-gray-600 dark:text-gray-300">
         <span className="font-semibold text-gray-800 dark:text-gray-100">Title :</span> {title}
       </h3>
       <p className="text-gray-600 dark:text-gray-300">
-        <span className="font-semibold text-gray-800 dark:text-gray-100">Date :</span> {date} |{" "}
-        <span className="font-semibold text-gray-800 dark:text-gray-100">Time :</span> {time}
+        <span className="font-semibold text-gray-800 dark:text-gray-100">Date :</span> {date}
       </p>
+        <p className="font-semibold text-gray-800 dark:text-gray-100">Time : {time}</p> 
     </div>
   );
 }
