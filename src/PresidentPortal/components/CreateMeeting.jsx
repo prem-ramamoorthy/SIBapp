@@ -78,7 +78,8 @@ export default function ModalViewer() {
         location,
         meeting_type: meetingType.toLowerCase(),
         meeting_notes: description,
-        meeting_status: "upcoming"
+        meeting_status: "upcoming",
+        attendance_status : false,
       };
 
       try {
