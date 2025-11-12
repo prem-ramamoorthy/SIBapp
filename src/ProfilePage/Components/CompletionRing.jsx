@@ -11,7 +11,7 @@ export const CompletionRing = ({ percentage = 0, size = 40, stroke = 3 }) => {
     const offset = circ - (percentage / 100) * circ;
 
     return (
-        <div className="flex flex-col items-center gap-1 h-full w-full justify-center">
+        <div className="flex flex-col ml-2 gap-1 h-full w-full justify-center">
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
                 <circle
                     cx={size / 2}

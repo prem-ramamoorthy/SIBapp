@@ -114,7 +114,7 @@ const ProfileStrip = ({
     <div className="w-full rounded-2xl border border-sky-200 bg-gradient-to-r from-white to-amber-100 dark:from-gray-800 dark:to-gray-700 shadow-sm my-2">
       <div className="flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="relative h-12 w-12 shrink-0 rounded-xl bg-red-500 md:h-14 md:w-14 transition-all">
+          <div className="relative h-12 w-12 shrink-0 rounded-xl bg-red-500 md:h-16 md:w-16 transition-all">
             <span className="absolute inset-0 flex items-center justify-center text-white font-bold dark:text-gray-200">
               {avatar ? (
                 <img
@@ -181,7 +181,7 @@ const ProfileStrip = ({
               <span>{copied ? "Copied!" : "Share"}</span>
             </button>
           </div>
-          <span className="hidden text-sm text-slate-700 dark:text-gray-300 sm:inline">
+          <span className=" text-sm text-slate-700 dark:text-gray-300 sm:inline">
             {chapter || ""}
           </span>
           {editable && <CompletionRing percentage={completionPercentage} />}
