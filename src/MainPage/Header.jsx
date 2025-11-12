@@ -67,13 +67,20 @@ function Header() {
         <Sidebar />
 
         <Zoom>
-          <img
-            src="/public/assets/LOGO (2).png"
-            alt="logo"
-            height={50}
-            width={50}
-            className="object-cover rounded-full"
-          />
+       <img
+  src="public/assets/logo.png"  // Ensure this file is a transparent .png or .svg
+  alt="logo"
+  height={60}
+  width={60}
+  style={{
+    background: "none",
+    display: "inline-block",
+    verticalAlign: "middle",
+    borderRadius: "50%", // Optional: for circular logos
+    objectFit: "contain" // Prevent stretching
+  }}
+/>
+
         </Zoom>
 
         <NavLink to={'/dashboard'}>
