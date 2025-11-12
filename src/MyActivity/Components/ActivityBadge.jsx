@@ -85,9 +85,10 @@ function ActivityBadge({
     TYFTB: ["green", "green"],
     REFERRAL: ["orange", "orange"],
     Approved : ["green", "green"] ,
-    Completed : ['blue' , 'blue']
+    Completed : ['blue' , 'blue'] ,
+    Present : ["green", "green"],
+    Absent : [ 'red' , 'red']
   }
-
   const colors = contentType[content] || ['gray', 'gray'];
   return (
     <button

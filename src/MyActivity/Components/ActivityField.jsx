@@ -7,7 +7,7 @@ function ActivityField({
   return (
     <p
       className={clsx(
-        "w-[120px] text-nowrap text-center mx-2 overflow-x-hidden text-gray-900 dark:text-gray-100 transition-colors duration-300",
+        "min-w-[120px] max-w-[120px] text-nowrap text-center mx-2 overflow-x-hidden text-gray-900 dark:text-gray-100 transition-colors duration-300",
         classname
       )}
     >

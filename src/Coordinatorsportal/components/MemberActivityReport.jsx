@@ -375,7 +375,7 @@ function MemberActivityReport() {
                             <button
                                 onClick={handleAttendanceSubmit}
                                 disabled={loading || !selectedMeeting}
-                                className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-green-500 hover:bg-green-600 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="flex-1 sm:flex-initial px-6 py-2 rounded-lg font-bold text-sm bg-amber-300 hover:bg-amber-5  00 text-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 Submit Attendances
                             </button>
@@ -489,7 +489,7 @@ function MemberActivityReport() {
                                                 <button
                                                     onClick={() => handleApproveRow(row.id)}
                                                     disabled={loading || approvedMembers.has(row.id)}
-                                                    className="px-3 py-1 rounded border-1 border-gray-600 bg-green-500/80 hover:bg-green-400/50 text-black font-semibold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                    className="px-3 py-1 rounded border-1 border-gray-600 bg-amber-300/80 hover:bg-amber-400/50 text-black font-semibold text-xs disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                                                 >
                                                     Approve
                                                 </button>

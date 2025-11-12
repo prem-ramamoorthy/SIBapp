@@ -4,13 +4,6 @@ import ActivityBadge from "../../MyActivity/Components/ActivityBadge";
 function Meeting({
   header = false,
   content = {
-    date: "20 sept 2025",
-    type: "Weekly Chapter",
-    direction: "Given",
-    name: "yonesh Murugan",
-    Location: "Erode TamilNadu , India",
-    status: "Approved",
-    duration: "90 Minutes",
   },
 }) {
   if (header) {
@@ -38,12 +31,12 @@ function Meeting({
   }
 
   return (
-    <div className="activity-field nth-[odd]:bg-gray-200 dark:nth-[odd]:bg-gray-700 flex flex-row justify-around py-2 items-center w-max cursor-auto lg:w-full xl:w-full transition-colors duration-300 hover:bg-amber-200/20 dark:hover:bg-amber-200/20 nth-[odd]:hover:bg-amber-200/20 dark:nth-[odd]:hover:bg-amber-200/20">
-      <ActivityField data={content.date} classname="overflow-x-hidden font-semibold text-gray-900 dark:text-gray-100" />
-      <ActivityField data={content.name} classname="font-bold w-fit text-gray-900 dark:text-gray-100" />
-      <ActivityField data={content.type} classname="font-semibold text-gray-900 dark:text-gray-100" />
-      <ActivityField data={content.Location} classname="overflow-x-hidden text-gray-900 dark:text-gray-100" />
-      <ActivityBadge content={content.status} color={"green"} />
+    <div className="activity-field nth-[odd]:bg-gray-200 dark:nth-[odd]:bg-gray-700 flex flex-row justify-around py-2 items-center w-max cursor-auto lg:w-full xl:w-full transition-colors duration-300 hover:bg-amber-200/20 dark:hover:bg-amber-200/20 nth-[odd]:hover:bg-amber-200/20 dark:nth-[odd]:hover:bg-amber-200/20 text-nowrap">
+      <ActivityField data={content.meetingDate} classname="overflow-x-hidden font-semibold text-gray-900 dark:text-gray-100" />
+      <ActivityField data={content.title} classname="font-bold w-fit text-gray-900 dark:text-gray-100" />
+      <ActivityField data={content.meetingType} classname="font-semibold text-gray-900 dark:text-gray-100" />
+      <ActivityField data={content.location} classname="overflow-x-hidden text-gray-900 dark:text-gray-100" />
+      <ActivityBadge content={content.status === "present" ? "Present" : "Absent"} color={content.status === "present" ? "green" : "red"} />
       <ActivityField data={content.duration} classname="overflow-x-hidden font-semibold text-gray-900 dark:text-gray-100" />
     </div>
   );

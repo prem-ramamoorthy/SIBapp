@@ -1,15 +1,10 @@
-// Filter.js
-import React from "react";
-
 export default function Filter({ state, update, content, name }) {
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium text-gray-700 dark:text-white">{name}:</label>
       <select
         value={state}
-        onChange={(e) => {
-          update(e.target.value);
-        }}
+        onChange={e => update({ [name.toLowerCase().replace(/ /g, "")]: e.target.value })}
         className="
           mt-1 h-11 rounded-xl bg-white dark:bg-gray-900 px-3 text-sm text-gray-900 dark:text-white ring-1 ring-gray-800
           focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none pr-9 bg-[right_0.65rem_center] bg-no-repeat
@@ -21,7 +16,7 @@ export default function Filter({ state, update, content, name }) {
           backgroundPosition: "calc(100% - 18px) 55%, calc(100% - 12px) 55%",
         }}
       >
-        {content.map((option) => (
+        {content.map(option => (
           <option key={option} value={option}>
             {option}
           </option>
