@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const BioSection = ({ title, content, editable, onChange, defaultOpen = false }) => {
+const BioSection = ({ title, content, editable, onChange, defaultOpen = false  , description = "hi bro"}) => {
   const [open, setOpen] = useState(defaultOpen);
   const [localContent, setLocalContent] = useState(content);
 
@@ -20,7 +20,7 @@ const BioSection = ({ title, content, editable, onChange, defaultOpen = false })
   return (
     <div className="border-t border-slate-200 dark:border-gray-700 first:border-t-0 p-2">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-slate-800 dark:text-gray-100">{title}</h3>
+        <h3 className="text-sm font-bold text-slate-800 dark:text-gray-100">{title} <span className="text-[12px] text-gray-800 dark:text-gray-500">{description}</span></h3>
         <button
           id={btnId}
           type="button"

@@ -9,12 +9,12 @@ export default function HeaderAvatar({
     { name: "My Activity", icon: "TrendingUp", path: "/myactivity" },
     { name: "Members Directory", icon: "users", path: "/members" },
     { name: "Meetings", icon: "calendar", path: "/meetings" },
-    { name: "Chapter Info", icon: "building2", path: "/mychapter" },
+    // { name: "Chapter Info", icon: "building2", path: "/mychapter" },
     { name: "Referral Slips", icon: "fileText", path: "/slips" },
     { name: "Notifications", icon: "messageSquareDot", path: "/allnotifications" },
     { name: "Coordinators Portal", icon: "users", path: "/coordinatorsportal" },
-    { name: "Visitors", icon: "userPlus", path: "/visitors" },
-    { name: "Substitutes", icon: "clock4", path: "/substitutes" }
+    // { name: "Visitors", icon: "userPlus", path: "/visitors" },
+    // { name: "Substitutes", icon: "clock4", path: "/substitutes" }
   ]
 }) {
   const [open, setOpen] = useState(false);

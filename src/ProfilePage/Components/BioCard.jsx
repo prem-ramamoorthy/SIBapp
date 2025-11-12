@@ -7,17 +7,20 @@ const MyBioCard = ({
   initialBioData = [
     {
       title: "GAINS Profile",
+      description : "hi bro" ,
       content:
         "Goals: Help 100 families achieve financial freedom by 2026. Accomplishments: 30+ years in finance, helped clients grow wealth. Interests: Stock market analysis, economic trends. Networks: Financial planning association, Investment clubs. Skills: Portfolio management, risk assessment, financial modeling.",
       defaultOpen: true,
     },
     {
+      description : "hi very wrong bro" ,
       title: "30-sec Pitch",
       content:
         "Certified planner helping professionals create resilient, tax‑efficient portfolios with clear, goal‑based plans.",
       defaultOpen: false,
     },
     {
+      description : "" ,
       title: "Why SIB?",
       content:
         "Community, accountability, and curated opportunities to expand networks and accelerate impact.",
@@ -116,6 +119,7 @@ const MyBioCard = ({
               key={section.title}
               title={section.title}
               content={section.content}
+              description={section.description}
               defaultOpen={section.defaultOpen}
               editable={isEditing}
               onChange={(newContent) => handleContentChange(index, newContent)}

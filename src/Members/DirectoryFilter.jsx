@@ -43,14 +43,14 @@ export default function DirectoryFilters({
 
   return (
     <section className="min-w-full rounded-3xl bg-white dark:bg-gray-800 md:p-6 shadow-2xl border border-gray-200 dark:border-gray-700 transition-colors duration-300" aria-label="Directory filters">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-1 items-center">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-1 items-center px-4 pt-3">
         <Filter name="Region" state={region} update={setRegion} content={regions} />
         <Filter name="Chapter" state={chapter} update={setChapter} content={chapters} />
         <Filter name="Vertical" state={vertical} update={setVertical} content={verticals} />
         <Filter name="Sort by" state={sort} update={setSort} content={sorts} />
       </div>
 
-      <div className="mt-1 sm:mt-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div className="mt-1 sm:mt-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-4 pt-3 pb-3">
         <Checkbox state={myChapterOnly} update={setMyChapterOnly} content="Show My Chapter Only" />
         <div className="flex gap-3 md:justify-end">
           <FilterButton

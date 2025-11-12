@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { CompletionRing } from "./CompletionRing";
 
 const ProfileStrip = ({
-  name = "Refresh the page to see your details",
+  name = "Refresh Page",
   email = "Kindly update your profile...",
   avatarUrl = null,
   shareText = "I'm excited to share my professional profile with you! Please check it out to know more about my background, expertise, and how we can connect or collaborate.",
