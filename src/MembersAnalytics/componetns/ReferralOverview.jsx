@@ -1,3 +1,4 @@
+import { Delete, DeleteIcon } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 
 const TABLE_COLUMNS = [
@@ -7,9 +8,9 @@ const TABLE_COLUMNS = [
     { key: 'referral_type', label: 'TYPE', sortable: true, width: 'w-20' },
     { key: 'referral_status', label: 'STATUS', sortable: false, width: 'min-w-[120px]' },
     { key: 'contact_phone', label: 'PHONE', sortable: false, width: 'w-28' },
-    { key: 'contact_email', label: 'EMAIL', sortable: false, width: 'min-w-[160px]' },
     { key: 'hot', label: 'HOTNESS', sortable: true, width: 'w-20' },
     { key: 'created_at', label: 'CREATED AT', sortable: true, width: 'w-32' },
+    { key: 'actions', label: 'ACTIONS', sortable: false, width: 'w-24' }
 ];
 
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 25, 50];
@@ -38,6 +39,7 @@ function ReferralsTable() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+    const [toDelete, setToDelete] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -157,6 +159,30 @@ function ReferralsTable() {
         return row[key];
     }
 
+    async function handleDelete() {
+        if (!toDelete?._id) return;
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(
+                `${import.meta.env.VITE_BACKEND_SERVER}/slips/referral/deleterefferalbyid/${toDelete._id}`,
+                {
+                    credentials: 'include',
+                    method: 'DELETE'
+                }
+            );
+            if (!response.ok) throw new Error('Failed to delete referral');
+            setData(prev => prev.filter(r => r._id !== toDelete._id));
+            setSuccess('Referral deleted');
+            setTimeout(() => setSuccess(null), 1200);
+        } catch (err) {
+            setError(err.message || 'Unexpected error');
+        } finally {
+            setLoading(false);
+            setToDelete(null);
+        }
+    }
+
     return (
         <div className="min-w-full min-h-screen p-4 sm:p-6 lg:p-8 transition-colors duration-300">
             <div className="max-w-6xl mx-auto">
@@ -208,7 +234,6 @@ function ReferralsTable() {
                         </div>
                     </div>
                 </div>
-
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                     <div className="bg-gray-100 dark:bg-gray-900 px-4 py-3 border-b border-gray-300 dark:border-gray-600">
                         <details className="cursor-pointer">
@@ -267,6 +292,19 @@ function ReferralsTable() {
                                         >
                                             {TABLE_COLUMNS.map(col => {
                                                 if (!visibleColumns[col.key]) return null;
+                                                if (col.key === 'actions') {
+                                                    return (
+                                                        <td key={col.key} className="px-3 sm:px-4 py-3 text-center">
+                                                            <button
+                                                                onClick={() => setToDelete(row)}
+                                                                className="px-3 py-1 rounded bg-red-500 hover:bg-red-600 text-white font-bold text-xs transition-colors"
+                                                                disabled={loading}
+                                                            >
+                                                                <Delete />
+                                                            </button>
+                                                        </td>
+                                                    )
+                                                }
                                                 let value = colValue(row, col.key);
                                                 if (col.key === 'referral_status' && value) {
                                                     return (
@@ -300,7 +338,6 @@ function ReferralsTable() {
                         </table>
                     </div>
                 </div>
-
                 <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                     <div className="text-sm text-gray-600 dark:text-gray-400">
                         Showing <span className="font-semibold">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
@@ -356,6 +393,30 @@ function ReferralsTable() {
                         </div>
                     </div>
                 </div>
+                {toDelete && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+                        <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg max-w-xs mx-auto p-6">
+                            <p className="text-lg mb-6 text-gray-900 dark:text-gray-100 font-semibold">
+                                Are you sure you want to delete this referral?
+                            </p>
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => setToDelete(null)}
+                                    className="flex-1 px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="flex-1 px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold"
+                                    disabled={loading}
+                                >
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

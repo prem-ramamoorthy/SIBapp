@@ -1,3 +1,4 @@
+import { Delete } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { HiX } from 'react-icons/hi';
 
@@ -9,7 +10,7 @@ const TABLE_COLUMNS = [
   { key: 'business_amount', label: 'AMOUNT', sortable: true, width: 'w-24' },
   { key: 'business_description', label: 'DESCRIPTION', sortable: true, width: 'min-w-[200px]' },
   { key: 'created_at', label: 'CREATED AT', sortable: true, width: 'w-32' },
-  { key: 'action', label: 'ACTION', sortable: false, width: 'w-20' },
+  { key: 'action', label: 'ACTION', sortable: false, width: 'w-36' },
 ];
 
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 25, 50];
@@ -62,6 +63,7 @@ function TYFTBTable() {
   const [success, setSuccess] = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -190,6 +192,30 @@ function TYFTBTable() {
     setSelectedRecord(null);
   }
 
+  async function handleDelete() {
+    if (!toDelete?._id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/slips/tyftb/deletetyftbbyid/${toDelete._id}`,
+        {
+          credentials: 'include',
+          method: 'DELETE'
+        }
+      );
+      if (!response.ok) throw new Error('Failed to delete TYFTB');
+      setData(prev => prev.filter(r => r._id !== toDelete._id));
+      setSuccess('Record deleted');
+      setTimeout(() => setSuccess(null), 1200);
+    } catch (err) {
+      setError(err.message || 'Unexpected error');
+    } finally {
+      setLoading(false);
+      setToDelete(null);
+    }
+  }
+
   return (
     <div className="w-full min-h-screen p-4 sm:p-6 lg:p-8 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
@@ -241,7 +267,6 @@ function TYFTBTable() {
             </div>
           </div>
         </div>
-
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="bg-gray-100 dark:bg-gray-900 px-4 py-3 border-b border-gray-300 dark:border-gray-600">
             <details className="cursor-pointer">
@@ -302,14 +327,21 @@ function TYFTBTable() {
                         if (!visibleColumns[col.key]) return null;
                         if (col.key === 'action') {
                           return (
-                            <td key={col.key} className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium ${col.width}`}>
+                            <div key={col.key} className={`px-3 flex sm:px-4 py-3 text-xs sm:text-sm font-medium ${col.width}`}>
                               <button
                                 onClick={() => openModal(row)}
-                                className="px-3 py-1 bg-amber-300 hover:bg-amber-400 text-black rounded text-xs font-semibold transition"
+                                className="px-3 py-1 mr-2 bg-amber-300 hover:bg-amber-400 text-black rounded text-xs font-semibold transition"
                               >
                                 View
                               </button>
-                            </td>
+                              <button
+                                onClick={() => setToDelete(row)}
+                                className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-semibold transition"
+                                disabled={loading}
+                              >
+                                <Delete />
+                              </button>
+                            </div>
                           );
                         }
                         let value = colValue(row, col.key);
@@ -332,7 +364,6 @@ function TYFTBTable() {
             </table>
           </div>
         </div>
-
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
           <div className="text-sm text-gray-600 dark:text-gray-400">
             Showing <span className="font-semibold">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
@@ -388,69 +419,92 @@ function TYFTBTable() {
             </div>
           </div>
         </div>
-      </div>
-
-      {showModal && selectedRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">TYFTB Details</h2>
-              <button
-                onClick={closeModal}
-                className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50"
-              >
-                <HiX size={24} />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {showModal && selectedRecord && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-50 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">TYFTB Details</h2>
+                <button
+                  onClick={closeModal}
+                  className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50"
+                >
+                  <HiX size={24} />
+                </button>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Payer</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-gray-50">{selectedRecord.payer?.username}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{selectedRecord.payer?.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Receiver</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-gray-50">{selectedRecord.receiver?.username}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{selectedRecord.receiver?.email}</p>
+                  </div>
+                </div>
+                <hr className="border-gray-200 dark:border-gray-700" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Business Type</p>
+                    <p className="text-lg text-gray-900 dark:text-gray-50 capitalize">{selectedRecord.business_type}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Referral Type</p>
+                    <p className="text-lg text-gray-900 dark:text-gray-50 uppercase">{selectedRecord.referral_type}</p>
+                  </div>
+                </div>
+                <hr className="border-gray-200 dark:border-gray-700" />
                 <div>
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Payer</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-gray-50">{selectedRecord.payer?.username}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{selectedRecord.payer?.email}</p>
+                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Business Amount</p>
+                  <p className="text-3xl font-bold text-green-600 dark:text-green-400">{selectedRecord.amountFormatted}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Receiver</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-gray-50">{selectedRecord.receiver?.username}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{selectedRecord.receiver?.email}</p>
-                </div>
-              </div>
-              <hr className="border-gray-200 dark:border-gray-700" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Business Type</p>
-                  <p className="text-lg text-gray-900 dark:text-gray-50 capitalize">{selectedRecord.business_type}</p>
+                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Description</p>
+                  <p className="text-gray-900 dark:text-gray-50">{selectedRecord.business_description || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Referral Type</p>
-                  <p className="text-lg text-gray-900 dark:text-gray-50 uppercase">{selectedRecord.referral_type}</p>
+                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Created At</p>
+                  <p className="text-gray-900 dark:text-gray-50">{selectedRecord.created_at}</p>
                 </div>
               </div>
-              <hr className="border-gray-200 dark:border-gray-700" />
-              <div>
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Business Amount</p>
-                <p className="text-3xl font-bold text-green-600 dark:text-green-400">{selectedRecord.amountFormatted}</p>
+              <div className="flex gap-2 justify-end p-6 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-50 rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-gray-600 transition"
+                >
+                  Close
+                </button>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Description</p>
-                <p className="text-gray-900 dark:text-gray-50">{selectedRecord.business_description || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Created At</p>
-                <p className="text-gray-900 dark:text-gray-50">{selectedRecord.created_at}</p>
-              </div>
-            </div>
-            <div className="flex gap-2 justify-end p-6 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-50 rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-gray-600 transition"
-              >
-                Close
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+        {toDelete && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg max-w-xs mx-auto p-6">
+              <p className="text-lg mb-6 text-gray-900 dark:text-gray-100 font-semibold">
+                Are you sure you want to delete this TYFTB record?
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setToDelete(null)}
+                  className="flex-1 px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold"
+                  disabled={loading}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

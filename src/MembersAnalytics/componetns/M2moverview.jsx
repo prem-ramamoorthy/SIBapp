@@ -1,3 +1,4 @@
+import { Delete } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { HiX } from 'react-icons/hi';
 
@@ -8,7 +9,7 @@ const TABLE_COLUMNS = [
   { key: 'location', label: 'LOCATION', sortable: true, width: 'min-w-[150px]' },
   { key: 'discussion_points', label: 'DISCUSSION POINTS', sortable: true, width: 'min-w-[200px]' },
   { key: 'created_by_user', label: 'CREATED BY', sortable: true, width: 'min-w-[120px]' },
-  { key: 'action', label: 'ACTION', sortable: false, width: 'w-20' },
+  { key: 'action', label: 'ACTION', sortable: false, width: 'w-32' },
 ];
 
 const ITEMS_PER_PAGE_OPTIONS = [5, 10, 25, 50];
@@ -47,6 +48,7 @@ function One2OneMeetingsTable() {
   const [success, setSuccess] = useState(null);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -179,6 +181,30 @@ function One2OneMeetingsTable() {
     setSelectedRecord(null);
   }
 
+  async function handleDelete() {
+    if (!toDelete?._id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/slips/one2one/deleteone2onebyid/${toDelete._id}`,
+        {
+          credentials: 'include',
+          method: 'DELETE'
+        }
+      );
+      if (!response.ok) throw new Error('Failed to delete meeting record');
+      setData(prev => prev.filter(r => r._id !== toDelete._id));
+      setSuccess('Meeting deleted');
+      setTimeout(() => setSuccess(null), 1200);
+    } catch (err) {
+      setError(err.message || 'Unexpected error');
+    } finally {
+      setLoading(false);
+      setToDelete(null);
+    }
+  }
+
   return (
     <div className="w-full min-h-screen p-4 sm:p-6 lg:p-8 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
@@ -268,9 +294,8 @@ function One2OneMeetingsTable() {
                       <th
                         key={col.key}
                         onClick={() => col.sortable && handleSort(col.key)}
-                        className={`px-3 sm:px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wide ${col.width} ${
-                          col.sortable ? 'cursor-pointer hover:bg-gray-700 dark:hover:bg-gray-800' : ''
-                        } transition-colors`}
+                        className={`px-3 sm:px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wide ${col.width} ${col.sortable ? 'cursor-pointer hover:bg-gray-700 dark:hover:bg-gray-800' : ''
+                          } transition-colors`}
                       >
                         <div className="flex items-center gap-2">
                           <span>{col.label}</span>
@@ -300,22 +325,28 @@ function One2OneMeetingsTable() {
                   paginatedData.map((row, idx) => (
                     <tr
                       key={row._id}
-                      className={`border-b border-gray-200 dark:border-gray-700 ${
-                        idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'
-                      } hover:bg-gray-100 dark:hover:bg-gray-900/50 transition-colors`}
+                      className={`border-b border-gray-200 dark:border-gray-700 ${idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'
+                        } hover:bg-gray-100 dark:hover:bg-gray-900/50 transition-colors`}
                     >
                       {TABLE_COLUMNS.map(col => {
                         if (!visibleColumns[col.key]) return null;
                         if (col.key === 'action') {
                           return (
-                            <td key={col.key} className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium ${col.width}`}>
+                            <div key={col.key} className={`px-3 flex sm:px-4 py-3 text-xs sm:text-sm font-medium ${col.width}`}>
                               <button
                                 onClick={() => openModal(row)}
-                                className="px-3 py-1 bg-amber-300 hover:bg-amber-400 text-black rounded text-xs font-semibold transition"
+                                className="px-3 py-1 mr-2 bg-amber-300 hover:bg-amber-400 text-black rounded text-xs font-semibold transition"
                               >
                                 View
                               </button>
-                            </td>
+                              <button
+                                onClick={() => setToDelete(row)}
+                                className="px-3 py-1 h-8 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-semibold transition"
+                                disabled={loading}
+                              >
+                                <Delete />
+                              </button>
+                            </div>
                           );
                         }
                         let value = colValue(row, col.key);
@@ -387,11 +418,10 @@ function One2OneMeetingsTable() {
                     <button
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
-                      className={`px-3 py-2 rounded text-sm font-medium transition-colors duration-200 ${
-                        currentPage === pageNum
+                      className={`px-3 py-2 rounded text-sm font-medium transition-colors duration-200 ${currentPage === pageNum
                           ? 'bg-red-500 text-white'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'
-                      }`}
+                        }`}
                     >
                       {pageNum}
                     </button>
@@ -408,101 +438,124 @@ function One2OneMeetingsTable() {
             </div>
           </div>
         </div>
-      </div>
+        {showModal && selectedRecord && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-50 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Meeting Details</h2>
+                <button
+                  onClick={closeModal}
+                  className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50"
+                >
+                  <HiX size={24} />
+                </button>
+              </div>
+              <div className="p-6 space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50 mb-3">Participants</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Member 1</p>
+                      <p className="text-lg font-bold text-gray-900 dark:text-gray-50">
+                        {selectedRecord.member1?.username}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{selectedRecord.member1?.email}</p>
+                    </div>
+                    <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                      <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Member 2</p>
+                      <p className="text-lg font-bold text-gray-900 dark:text-gray-50">
+                        {selectedRecord.member2?.username}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{selectedRecord.member2?.email}</p>
+                    </div>
+                  </div>
+                </div>
 
-      {showModal && selectedRecord && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Meeting Details</h2>
-              <button
-                onClick={closeModal}
-                className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50"
-              >
-                <HiX size={24} />
-              </button>
-            </div>
-            <div className="p-6 space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50 mb-3">Participants</h3>
+                <hr className="border-gray-200 dark:border-gray-700" />
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Member 1</p>
-                    <p className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                      {selectedRecord.member1?.username}
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Meeting Date</p>
+                    <p className="text-lg text-gray-900 dark:text-gray-50">
+                      {formatDate(selectedRecord.meeting_date)}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{selectedRecord.member1?.email}</p>
                   </div>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Member 2</p>
-                    <p className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                      {selectedRecord.member2?.username}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{selectedRecord.member2?.email}</p>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Location</p>
+                    <p className="text-lg text-gray-900 dark:text-gray-50">{selectedRecord.location || 'N/A'}</p>
                   </div>
                 </div>
-              </div>
 
-              <hr className="border-gray-200 dark:border-gray-700" />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Meeting Date</p>
-                  <p className="text-lg text-gray-900 dark:text-gray-50">
-                    {formatDate(selectedRecord.meeting_date)}
-                  </p>
+                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Discussion Points</p>
+                  <p className="text-gray-900 dark:text-gray-50">{selectedRecord.discussion_points || 'N/A'}</p>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Location</p>
-                  <p className="text-lg text-gray-900 dark:text-gray-50">{selectedRecord.location || 'N/A'}</p>
+
+                <hr className="border-gray-200 dark:border-gray-700" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Created By</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-gray-50">
+                      {selectedRecord.created_by_user?.username}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {selectedRecord.created_by_user?.email}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Chapter</p>
+                    <p className="text-lg font-bold text-gray-900 dark:text-gray-50">
+                      {selectedRecord.chapter?.chapter_name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {selectedRecord.chapter?.chapter_code}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Discussion Points</p>
-                <p className="text-gray-900 dark:text-gray-50">{selectedRecord.discussion_points || 'N/A'}</p>
-              </div>
-
-              <hr className="border-gray-200 dark:border-gray-700" />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Created By</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                    {selectedRecord.created_by_user?.username}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {selectedRecord.created_by_user?.email}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Chapter</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                    {selectedRecord.chapter?.chapter_name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {selectedRecord.chapter?.chapter_code}
-                  </p>
+                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Created At</p>
+                  <p className="text-gray-900 dark:text-gray-50">{formatDateTime(selectedRecord.createdAt)}</p>
                 </div>
               </div>
 
-              <div>
-                <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Created At</p>
-                <p className="text-gray-900 dark:text-gray-50">{formatDateTime(selectedRecord.createdAt)}</p>
+              <div className="flex gap-2 justify-end p-6 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={closeModal}
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-50 rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-gray-600 transition"
+                >
+                  Close
+                </button>
               </div>
-            </div>
-
-            <div className="flex gap-2 justify-end p-6 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-gray-300 dark:bg-gray-700 text-gray-900 dark:text-gray-50 rounded-lg font-semibold hover:bg-gray-400 dark:hover:bg-gray-600 transition"
-              >
-                Close
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+        {toDelete && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div className="bg-white dark:bg-gray-900 rounded-lg shadow-lg max-w-xs mx-auto p-6">
+              <p className="text-lg mb-6 text-gray-900 dark:text-gray-100 font-semibold">
+                Are you sure you want to delete this meeting record?
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => setToDelete(null)}
+                  className="flex-1 px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="flex-1 px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white font-bold"
+                  disabled={loading}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
