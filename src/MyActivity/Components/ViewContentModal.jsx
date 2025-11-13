@@ -91,7 +91,7 @@ export function ModalViewer({ content = {} }) {
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700">
                 <div className="flex items-center gap-2 mb-3">
                     <User className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                    <h3 className="font-bold text-gray-900 dark:text-white">Payer Details</h3>
+                    <h3 className="font-bold text-gray-900 dark:text-white">FROM</h3>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -108,7 +108,7 @@ export function ModalViewer({ content = {} }) {
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-red-200 dark:border-red-700">
                 <div className="flex items-center gap-2 mb-3">
                     <User className="w-5 h-5 text-red-600 dark:text-red-400" />
-                    <h3 className="font-bold text-gray-900 dark:text-white">Receiver Details</h3>
+                    <h3 className="font-bold text-gray-900 dark:text-white">TO</h3>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -406,7 +406,7 @@ export function ModalViewer({ content = {} }) {
     const getTypeLabel = () => {
         const type = content.type?.toLowerCase();
         switch(type) {
-            case 'tyftb': return 'TYFTB Slip';
+            case 'tyftb': return 'TYB Slip';
             case 'referral': return 'Referral';
             case 'm2m': return 'One-to-One Meeting';
             default: return 'Details';
