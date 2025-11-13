@@ -80,8 +80,8 @@ function Activity() {
   const ActivityPs = [
     { content: 'Referral Given', upcoming: extractDecimal(data2?.referral_given), actual: error ? 'error' : extractDecimal(data?.referral_given) },
     { content: 'Referral Received', upcoming: extractDecimal(data2?.referral_received), actual: error ? 'error' : extractDecimal(data?.referral_received) },
-    { content: 'TYFTB Received', upcoming: extractDecimal(data2?.tyftb_received), actual: error ? 'error' : extractDecimal(data?.tyftb_received) },
-    { content: 'TYFTB Given', upcoming: extractDecimal(data2?.tyftb_given), actual: error ? 'error' : extractDecimal(data?.tyftb_given) },
+    { content: 'TYB Received', upcoming: extractDecimal(data2?.tyftb_received), actual: error ? 'error' : extractDecimal(data?.tyftb_received) },
+    { content: 'TYB Given', upcoming: extractDecimal(data2?.tyftb_given), actual: error ? 'error' : extractDecimal(data?.tyftb_given) },
     { content: 'Business Made', upcoming: extractDecimal(data2?.business_made), actual: error ? 'error' : extractDecimal(data?.business_made) },
     { content: 'M to M', upcoming: extractDecimal(data2?.M2Ms), actual: error ? 'error' : extractDecimal(data?.M2Ms) },
     { content: 'Visitor', upcoming: extractDecimal(data2?.Visitors), actual: error ? 'error' : extractDecimal(data?.Visitors) },

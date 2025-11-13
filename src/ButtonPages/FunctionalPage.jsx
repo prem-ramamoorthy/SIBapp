@@ -4,7 +4,7 @@ import Header from "../MainPage/Header";
 function SubmitButtons() {
   const buttonData = [
     { label: "Submit Referral", description: "Create new referral slip", component: "referral" },
-    { label: "Submit TYFTB", description: "Create new referral slip", component: "tyftb" },
+    { label: "Submit TYB", description: "Create new referral slip", component: "tyftb" },
     { label: "Submit M to M", description: "Create new referral slip", component: "m2m" },
     { label: "Submit Visitor", description: "Create new referral slip", component: "visitors" },
   ];

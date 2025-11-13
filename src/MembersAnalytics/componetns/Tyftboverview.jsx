@@ -71,7 +71,7 @@ function TYFTBTable() {
         const response = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/tyftb/getalltyftb`, {
           credentials: 'include',
         });
-        if (!response.ok) throw new Error('Could not load TYFTB records');
+        if (!response.ok) throw new Error('Could not load TYB records');
         let rows = await response.json();
         setData(
           rows.map(row => ({
@@ -194,7 +194,7 @@ function TYFTBTable() {
     <div className="w-full min-h-screen p-4 sm:p-6 lg:p-8 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 mb-2">TYFTB Records</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 mb-2">TYB Records</h1>
           <p className="text-gray-600 dark:text-gray-400 text-sm">All Thank You For The Business records of your chapter.</p>
         </div>
         {error && (
@@ -212,7 +212,7 @@ function TYFTBTable() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 uppercase">
-                  Search TYFTB
+                  Search TYB
                 </label>
                 <input
                   type="text"
@@ -394,7 +394,7 @@ function TYFTBTable() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">TYFTB Details</h2>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50">TYB Details</h2>
               <button
                 onClick={closeModal}
                 className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-50"

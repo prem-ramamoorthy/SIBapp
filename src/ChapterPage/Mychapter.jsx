@@ -20,7 +20,7 @@ function Meetings() {
     { name: "Meetings Held", value: 10 },
     { name: "Visitors", value: 5 },
     { name: "Guests", value: 12 },
-    { name: "TYFTB Amount", value: "23Cr" },
+    { name: "TYB Amount", value: "23Cr" },
     { name: "One-To-OneS", value: 4 },
   ];
 

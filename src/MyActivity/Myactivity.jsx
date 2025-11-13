@@ -37,7 +37,7 @@ function MyActivity() {
             month: 'short', 
             year: 'numeric' 
           }) : 'N/A',
-          type: 'TYFTB',
+          type: 'TYB',
           direction: item.direction?.charAt(0).toUpperCase() + item.direction?.slice(1) || 'Unknown',
           name: item.direction === 'given' 
             ? (item.receiver.name || 'Unknown') 
@@ -182,7 +182,7 @@ function MyActivity() {
         <Header />
       </div>
       <main className="w-full max-w-7xl px-3 sm:px-6 md:px-10 text-gray-900 dark:text-gray-100">
-        <section className="mb-6">
+        <section className="mb-6 mr-3">
           <Hero
             value={value}
             setValue={setValue}
@@ -194,7 +194,7 @@ function MyActivity() {
           />
         </section>
 
-        <section className="mb-6">
+        <section className="mb-6 mr-3">
           {loading ? (
             <Loader />
           ) : error ? (
@@ -204,15 +204,15 @@ function MyActivity() {
               items={[
                 { name: "Referrals Given", value: statdata.referral_given },
                 { name: "Referrals Received", value: statdata.referral_received },
-                { name: "TYFTB Given", value: statdata.tyftb_given },
-                { name: "TYFTB Received", value: statdata.tyftb_received },
+                { name: "TYB Given", value: statdata.tyftb_given },
+                { name: "TYB Received", value: statdata.tyftb_received },
                 { name: "M2M Attended", value: statdata.M2Ms }
               ]}
             />
           )}
         </section>
 
-        <section className="w-full">
+        <section className=" mr-3">
           {loading ? <Loader /> : error ? <Error /> : <FullActivity data={fullactivitydata}/>}
         </section>
       </main>

@@ -100,7 +100,7 @@ export default function RevenueLine() {
             itemStyle={{ color: 'currentColor' }}
           />
           <Line type="monotone" dataKey="referral_given" stroke="currentColor" strokeWidth={2} />
-          <Line type="monotone" dataKey="tyftb_given" stroke="#ef4444" strokeWidth={2} />
+          <Line type="monotone" dataKey="tyb_given" stroke="#ef4444" strokeWidth={2} />
           <Line type="monotone" dataKey="M2Ms" stroke="#3b82f6" strokeWidth={2} />
           <Legend />
         </LineChart>

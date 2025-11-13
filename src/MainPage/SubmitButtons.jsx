@@ -9,7 +9,7 @@ function SubmitButtons() {
       component: "referral",
     },
     {
-      label: "Submit TYFTB",
+      label: "Submit TYB",
       discription: "Create new referal slip",
       component: "tyftb",
     },
