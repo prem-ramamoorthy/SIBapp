@@ -82,7 +82,7 @@ function ActivityBadge({
 
   const contentType = {
     M2M: ["pink", "pink"],
-    TYFTB: ["green", "green"],
+    TYB: ["green", "green"],
     REFERRAL: ["orange", "orange"],
     Approved : ["green", "green"] ,
     Completed : ['blue' , 'blue'] ,

@@ -79,7 +79,10 @@ export default function SignInForm() {
         value={values.email}
         onChange={onChange}
         error={errors.email}
-        autoComplete="email"
+        autoComplete="username"
+          autoCapitalize="none"
+  autoCorrect="off"
+  inputMode="email"
         className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:placeholder-gray-400"
       />
 
@@ -89,6 +92,7 @@ export default function SignInForm() {
         value={values.password}
         onChange={onChange}
         error={errors.password}
+          autoComplete="current-password"
         className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:placeholder-gray-400"
       />
 

@@ -89,8 +89,8 @@ function ButtonPage({ onClose = () => { } }) {
       const notificationData = {
         receiver: data.receiver_displayname,
         sender: getuser?.username ?? "",
-        header: `You've received the TYFTB from the user : ${(getuser?.username ?? "").toString()}`,
-        content: `Thankyou for the Business(TYFTB), I have earned ₹${data.business_amount} from your referral. Description : ${data.business_description} `,
+        header: `You've received the TYB from the user : ${(getuser?.username ?? "").toString()}`,
+        content: `Thankyou for Business(TYB), I have earned ₹${data.business_amount} from your referral. Description : ${data.business_description} `,
         read: false
       };
 
@@ -124,7 +124,7 @@ function ButtonPage({ onClose = () => { } }) {
         const okText =
           typeof result === "string"
             ? result
-            : result?.message || "TYFTB submitted successfully.";
+            : result?.message || "TYB submitted successfully.";
         setResponse(String(okText));
       }
     } catch (err) {
@@ -138,7 +138,7 @@ function ButtonPage({ onClose = () => { } }) {
     <div className="flex flex-1 items-center justify-around min-h-screen p-4">
       <div className="max-w-full border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 rounded-2xl flex flex-col gap-3 shadow-lg">
         <div className="header border-b-2 border-gray-300 dark:border-gray-600 pb-2 flex justify-between">
-          <p className="font-bold text-gray-900 dark:text-gray-100">SIB TYFTB Slip</p>
+          <p className="font-bold text-gray-900 dark:text-gray-100">SIB TYB Slip</p>
           <button
             className="font-bold text-gray-900 dark:text-gray-100 hover:text-red-500 dark:hover:text-red-400"
             onClick={onClose}

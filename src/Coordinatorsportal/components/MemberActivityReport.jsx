@@ -629,7 +629,7 @@ function MemberActivityReport() {
                         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
                             <h2 className="text-xl font-bold text-gray-900 dark:text-gray-50 mb-4">Confirm Approval</h2>
                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                                Are you sure you want to approve {selectedRows.size} member(s)? This action will update referrals, TYFTB, and M2M status.
+                                Are you sure you want to approve {selectedRows.size} member(s)? This action will update referrals, TYB, and M2M status.
                             </p>
                             <div className="flex gap-3">
                                 <button

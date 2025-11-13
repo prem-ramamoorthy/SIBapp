@@ -86,8 +86,8 @@ function Activity() {
   const ActivityPs = [
     { content: 'Referral Given', upcoming: extractDecimal(data2?.referral_given), actual: error ? 'error' : extractDecimal(data?.referral_given) },
     { content: 'Referral Received', upcoming: extractDecimal(data2?.referral_received), actual: error ? 'error' : extractDecimal(data?.referral_received) },
-    { content: 'TYFTB Given', upcoming: tyftb(data2?.business_made), actual: error ? 'error' : tyftb(data?.business_made) },
-    { content: 'TYFTB Received', upcoming: tyftb(data2?.business_given1), actual: error ? 'error' : tyftb(data?.business_given1) },
+    { content: 'TYB Given', upcoming: tyftb(data2?.business_made), actual: error ? 'error' : tyftb(data?.business_made) },
+    { content: 'TYB Received', upcoming: tyftb(data2?.business_given1), actual: error ? 'error' : tyftb(data?.business_given1) },
     { content: 'M to M', upcoming: extractDecimal(data2?.M2Ms), actual: error ? 'error' : extractDecimal(data?.M2Ms) },
     { content: 'Visitor', upcoming: extractDecimal(data2?.Visitors), actual: error ? 'error' : extractDecimal(data?.Visitors) },
   ].map((props, index) => <ActivityP key={index} {...props} />);

@@ -5,8 +5,8 @@ function Stats({
   items = [
     { name: "Referrals Given", value: 23 },
     { name: "Referrals Received", value: 23 },
-    { name: "TYFTB Given", value: 23 },
-    { name: "TYFTB Received", value: 23 },
+    { name: "TYB Given", value: 23 },
+    { name: "TYB Received", value: 23 },
     { name: "M2M Attended", value: 23 },
   ],
 }) {

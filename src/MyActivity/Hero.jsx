@@ -40,7 +40,7 @@ function Hero({ value, setValue = () => { }, startDate, endDate, setStartDate = 
 
   const options = [
     { value: "all", label: "All" },
-    { value: "tyftb", label: "TYFTB" },
+    { value: "tyftb", label: "TYB" },
     { value: "m2m", label: "One to One" },
     { value: "referral", label: "Referral" },
   ];

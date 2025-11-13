@@ -51,12 +51,13 @@ export default function HeaderAvatar({
       setItems(prev => {
         const existsPres = prev.some(e => e.path === "/presidentportal");
         if (!existsPres) {
-          return [
-            ...prev,
-            { name: "Members Analytics", icon: "chartLine", path: "/memberdetailedanalytics" },
-            { name: "President Portal", icon: "users", path: "/presidentportal" },
-            { name: "Coordinators Portal", icon: "users", path: "/coordinatorsportal" }
-          ];
+         return [
+    ...prev,
+    { name: "Members Analytics", icon: "chartLine", path: "/memberdetailedanalytics" },
+    { name: "President Portal", icon: "users", path: "/presidentportal" },
+    { name: "Coordinators Portal", icon: "users", path: "/coordinatorsportal" }
+];
+
         }
         return prev;
       });

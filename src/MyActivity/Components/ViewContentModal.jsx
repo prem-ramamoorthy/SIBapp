@@ -84,7 +84,7 @@ export function ModalViewer({ content = {} }) {
     const renderTYFTB = (data) => (
         <div className="space-y-4">
             <div className="pb-4 border-b-2 border-amber-300">
-                <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide">TYFTB Slip ID</p>
+                <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide">TYB Slip ID</p>
                 <p className="font-mono text-base text-gray-900 dark:text-gray-100 mt-1">{safeGet(data, '_id')}</p>
             </div>
 
