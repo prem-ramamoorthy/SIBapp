@@ -204,8 +204,8 @@ function MyActivity() {
               items={[
                 { name: "Referrals Given", value: statdata.referral_given },
                 { name: "Referrals Received", value: statdata.referral_received },
-                { name: "TYB Given", value: statdata.tyftb_given },
-                { name: "TYB Received", value: statdata.tyftb_received },
+                { name: "TYB Given Slip", value: statdata.tyftb_given },
+                { name: "TYB Received Slip", value: statdata.tyftb_received },
                 { name: "M2M Attended", value: statdata.M2Ms }
               ]}
             />

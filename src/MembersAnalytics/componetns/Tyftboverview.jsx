@@ -3,8 +3,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { HiX } from 'react-icons/hi';
 
 const TABLE_COLUMNS = [
-  { key: 'payer', label: 'PAYER', sortable: true, width: 'min-w-[120px]' },
-  { key: 'receiver', label: 'RECEIVER', sortable: true, width: 'min-w-[120px]' },
+  { key: 'payer', label: 'FROM', sortable: true, width: 'min-w-[120px]' },
+  { key: 'receiver', label: 'TO', sortable: true, width: 'min-w-[120px]' },
   { key: 'business_type', label: 'BUSINESS TYPE', sortable: true, width: 'min-w-[100px]' },
   { key: 'referral_type', label: 'REFERRAL TYPE', sortable: true, width: 'min-w-[100px]' },
   { key: 'business_amount', label: 'AMOUNT', sortable: true, width: 'w-24' },

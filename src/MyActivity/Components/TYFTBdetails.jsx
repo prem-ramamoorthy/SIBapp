@@ -142,7 +142,7 @@ const TYFTBSlipModal = ({
           <div className={`rounded-lg p-4 mb-4 ${colors.payerBg}`}>
             <div className="flex items-center gap-2 mb-3">
               <User className="w-5 h-5" />
-              <h3 className="font-bold">Payer Details</h3>
+              <h3 className="font-bold">FROM</h3>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -159,7 +159,7 @@ const TYFTBSlipModal = ({
           <div className={`rounded-lg p-4 mb-4 ${colors.receiverBg}`}>
             <div className="flex items-center gap-2 mb-3">
               <User className="w-5 h-5" />
-              <h3 className="font-bold">Receiver Details</h3>
+              <h3 className="font-bold">TO</h3>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
