@@ -111,7 +111,7 @@ export default function CreateMemberForm() {
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        password : form.password, 
+                        password: form.password,
                         username: form.username,
                         role: form.role,
                         membership_status: true,
@@ -121,6 +121,22 @@ export default function CreateMemberForm() {
                 }
             );
             const membershipJson = await membershipRes.json();
+
+            const payload = {
+                receiver: form.username,
+                header: "Welcome to SIB Platform!r",
+                content: `Hello and welcome to the Sengunthar In Business family! Your account has been created successfully. You can now log in to access all features and participate in chapter activities. If you have any questions or need assistance, feel free to reach out to support.`
+            };
+
+            await fetch(
+                `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                }
+            );
 
             if (!membershipRes.ok) {
                 throw new Error(membershipJson.message || membershipJson.error || "Membership creation failed");

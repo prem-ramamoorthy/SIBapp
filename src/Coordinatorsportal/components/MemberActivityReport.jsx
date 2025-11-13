@@ -74,7 +74,7 @@ function MemberActivityReport() {
             const processedMembers = (activities || []).map((member) => ({
                 ...member,
                 approvalStatus: 'PENDING',
-                attendance: '',
+                attendance: 'Present',
             }));
 
             setMemberData(processedMembers);
@@ -157,7 +157,7 @@ function MemberActivityReport() {
                         username: member.name,
                         meeting_id: selectedMeeting,
                         attendance_status: member.attendance.toLowerCase(),
-                        date: formattedDate
+                        date: formattedDate,
                     };
                     await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/attendance/createattendance`, {
                         method: 'POST',
@@ -166,8 +166,8 @@ function MemberActivityReport() {
                         body: JSON.stringify(data),
                     });
                     const confirm_data = {
-                        _id : selectedMeeting,
-                        attendance_status: true
+                        _id: selectedMeeting,
+                        attendance_status: true,
                     };
                     await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/updatemeeting`, {
                         method: 'PUT',
