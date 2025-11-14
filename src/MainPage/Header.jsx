@@ -97,13 +97,13 @@ function Header() {
       </div>
 
       <div className="flex flex-row items-center justify-end gap-3 p-2 mx-4">
-        <NotificationPanel />
-
         <span className="
-          text-gray-700 dark:text-gray-300 font-bold text-base  md:inline-block xl:inline-block truncate max-w-[140px] sm:max-w-xs
+          text-gray-700 dark:text-gray-300 font-bold text-base md:inline-block xl:inline-block truncate max-w-[140px] sm:max-w-xs
         ">
           {loading2 ? <Loader /> : error2 ? <ErrorComponent /> : (chapterName?.chapterName || "Chapter Name")}
         </span>
+
+        <NotificationPanel />
 
         <div className="flex-shrink-0">
           {loading ? (
