@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 
-export default function Coordinatorsportal() {
+export default function CoordinatorsRoute() {
     const [isValid, setIsValid] = useState(null);
 
     const { data: access, loading } = useFetch(

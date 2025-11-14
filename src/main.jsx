@@ -22,6 +22,7 @@ import Coordinatorsportal from './Coordinatorsportal/Coordinatorsportalpage';
 import PresidentRoute from './hooks/PresidentRoute';
 import NotEligibleRole from './Notfound/NotEligible';
 import ErrorDisplay from './Notfound/ErrorDisplay';
+import CoordinatorRoute from './hooks/CoordinatorRoute'
 
 import './index.css'
 
@@ -46,11 +47,9 @@ const router = createBrowserRouter([
     element: <PresidentRoute />,
     children: [
       { path: '/presidentportal', element: <AnimatedRoute><PresidentPortal /></AnimatedRoute> },
-      { path: '/memberdetailedanalytics', element: <AnimatedRoute><MembersAnalytics /></AnimatedRoute> },
-      { path: '/coordinatorsportal', element: <AnimatedRoute><Coordinatorsportal /></AnimatedRoute> },
     ]
   }, {
-    element: <Coordinatorsportal />,
+    element: <CoordinatorRoute />,
     children: [
       { path: '/memberdetailedanalytics', element: <AnimatedRoute><MembersAnalytics /></AnimatedRoute> },
       { path: '/coordinatorsportal', element: <AnimatedRoute><Coordinatorsportal /></AnimatedRoute> },
