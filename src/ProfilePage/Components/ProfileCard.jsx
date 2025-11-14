@@ -38,7 +38,7 @@ const fieldConfig = [
   { key: "wedding", label: "Wedding Date", icon: <Calendar className="h-5 w-5"/> , type :"date" },
   { key: "bloodGroup", label: "Blood Group", icon: <Heart className="h-5 w-5" /> , type :"text" },
   { key: "subCaste", label: "வகையறா", type :"text"  },
-  { key: "gothram", label: "குட்டம்", type :"text"  },
+  { key: "gothram", label: "கூட்டம்", type :"text"  },
   { key: "motherTongue", label: "ஊர்", type :"text"  },
   { key: "kuladeivam", label: "குலதெய்வம்", valueClass: "text-rose-600", colSpan: 2 , type :"text" },
 ];
