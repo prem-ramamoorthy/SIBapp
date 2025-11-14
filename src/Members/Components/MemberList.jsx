@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import MemberCard from "../MemberCard/MemberCard";
 
-const ITEMS_PER_PAGE = 5;
+const ITEMS_PER_PAGE = 10;
 
 const MemberList = ({ members }) => {
   const [currentPage, setCurrentPage] = useState(1);
