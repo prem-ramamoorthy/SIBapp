@@ -243,8 +243,8 @@ function UpcomingEvents() {
         </div>
         <div className="w-full min-w-[180px] flex flex-col justify-start px-2 text-black border-l-1 border-amber-50 dark:bg-gray-900">
           <div className="flex min-w-full justify-between items-center">
-            <h2 className="text-md border-b-1 border-gray-200 dark:border-gray-700 font-bold m-1 text-gray-800 dark:text-white">
-              Coordinators
+            <h2 className="text nowrap text-md border-b-1 border-gray-200 dark:border-gray-700 font-bold m-1 text-gray-800 dark:text-white">
+              Leadership Team
             </h2>
             {canedit && (
               <button className="dark:text-amber-300 text-sm m-2" onClick={handleEditClick}>

@@ -9,7 +9,7 @@ function CulturalComponent({ data }) {
         <span>{data.vagai_category ?? "N/A"}</span>
       </div>
       <div className="flex flex-row justify-between">
-        <span className="font-bold mr-2">குட்டம்:</span>
+        <span className="font-bold mr-2">கூட்டம்:</span>
         <span>{data.kulam_category ?? "N/A"}</span>
       </div>
       <div className="flex flex-row justify-between">
