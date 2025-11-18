@@ -23,6 +23,7 @@ import PresidentRoute from './hooks/PresidentRoute';
 import NotEligibleRole from './Notfound/NotEligible';
 import ErrorDisplay from './Notfound/ErrorDisplay';
 import CoordinatorRoute from './hooks/CoordinatorRoute'
+import CSAEPolicy from './Notfound/CSAEPolicy'
 
 import './index.css'
 
@@ -58,6 +59,7 @@ const router = createBrowserRouter([
   { path: '/profile/:id', element: <AnimatedRoute><Profile /></AnimatedRoute> },
   { path: '/reset-password', element: <AnimatedRoute><ResetPassword /></AnimatedRoute> },
   { path: '/noteligible', element: <AnimatedRoute><NotEligibleRole /></AnimatedRoute> },
+  { path: '/child-safety-standards', element: <AnimatedRoute><CSAEPolicy /></AnimatedRoute> },
   { path: '*', element: <NotFound404 /> },
 ]);
 
