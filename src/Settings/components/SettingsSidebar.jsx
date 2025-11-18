@@ -3,6 +3,7 @@ import React from "react";
 const items = [
   { key: "security", label: "Security" },
   { key: "notifications", label: "Notifications" },
+  { key: "privacy", label:"Privacy"},
 ];
 
 export default function SettingsSidebar({ active, onChange }) {

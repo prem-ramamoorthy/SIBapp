@@ -3,11 +3,13 @@ import SettingsHeader from "./components/SettingsHeader";
 import SettingsSidebar from "./components/SettingsSidebar";
 import SecurityPanel from "./components/SecurityPanel";
 import NotificationsPanel from "./components/NotificationsPanel";
+import PrivacyPanel from "./components/PrivacyPanel"; // Add this import
 import Header from "../MainPage/Header";
 
 const PANELS = {
   security: SecurityPanel,
   notifications: NotificationsPanel,
+  privacy: PrivacyPanel, // Add this
 };
 
 export default function Settings() {
