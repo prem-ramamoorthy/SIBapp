@@ -149,35 +149,31 @@ function MemberActivityReport() {
         setLoading(true);
         setShowConfirmModal(false);
         try {
-            for (const member of filteredAndSortedData) {
-                if (member.attendance && !submittedAttendances.has(member.id)) {
-                    const today = new Date();
-                    const formattedDate = today.toISOString().split('T')[0];
-                    const data = {
-                        username: member.name,
-                        meeting_id: selectedMeeting,
-                        attendance_status: member.attendance.toLowerCase(),
-                        date: formattedDate,
-                    };
-                    await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/attendance/createattendance`, {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data),
-                    });
-                    const confirm_data = {
-                        _id: selectedMeeting,
-                        attendance_status: true,
-                    };
-                    await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/updatemeeting`, {
-                        method: 'PUT',
-                        credentials: 'include',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(confirm_data),
-                    });
-                    setSubmittedAttendances((prev) => new Set([...prev, member.id]));
-                }
-            }
+            console.log(filteredAndSortedData)
+            const today = new Date();
+            const formattedDate = today.toISOString().split('T')[0];
+            const data = {
+                usersdata: filteredAndSortedData,
+                meeting_id: selectedMeeting,
+                date: formattedDate,
+            };
+            await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/attendance/createbulkattendances`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            setSubmittedAttendances((prev) => new Set([...prev, filteredAndSortedData.id]));
+            const confirm_data = {
+                _id: selectedMeeting,
+                attendance_status: true,
+            };
+            await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/updatemeeting`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(confirm_data),
+            });
             setSuccess('Attendance submitted successfully');
             setTimeout(() => setSuccess(null), 2000);
         } catch (err) {
@@ -200,40 +196,39 @@ function MemberActivityReport() {
         setShowApprovalConfirmModal(false);
         try {
             const selectedMembers = Array.from(selectedRows);
-            for (const memberId of selectedMembers) {
-                const notificationData = {
-                    receiver: memberId,
-                    header: "Approval Notification",
-                    content: `Your meeting/business activity data has been approved by the coordinator in the meeting "${selectedMeeting}".`
-                };
-                await Promise.all([
-                    fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/referral/updatereferralstatusbyreferrer/${memberId}`, {
-                        method: 'PUT',
-                        credentials: 'include',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: true }),
-                    }),
-                    fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/tyftb/updatetyftbstatusbypayer/${memberId}`, {
-                        method: 'PUT',
-                        credentials: 'include',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: true }),
-                    }),
-                    fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/one2one/updatem2mstatusbyuserid/${memberId}`, {
-                        method: 'PUT',
-                        credentials: 'include',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ status: true }),
-                    }),
-                    fetch(`${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`, {
-                        method: 'POST',
-                        credentials: 'include',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(notificationData),
-                    }),
-                ]);
-                setApprovedMembers((prev) => new Set([...prev, memberId]));
-            }
+            console.log(selectedMembers)
+            const notificationData = {
+                receiverList: selectedMembers,
+                header: "Approval Notification",
+                content: `Your meeting/business activity data has been approved by the coordinator in the meeting "${selectedMeeting}".`
+            };
+            await Promise.all([
+                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/referral/updatebulkreferralstatusbyreferrer`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({"list" : selectedMembers}),
+                }),
+                await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/tyftb/updatebulktyftbstatusbypayer`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ "list": selectedMembers }),
+                }),
+                await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/one2one/updatebulkm2mstatusbyuserid`, {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ "list": selectedMembers }),
+                }),
+                await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/notification/createbulknotificationwithoutsenderbyid`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(notificationData),
+                }),
+            ]);
+            setApprovedMembers((prev) => new Set([...prev, ...selectedMembers]));
 
             const updated = memberData.map((m) =>
                 selectedRows.has(m.id) ? { ...m, approvalStatus: 'APPROVED' } : m
