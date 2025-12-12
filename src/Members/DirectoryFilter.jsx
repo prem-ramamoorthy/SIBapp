@@ -13,15 +13,13 @@ export default function DirectoryFilters({
   chapters = ["All Chapters", "Alpha", "Beta", "Gamma"],
   verticals = ["All Verticals", "Engineering", "Design", "Marketing"],
   sorts = ["Name A-Z", "Name Z-A", "Chapter", "Region"],
-  onChange,
-  onClear = () => {},
-  onExport = () => {},
+  onChange = () => { },
+  onClear = () => { },
+  onExport = () => { },
 }) {
-
   useEffect(() => {
-    onChange?.({
-      region, chapter, vertical,
-      myChapterOnly, sort
+    onChange({
+      region, chapter, vertical, myChapterOnly, sort
     });
   }, [region, chapter, vertical, myChapterOnly, sort]);
 
@@ -31,19 +29,12 @@ export default function DirectoryFilters({
     setVertical(verticals[0]);
     setSort(sorts[0]);
     setMyChapterOnly(false);
-
-    onClear?.({
-      region: regions[0],
-      chapter: chapters[0],
-      vertical: verticals[0],
-      sort: sorts[0],
-      myChapterOnly: false
-    });
+    onClear?.();
   };
 
   return (
     <section className="min-w-full rounded-3xl bg-white dark:bg-gray-800 md:p-6 shadow-2xl border border-gray-200 dark:border-gray-700 transition-colors duration-300" aria-label="Directory filters">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-1 items-center px-4 pt-3">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center px-4 pt-3">
         <Filter name="Region" state={region} update={setRegion} content={regions} />
         <Filter name="Chapter" state={chapter} update={setChapter} content={chapters} />
         <Filter name="Vertical" state={vertical} update={setVertical} content={verticals} />
@@ -56,8 +47,8 @@ export default function DirectoryFilters({
           <FilterButton
             content="Clear Filter"
             onClick={clear}
-            bg="bg-white dark:bg-gray-700"
-            hover="hover:bg-gray-200 dark:hover:bg-gray-600"
+            bg="bg-white dark:bg-gray-300"
+            hover="hover:bg-gray-200 dark:hover:bg-gray-400"
           />
           <FilterButton
             content="Export Directory"

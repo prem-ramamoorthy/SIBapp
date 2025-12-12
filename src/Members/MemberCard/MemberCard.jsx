@@ -22,8 +22,8 @@ function MemberCard({
           alt=""
           className="h-full w-full rounded-full object-cover object-top"
         />
-        <div className="h-[24px] w-[24px] rounded-full bg-red-500 absolute bottom-2 right-2 font-bold border-2 border-white">
-          <p className="pt-0.5 pl-1 text-white text-xs">{member.blood_group}</p>
+        <div className="h-[28px] w-[28px] rounded-full bg-red-500 absolute bottom-2 -right-1 font-bold border-2 border-white">
+          <p className=" text-white text-[8px] text-center pt-1">{member.blood_group}</p>
         </div>
       </div>
 

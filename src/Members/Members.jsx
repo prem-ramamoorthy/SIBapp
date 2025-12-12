@@ -26,7 +26,7 @@ function Members() {
     region: "All Regions",
     chapter: "All Chapters",
     vertical: "All Verticals",
-    myChapterOnly: false,
+    myChapterOnly: true,
     sort: "Name A-Z"
   });
 

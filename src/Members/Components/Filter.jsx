@@ -1,27 +1,18 @@
-export default function Filter({ state, update, content, name }) {
+function Filter({ name, state, update, content = [] }) {
   return (
-    <div className="flex flex-col">
-      <label className="text-sm font-medium text-gray-700 dark:text-white">{name}:</label>
+    <label className="flex flex-col">
+      <span className="mb-2 text-xs font-medium text-gray-600 dark:text-gray-300">{name}</span>
       <select
         value={state}
-        onChange={e => update({ [name.toLowerCase().replace(/ /g, "")]: e.target.value })}
-        className="
-          mt-1 h-11 rounded-xl bg-white dark:bg-gray-900 px-3 text-sm text-gray-900 dark:text-white ring-1 ring-gray-800
-          focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none pr-9 bg-[right_0.65rem_center] bg-no-repeat
-        "
-        style={{
-          backgroundImage:
-            "linear-gradient(45deg, transparent 50%, #6B7280 50%), linear-gradient(135deg, #6B7280 50%, transparent 50%)",
-          backgroundSize: "6px 6px, 6px 6px",
-          backgroundPosition: "calc(100% - 18px) 55%, calc(100% - 12px) 55%",
-        }}
+        onChange={(e) => update(e.target.value)}
+        className="py-2 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-700 dark:text-gray-200 shadow-sm"
       >
-        {content.map(option => (
-          <option key={option} value={option}>
-            {option}
-          </option>
+        {content.map((c, i) => (
+          <option key={i} value={c}>{c}</option>
         ))}
       </select>
-    </div>
+    </label>
   );
 }
+
+export default Filter;
