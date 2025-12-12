@@ -9,11 +9,15 @@ function CrossChapterSearch({
   searchdomain = "searchuser",
   readonly = false
 }) {
+  const [crosschapter, setcrosschapter] = useState(false);
   const [searchTerm, setSearchTerm] = useState(value || "");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const [searchdomainstate, setSearchdomainstate] = useState("");
+
+  useEffect(() => setSearchdomainstate(searchdomain), [searchdomain])
 
   const debounceRef = useRef(null);
   const wrapperRef = useRef(null);
@@ -41,7 +45,7 @@ function CrossChapterSearch({
         setLoading(true);
         setError("");
         const res = await fetch(
-          `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/${searchdomain}`,
+          `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/${searchdomainstate}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -78,6 +82,11 @@ function CrossChapterSearch({
     onChange?.(item);
     setShowDropdown(false);
   };
+
+  const handlecross = () => {
+    searchdomain === 'searchuser' ? setSearchdomainstate('searchalluser') : setSearchdomainstate('searchalluser');
+    crosschapter ? setcrosschapter(false) : setcrosschapter(true);
+  }
 
   return (
     <div className="flex flex-col items-start w-full gap-1" ref={wrapperRef}>
@@ -133,8 +142,8 @@ function CrossChapterSearch({
         )}
 
       </div>
-      { offsubmit !== true ? <button type="button" className="mt-2 inline-flex items-center justify-center rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-500 " >
-        Search Cross Chapter
+      {offsubmit !== true ? <button type="button" className="mt-2 inline-flex items-center justify-center rounded-lg bg-red-600 px-5 py-3 text-sm font-semibold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 dark:bg-red-700 dark:hover:bg-red-800 dark:focus:ring-red-500 " onClick={handlecross}>
+        {crosschapter ? "Hide Cross Chapter" : "Search Cross Chapter"}
       </button> : null}
     </div>
   );
