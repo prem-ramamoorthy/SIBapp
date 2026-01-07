@@ -1,4 +1,5 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 
 function SiteButtonUI({
   style,
@@ -10,8 +11,8 @@ function SiteButtonUI({
 , need = true
 }) {
   return (
-    <a
-      href={to}
+    <NavLink
+      to={to}
       className="
         px-4 py-2
         bg-yellow-50 dark:bg-yellow-200/10
@@ -37,7 +38,7 @@ function SiteButtonUI({
       >
         {content}
       </span>
-    </a>
+    </NavLink>
   )
 }
 
