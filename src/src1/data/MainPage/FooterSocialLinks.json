@@ -1,0 +1,17 @@
+[
+    {
+        "name" : "Facebook" ,
+        "emoji" : "📘",
+        "link" : "#"
+    },
+    {
+        "name" : "LinkedIn" ,
+        "emoji" : "💼",
+        "link" : "#"
+    },
+    {
+        "name" : "Twitter" ,
+        "emoji" : "🐥",
+        "link" : "#"
+    }
+]

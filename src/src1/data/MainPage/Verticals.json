@@ -1,0 +1,107 @@
+[
+    {
+        "img": "/assets/Vertical/Beauty and Cosmetics.jpg",
+        "title": "Beauty & Cosmetics",
+        "members": "6 Members",
+        "description": "Beauty salons, cosmetic stores, and wellness centers providing premium beauty services",
+        "activeMembers": "6 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/construction1.jpg",
+        "title": "Construction Professionals",
+        "members": "6 Members",
+        "description": "Civil engineers, architects, and construction professionals delivering quality infrastructure",
+        "activeMembers": "6 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/Constructionjpg.jpg",
+        "title": "Construction Services",
+        "members": "18 Members",
+        "description": "Building materials, contractors, and construction support services",
+        "activeMembers": "18 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/digital.jpg",
+        "title": "Digital Marketing",
+        "members": "5 Members",
+        "description": "Digital agencies, social media management, and innovative online marketing solutions",
+        "activeMembers": "5 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/photo.jpg",
+        "title": "Events & Photography",
+        "members": "6 Members",
+        "description": "Event management companies, wedding planners, professional photographers, and videographers",
+        "activeMembers": "6 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/finance.jpg",
+        "title": "Financial Services",
+        "members": "10 Members",
+        "description": "Banking, insurance, investments, and financial advisory services",
+        "activeMembers": "10 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/food.jpg",
+        "title": "Food & Restaurants",
+        "members": "9 Members",
+        "description": "Restaurants, catering, food processing, and hospitality services",
+        "activeMembers": "9 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/glass furniture.jpg",
+        "title": "Glass & Furniture",
+        "members": "6 Members",
+        "description": "Furniture manufacturing, glass works, and furnishing solutions",
+        "activeMembers": "6 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/health.jpg",
+        "title": "Health & Related Services",
+        "members": "7 Members",
+        "description": "Hospitals, clinics, pharmacies, diagnostic centers, and fitness or wellness studios",
+        "activeMembers": "7 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/interior.jpg",
+        "title": "Interior Services",
+        "members": "9 Members",
+        "description": "Interior designers, decorators, renovation contractors, and vastu consultants",
+        "activeMembers": "9 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/printers.jpg",
+        "title": "Printers & Publications",
+        "members": "3 Members",
+        "description": "Commercial printing presses, graphic designers, publishing houses, and packaging specialists",
+        "activeMembers": "3 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/retail.jpg",
+        "title": "Retail Business",
+        "members": "26 Members",
+        "description": "Apparel boutiques, electronics showrooms, supermarkets, and general merchandise stores",
+        "activeMembers": "26 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/services.jpg",
+        "title": "Services",
+        "members": "11 Members",
+        "description": "Travel agencies, legal consultants, educational institutions, and business consulting firms",
+        "activeMembers": "11 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/solar.jpg",
+        "title": "Solar, UPS & RO",
+        "members": "6 Members",
+        "description": "Solar panel installation, power backup solutions, and water purifier sales and service",
+        "activeMembers": "6 Active Members"
+    },
+    {
+        "img": "/assets/Vertical/textile.jpg",
+        "title": "Textile",
+        "members": "11 Members",
+        "description": "Fabric manufacturing, garment production, weaving mills, and wholesale textile trading",
+        "activeMembers": "11 Active Members"
+    }
+]

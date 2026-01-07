@@ -1,0 +1,234 @@
+:root {
+  /* Color Variables */
+  --color-white: rgba(255, 255, 255, 1);
+  --color-black: rgba(0, 0, 0, 1);
+  --color-cream-50: rgba(252, 252, 249, 1);
+  --color-cream-100: rgba(255, 255, 253, 1);
+  --color-gray-200: rgba(245, 245, 245, 1);
+  --color-gray-300: rgba(167, 169, 169, 1);
+  --color-gray-400: rgba(119, 124, 124, 1);
+  --color-slate-500: rgba(98, 108, 113, 1);
+  --color-brown-600: rgba(94, 82, 64, 1);
+  --color-charcoal-700: rgba(31, 33, 33, 1);
+  --color-charcoal-800: rgba(38, 40, 40, 1);
+  --color-slate-900: rgba(19, 52, 59, 1);
+  --color-teal-300: rgba(50, 184, 198, 1);
+  --color-teal-400: rgba(45, 166, 178, 1);
+  --color-teal-500: rgba(33, 128, 141, 1);
+  --color-teal-600: rgba(29, 116, 128, 1);
+  --color-teal-700: rgba(26, 104, 115, 1);
+  --color-red-400: rgba(255, 84, 89, 1);
+  --color-red-500: rgba(192, 21, 47, 1);
+  --color-orange-400: rgba(230, 129, 97, 1);
+  --color-orange-500: rgba(168, 75, 47, 1);
+
+  /* Premium Colors */
+  --royal-blue: #002349;
+  --warm-gold: #BFA181;
+  --cream: #F2F0EA;
+  --deep-navy: #001a36;
+  --light-gold: #D4B896;
+  --accent-blue: #0056b3;
+  --glass-white: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--royal-blue) 0%, var(--accent-blue) 100%);
+  --gradient-gold: linear-gradient(135deg, var(--warm-gold) 0%, var(--light-gold) 100%);
+  --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+
+  /* Shadows */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --shadow-premium: 0 20px 60px rgba(0, 35, 73, 0.15);
+  --shadow-glow: 0 0 40px rgba(191, 161, 129, 0.3);
+
+  /* Typography */
+  --font-family-base: "FKGroteskNeue", "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-size-2xl: 20px;
+  --font-size-3xl: 24px;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 550;
+  --font-weight-bold: 600;
+
+  /* Animation Variables */
+  --ease-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --duration-normal: 250ms;
+}
+
+.ver .container {
+  max-width: 85%;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.ver .section-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.ver .section-tag {
+  display: inline-block;
+  background: var(--gradient-gold);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  margin-top: 4rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.ver .section-title {
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--royal-blue);
+}
+
+.ver .section-subtitle {
+  font-size: 1.2rem;
+  color: rgb(82, 80, 80);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.ver.verticals {
+  background: linear-gradient(135deg, var(--cream) 0%, rgba(242, 240, 234, 0.5) 100%);
+  position: relative;
+  padding: 6rem 0;
+}
+
+.ver .verticals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 3rem;
+}
+
+.ver .flip-card {
+  background-color: transparent;
+  width: 100%;
+  height: 280px;
+  perspective: 1000px;
+}
+
+.ver .flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s var(--ease-smooth);
+  transform-style: preserve-3d;
+}
+
+.ver .flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.ver .flip-card-front,
+.ver .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 93%;
+  backface-visibility: hidden;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 6px;
+}
+
+.ver .flip-card-front {
+  background: var(--gradient-glass);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
+  overflow: hidden;
+  text-align: center;
+}
+
+.ver .flip-card-back {
+  background: var(--gradient-primary);
+  color: white;
+  transform: rotateY(180deg);
+}
+
+.ver .vertical-image {
+  position: relative;
+  width: 100%;
+  min-height: 70%;
+}
+
+.ver .vertical-image img {
+  border-radius: 20px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  position: relative;
+  z-index: 0;
+}
+
+.ver .vertical-card h3,
+.ver .flip-card-front h3 {
+  color: var(--royal-blue);
+  font-size: 1rem;
+  font-weight: 600;
+  text-wrap: nowrap;
+  margin: 6px;
+}
+
+.ver .member-badge {
+  background: var(--gradient-gold);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.ver .flip-card-back h4 {
+  color: var(--warm-gold);
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+}
+
+.ver .flip-card-back p {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.ver .stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ver .stat {
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .ver .verticals-grid {
+    grid-template-columns: 1fr 1fr;
+    font-size: smaller;
+  }
+}
+
+@media (max-width: 480px) {
+  .ver .verticals-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ver .flip-card {
+    height: 300px;
+  }
+}

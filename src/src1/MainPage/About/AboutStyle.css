@@ -1,0 +1,145 @@
+:root {
+  --warm-gold: #BFA181;
+  --light-gold: #D4B896;
+  --accent-blue: #0056b3;
+  --gradient-gold: linear-gradient(135deg, var(--warm-gold) 0%, var(--light-gold) 100%);
+}
+
+.about .container {
+    max-width: 100%;
+}
+
+.about .section-header {
+    text-align: center;
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+}
+
+.about .section-tag {
+    display: inline-block;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: var(--gradient-gold);
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+}
+
+.about .section-title {
+    font-size: 2.5rem;
+    color: rgb(0, 35, 102);
+    margin-bottom: 2.5rem;
+    margin-top: 20px;
+    font-weight: 700;
+}
+
+.about .section-subtitle {
+    font-size: 1.2rem;
+    color: rgb(82, 80, 80);
+    margin: 0px auto;
+}
+
+.about .timeline-item h3 {
+    font-family: Inter, "Segoe UI", sans-serif;
+    font-weight: 800;
+    color: rgb(25, 60, 109);
+    letter-spacing: 0.02em;
+    font-size: 1.5rem;
+    margin-bottom: 1.1rem;
+    text-align: center;
+}
+
+.about .timeline-item p.tamil {
+    font-family: "Noto Sans Tamil", "Tiro Tamil", Arial, sans-serif;
+    font-weight: 1000;
+    font-size: 1.09rem;
+    color: rgb(107, 106, 122);
+    line-height: 1.65;
+    text-align: center;
+    letter-spacing: 0.013em;
+    margin: 0.31rem 0px;
+}
+
+.about .timeline-item p.en {
+    color: rgb(161, 143, 87);
+    font-size: 1rem;
+    margin-top: 1.1rem;
+    line-height: 1.65;
+    font-family: inherit;
+    text-align: center;
+    letter-spacing: 0.013em;
+    margin: 0.31rem 0px;
+}
+
+.about .timeline-image img {
+    width: 450px;
+    height: auto;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 15px;
+    border-radius: 10px;
+}
+
+.about .timeline-item-container {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 32px;
+    display: flex;
+    flex-direction: row;
+    gap:2rem;
+    overflow: hidden;
+    border-width: 1.5px;
+    border-style: solid;
+    border-color: rgba(180, 180, 230, 0.12);
+    border-image: initial;
+    background: rgba(255, 255, 255, 0.68);
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem 2rem;
+    margin: 0px 1rem;
+    height: auto;
+    position: relative;
+    transition: transform 0.3s ease-in;
+    width : 80% ;
+}
+
+.about .timeline-item-container:hover {
+    transform: scale(1.02);
+    transition: transform 0.3s ease-in;
+}
+
+.about .timeline-item-container:nth-child(odd) {
+    flex-direction: row-reverse;
+}
+
+.about .about-content {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4rem;
+    gap: 3rem;
+}
+
+.about .timeline-item{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+@media screen and (max-width: 900px) {
+    .about .timeline-item-container {
+        flex-direction: column;
+    }
+
+    .about .timeline-item-container:nth-child(odd) {
+        flex-direction: column;
+    }
+
+    .about .timeline-image img {
+        width: 100%;
+        height: auto;
+    }
+
+    .about .section-header{
+        margin: 2rem 2rem;
+    }
+}

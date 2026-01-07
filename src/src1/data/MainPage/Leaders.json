@@ -1,0 +1,65 @@
+[
+    {
+        "img": "/assets/JPEG/yogibalu.jpg",
+        "name": "Yogi Balu",
+        "position": "President",
+        "business": "Yogi Digital Studio",
+        "phone": "+91 98427 75676"
+    },
+    {
+        "img": "/assets/JPEG/144.jpg",
+        "name": "S.Kumaresavel",
+        "position": "Vice President",
+        "business": "The Vogue Apparels",
+        "phone": "+91 95242 33350"
+    },
+    {
+        "img": "/assets/JPEG/Rajkumar.jpg",
+        "name": "S.Rajkumar",
+        "position": "Secretary",
+        "business": "MR Group of Companies",
+        "phone": "+91 88837 31408"
+    },
+    {
+        "img": "/assets/JPEG/142.jpg",
+        "name": "N.Kanagavalli",
+        "position": "Treasurer",
+        "business": "Wellness Coach",
+        "phone": "+91 98652 89823"
+    },
+    {
+        "img": "/assets/JPEG/54.jpg",
+        "name": "M.Baskar",
+        "position": "Coordinator",
+        "business": "Rainbow TV",
+        "phone": "+91 98651 82929"
+    },
+    {
+        "img": "/assets/JPEG/19.jpg",
+        "name": "P.K.Deepak",
+        "position": "Coordinator",
+        "business": "Specialist In Medical Insurance",
+        "phone": "+91 94430 16079"
+    },
+    {
+        "img": "/assets/JPEG/101.jpg",
+        "name": "R.Sethuraman",
+        "position": "Coordinator",
+        "business": "V Trade & Sethu and Sons",
+        "phone": "+91 98431 14545"
+    },
+    {
+        "img": "/assets/JPEG/62.jpg",
+        "name": "V.B.Saravanan",
+        "position": "Coordinator",
+        "business": "Positive Construction",
+        "phone": "+91 83443 55255"
+    },
+    {
+        "img": "/assets/JPEG/27.jpg",
+        "name": "K.G.Sivalingam",
+        "position": "Coordinator",
+        "business": "Shiva and Daughters",
+        "phone": "+91 95242 33350"
+    }
+]

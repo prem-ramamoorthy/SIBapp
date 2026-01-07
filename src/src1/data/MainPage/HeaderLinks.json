@@ -1,0 +1,30 @@
+[
+    {
+        "name": "Home",
+        "url": "#home"
+    },
+    {
+        "name": "Members",
+        "url": "/members"
+    },
+    {
+        "name": "About",
+        "url": "#about"
+    },
+    {
+        "name": "Business Verticals",
+        "url": "#verticals"
+    },
+    {
+        "name": "Leadership",
+        "url": "#leadership"
+    },
+    {
+        "name": "Contact",
+        "url": "#contact"
+    },
+    {
+        "name": "Login",
+        "url": "/sib"
+    }
+]

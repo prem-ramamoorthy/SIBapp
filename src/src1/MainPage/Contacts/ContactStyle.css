@@ -1,0 +1,191 @@
+/* ---------------------------
+   CONTACT SECTION STYLES
+--------------------------- */
+
+.con.contact {
+    background: #f9f7f3;
+    padding: 4rem 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+
+/* Section Header */
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-tag {
+    background: linear-gradient(135deg, var(--warm-gold) 0%, #D4B896 100%);
+    color: #ffffff;
+    padding: 0.3rem 1rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    display: inline-block;
+    margin-bottom: 0.7rem;
+    font-weight: 600;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    color: #0a2342;
+}
+
+.section-subtitle {
+    font-size: 1rem;
+    color: #6c6c6c;
+}
+
+/* Contact Layout */
+.contact-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .contact-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Glass Cards */
+.glass-card {
+    background: #ffffff;
+    border-radius: 1.2rem;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Contact Info Items */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.contact-item h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.contact-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.contact-details a {
+    color: #333;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.contact-details a:hover {
+    text-decoration: underline;
+}
+
+/* Contact Form */
+.contact-form h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+    font-weight: 700;
+    color: #0a2342;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        flex-direction: column;
+    }
+}
+
+.form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+    color: #333;
+}
+
+.form-input,
+textarea.form-input {
+    padding: 0.7rem 0.9rem;
+    border: 1px solid #ddd;
+    border-radius: 0.6rem;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.form-input:focus,
+textarea.form-input:focus {
+    border-color: #0a66c2;
+}
+
+/* Submit Button */
+.submit-btn {
+    background: linear-gradient(90deg, #003366, #0055aa);
+    color: white;
+    border: none;
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 0.6rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.2s ease;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(90deg, #00284d, #004b99);
+}
+
+.form-result {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    color: #007f5f;
+}
+
+.location{
+    text-decoration: none;
+}
+
+.location h4 {
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+    font-weight: 700;
+    color: #0a2342;
+}
+
+.location address {
+    color: #333;
+    text-decoration: none;
+    font-size: 0.95rem;
+}

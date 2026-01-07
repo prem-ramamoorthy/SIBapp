@@ -26,9 +26,10 @@ import CoordinatorRoute from './hooks/CoordinatorRoute'
 import CSAEPolicy from './Notfound/CSAEPolicy'
 
 import './index.css'
+import MainPage from './src1/MainPage/MainPage';
 
 const router = createBrowserRouter([
-  { path: '/', element: <SignInPage />, errorElement: <ErrorDisplay /> },
+  { path: '/sib', element: <SignInPage />, errorElement: <ErrorDisplay /> },
   {
     element: <ProtectedRoute />,
     errorElement: <ErrorDisplay />,
@@ -60,6 +61,7 @@ const router = createBrowserRouter([
   { path: '/reset-password', element: <AnimatedRoute><ResetPassword /></AnimatedRoute> },
   { path: '/noteligible', element: <AnimatedRoute><NotEligibleRole /></AnimatedRoute> },
   { path: '/child-safety-standards', element: <AnimatedRoute><CSAEPolicy /></AnimatedRoute> },
+  { path: '/', element: <MainPage /> },
   { path: '*', element: <NotFound404 /> },
 ]);
 

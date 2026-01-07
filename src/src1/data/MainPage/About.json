@@ -1,0 +1,16 @@
+[
+  {
+    "title": "குறிக்கோள் (Vision)",
+    "description_tamil": "நமது சமுதாய மக்கள், சமூக ரீதியாகவும், பொருளாதார ரீதியாகவும் முன்னேற உதவுவதையும், வளர்ச்சி அடைவதையும் நாங்கள் நோக்கமாக கொண்டுள்ளோம்.",
+    "description_en": "We strive to support the community's progress and prosperity through comprehensive social and economic development programs",
+    "image": "/assets/vision.jpg",
+    "image_alt": "Our Vision"
+  },
+  {
+    "title": "நோக்கம் (Mission)",
+    "description_tamil": "கல்வி, திறன் மேம்பாடு, தொழில் வாய்ப்புகள் மற்றும் வலுவான உறவுப் பிணைப்புகளை உருவாக்குதல் மூலம் நம் சமுதாய மக்களின் வளர்ச்சியை உறுதி செய்வதே நமது அமைப்பின் நோக்கமாகும்",
+    "description_en": "The mission of our organization is to ensure the growth of our community people through education, skill development, business opportunities, and by creating strong relationship bonds.",
+    "image": "/assets/mission.jpg",
+    "image_alt": "Our Mission"
+  }
+]

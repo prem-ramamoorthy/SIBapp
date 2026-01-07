@@ -1,0 +1,16 @@
+html {
+  scroll-behavior:smooth;
+  scrollbar-width: thin;
+  scrollbar-color: gold #000000;
+}
+
+.sib{
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    background-color:  rgba(252, 252, 249, 1);
+    scroll-snap-type: y mandatory;
+    transition: all 0.3s ease;
+}

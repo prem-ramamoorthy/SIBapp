@@ -1,0 +1,33 @@
+{
+    "stats": [
+        {
+            "name": "name",
+            "value": "139"
+        },
+        {
+            "name": "Business",
+            "value": "218253123"
+        },
+        {
+            "name": "Referals",
+            "value": "1520"
+        },
+        {
+            "name": "Verticals",
+            "value": "15"
+        }
+    ] ,
+    "buttons" : [
+        {
+            "name": "Discover More",
+            "content": "",
+            "type": "primary ripple-btn"
+
+        },
+        {
+            "name": "Connect With Us",
+            "content": "→",
+            "type": "secondary magnetic-btn"
+        }
+    ]
+}

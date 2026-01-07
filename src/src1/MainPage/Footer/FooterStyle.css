@@ -1,0 +1,219 @@
+:root {
+  --warm-gold: #BFA181;
+  --royal-blue: #002349;
+  --cream: #F2F0EA;
+  --gradient-primary: linear-gradient(135deg, var(--royal-blue) 0%, #0056b3 100%);
+  --gradient-gold: linear-gradient(135deg, var(--warm-gold) 0%, #D4B896 100%);
+  --shadow-premium: 0 20px 60px rgba(0, 35, 73, 0.15);
+}
+
+.fot .footer {
+  background: var(--royal-blue);
+  color: white;
+  position: relative;
+  overflow: hidden;
+  padding: 50px;
+}
+
+.fot .footer-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding-top: 50px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0,30 Q50,0 100,30 L100,100 L0,100 Z" fill="rgba(191,161,129,0.05)"/></svg>');
+}
+
+.fot .footer-content {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+}
+
+.fot .footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.fot .logo-container {
+  position: relative;
+}
+
+.fot .logo-placeholder {
+  width: 60px;
+  height: 60px;
+  background: var(--gradient-primary);
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.fot .logo-image {
+  display: block;
+  margin-left: -7px;
+  margin-right: auto;
+  max-width: 65px;
+  max-height: 65px;
+  object-fit: contain;
+  transform: scale(1);
+}
+
+.fot .footer-section h4 {
+  color: var(--warm-gold);
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+}
+
+.fot .footer-info p {
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.fot .social-links {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fot .social-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.fot .social-link:hover {
+  background: var(--warm-gold);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.fot .footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.fot .footer-link {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  padding: 0.3rem 0;
+  position: relative;
+}
+
+.fot .footer-link::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: var(--warm-gold);
+  transition: width 0.3s ease;
+}
+
+.fot .footer-link:hover {
+  color: var(--warm-gold);
+  padding-left: 1rem;
+}
+
+.fot .footer-link:hover::before {
+  width: 20px;
+}
+
+.fot .footer-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--warm-gold), transparent);
+  margin-bottom: 2rem;
+}
+
+.fot .footer-bottom {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+/* Responsive Footer Styles */
+@media (max-width: 1024px) {
+  .fot .footer-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .fot .footer-logo {
+    justify-content: center;
+  }
+
+  .fot .social-links {
+    justify-content: center;
+  }
+
+  .fot .footer-links, .fot .footer-info {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .fot .footer {
+    padding: 30px 20px;
+  }
+
+  .fot .footer-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .fot .footer-section h4 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .fot .footer-info p {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  .fot .social-link {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .fot .footer-links {
+    gap: 0.5rem;
+  }
+
+  .fot .footer-link:hover {
+    padding-left: 0.5rem;
+  }
+
+  .fot .footer-link {
+    font-size: 0.9rem;
+    padding: 0.2rem 0;
+  }
+
+  .fot .footer-divider {
+    margin-bottom: 1.5rem;
+  }
+
+  .fot .footer-bottom {
+    font-size: 0.8rem;
+  }
+}
