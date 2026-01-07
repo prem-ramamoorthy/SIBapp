@@ -10,7 +10,7 @@ import { getDate } from "../utils/getDate.mjs";
 import { X } from "lucide-react";
 import { sanitizeReferralData } from "../utils/slipsSanitization.mjs";
 
-function ButtonPage({ onClose = () => {} }) {
+function ButtonPage({ onClose = () => { } }) {
   const todaysDate = getDate();
 
   const [date, setDate] = useState(todaysDate);
@@ -29,6 +29,13 @@ function ButtonPage({ onClose = () => {} }) {
   const [error, setError] = useState(null);
   const [response, setResponse] = useState(null);
   const [username, setUsername] = useState("loading...");
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    if (userData) {
+      if(userData?.email) setEmail(userData.email || "");
+      if(userData?.phone_number) setPhone(userData.phone_number || "");
+    }
+  }, [userData]);
 
   useEffect(() => {
     let cancelled = false;
@@ -73,7 +80,7 @@ function ButtonPage({ onClose = () => {} }) {
       comments: comments,
       hot: heatScale,
       created_at: date,
-      status:false
+      status: false
     };
 
     data = sanitizeReferralData(data);
@@ -132,6 +139,9 @@ function ButtonPage({ onClose = () => {} }) {
             ? result
             : result?.message || "Referral created successfully.";
         setResponse(okText);
+        setTimeout(() => {
+          onClose();
+        }, 500);
       }
     } catch (err) {
       setError(err?.message || "Network error.");
@@ -167,7 +177,7 @@ function ButtonPage({ onClose = () => {} }) {
             label="From *"
             value={from}
             readOnly={true}
-            onChange={() => {}}
+            onChange={() => { }}
           />
         </div>
 
@@ -175,10 +185,11 @@ function ButtonPage({ onClose = () => {} }) {
           label="To *"
           placeholder="Search Username..."
           onChange={setTo}
+          userstate={setUserData}
         />
 
         <TextArea
-          label="Referral"
+          label="Referral *"
           placeholder="Enter the referral details..."
           onChange={setReferralDetails}
         />

@@ -93,6 +93,9 @@ function ButtonPage({ onClose = () => { } }) {
       }
       else {
         setResponse(result);
+        setTimeout(() => {
+          onClose();
+        }, 500);
       }
     } catch (err) {
       setError(err.message);

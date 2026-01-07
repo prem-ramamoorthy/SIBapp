@@ -7,7 +7,8 @@ function CrossChapterSearch({
   label = "To",
   offsubmit = false,
   searchdomain = "searchuser",
-  readonly = false
+  readonly = false,
+  userstate = null,
 }) {
   const [crosschapter, setcrosschapter] = useState(false);
   const [searchTerm, setSearchTerm] = useState(value || "");
@@ -55,7 +56,9 @@ function CrossChapterSearch({
         );
 
         const data = await res.json();
-
+        if(userstate && data?.userdata){
+          userstate(data.userdata);
+        }
         if (!res.ok || data?.errors || data?.message) {
           const errMsg =
             data?.errors?.[0]?.msg || data?.message || "An unknown error occurred.";
