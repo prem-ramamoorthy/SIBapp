@@ -159,6 +159,7 @@ function Profile() {
           <div className="order-1">
             <ProfileCard
               data={{
+                displayName: profileData?.display_name,
                 phone: profileData?.company_phone,
                 email: profileData?.company_email,
                 address: profileData?.company_address,
