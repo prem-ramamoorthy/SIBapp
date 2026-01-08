@@ -1,0 +1,376 @@
+/* --- RESET & VARIABLES --- */
+:root {
+  --primary-color: #2563eb;
+  --text-dark: #0f172a; /* Darker, richer text */
+  --text-light: #64748b;
+  --bg-color: #f8fafc;
+  --card-radius: 16px;
+  --transition-curve: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth easing */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --overlay-gradient: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+}
+
+/* Custom Scrollbar for Chrome/Safari/Edge */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+.album-wrapper {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding-bottom: 80px;
+}
+
+/* --- STICKY GLASS HEADER --- */
+.gallery-header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  background: rgba(255, 255, 255, 0.75); /* More transparent */
+  backdrop-filter: blur(20px) saturate(180%); /* Heavier blur, saturated colors */
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  padding: 16px 20px;
+  transition: all 0.3s ease;
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-title {
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--text-light);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  background: linear-gradient(to right, var(--text-dark), var(--primary-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* Modern Back Button */
+.back-btn-modern {
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(0,0,0,0.05);
+  color: var(--text-dark);
+  padding: 10px 24px;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s var(--transition-curve);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(4px);
+}
+
+.back-btn-modern:hover {
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  color: var(--primary-color);
+}
+
+.back-btn-modern .icon {
+  font-size: 1.1rem;
+  transition: transform 0.3s ease;
+}
+
+.back-btn-modern:hover .icon {
+  transform: translateX(-4px);
+}
+
+/* --- MAIN CONTAINER --- */
+.gallery-container {
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+/* ------------------------------------------- */
+/* --- MASONRY GRID (PHOTOS) STYLING --- */
+/* ------------------------------------------- */
+
+.masonry-grid {
+  column-count: 4; 
+  column-gap: 24px; /* Increased gap for cleaner look */
+  width: 100%;
+}
+
+.masonry-item {
+  break-inside: avoid; 
+  margin-bottom: 24px;
+  position: relative;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  cursor: zoom-in;
+  /* Skeleton Loading Effect Background */
+  background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+  background-size: 200% 100%;
+  animation: 1.5s shine linear infinite;
+}
+
+@keyframes shine {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+.masonry-item img {
+  width: 100% !important; 
+  height: auto !important; 
+  display: block;
+  transition: transform 0.7s var(--transition-curve);
+  /* Initially slightly scaled down for effect? No, let's keep it 1 and zoom in */
+}
+
+/* Hover Effect - Cinematic Zoom */
+.masonry-item:hover img {
+  transform: scale(1.08);
+}
+
+/* Premium Overlay */
+.img-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.2); /* Subtle dim */
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(2px); /* Blur the image slightly on hover */
+}
+
+.masonry-item:hover .img-overlay {
+  opacity: 1;
+}
+
+.img-overlay span {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  padding: 12px;
+  border-radius: 50%;
+  color: white;
+  transform: scale(0.8) translateY(10px);
+  transition: all 0.4s var(--transition-curve);
+  font-size: 1.2rem;
+}
+
+.masonry-item:hover .img-overlay span {
+  transform: scale(1) translateY(0);
+}
+
+/* --- ALBUM CARD GRID VIEW --- */
+.album-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 32px;
+}
+
+.album-card-modern {
+  background: white;
+  border-radius: 20px; /* More rounded */
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.4s var(--transition-curve);
+  border: 1px solid rgba(255,255,255,0.5);
+  position: relative;
+}
+
+.album-card-modern:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.image-container {
+  height: 260px; /* Taller images */
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.8s var(--transition-curve);
+}
+
+.album-card-modern:hover .image-container img {
+  transform: scale(1.1);
+}
+
+.overlay-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 60%);
+  opacity: 0.8;
+}
+
+.card-content {
+  padding: 24px 28px;
+  position: relative;
+}
+
+/* Floating Date Badge */
+.date-badge {
+  position: absolute;
+  top: -15px; /* Pull it up into the image area slightly? No, let's keep it inside but styled */
+  /* Actually, let's make it a tag inside */
+  position: static;
+  background: #f1f5f9;
+  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.card-content h3 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.photo-count {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin: 0;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.photo-count::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: var(--primary-color);
+  border-radius: 50%;
+}
+
+/* --- ANIMATIONS --- */
+.animate-up {
+  animation: slideUp 0.8s var(--transition-curve) forwards;
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* --- RESPONSIVENESS --- */
+@media (max-width: 1024px) {
+  .masonry-grid {
+    column-count: 3;
+    column-gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .masonry-grid {
+    column-count: 2;
+    column-gap: 16px;
+  }
+  
+  .album-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  
+  .header-content {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .back-btn-modern {
+    width: 100%;
+    justify-content: center;
+    padding: 14px;
+    background-color: white; /* clearer on mobile */
+  }
+  
+  .card-content {
+    padding: 20px;
+  }
+  
+  .image-container {
+    height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .masonry-grid {
+    column-count: 2; 
+    column-gap: 12px;
+  }
+  
+  .masonry-item {
+    margin-bottom: 12px;
+    border-radius: 8px; /* Slightly sharper on small screens looks crisper */
+  }
+}

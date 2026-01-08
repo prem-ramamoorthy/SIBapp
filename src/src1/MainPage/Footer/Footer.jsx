@@ -24,7 +24,7 @@ function Footer({margin = "auto" , ismember = false}) {
                                 <div className="footer-logo">
                                     <div className="logo-container">
                                         <div className="logo-placeholder">
-                                            <img src="/logo.png" alt="Sengunthar in Business Logo" className="logo-image"
+                                            <img src="/logo.webp" alt="Sengunthar in Business Logo" className="logo-image"
                                                 style={{
                                                     display: 'block',
                                                     marginLeft:  `${margin}`,
@@ -36,7 +36,7 @@ function Footer({margin = "auto" , ismember = false}) {
                                                 }} />
                                         </div>
                                     </div>
-                                    <h4>Sengunthar in Business (SIB) - Erode</h4>
+                                    <h4>Sengunthar in Business (SIB) </h4>
                                 </div>
                                 <p>Empowering Business Excellence Through Unity</p>
                                 <div className="social-links">
@@ -61,7 +61,7 @@ function Footer({margin = "auto" , ismember = false}) {
                         </div>
                         <div className="footer-bottom">
                             <div className="footer-divider"></div>
-                            <p>&copy; 2025 Sengunthar in Business (SIB) - Erode. All rights reserved. | Designed with Excellence
+                            <p>&copy; 2025 Sengunthar in Business (SIB) . All rights reserved. | Designed with Excellence
                             </p>
                         </div>
                     </div>

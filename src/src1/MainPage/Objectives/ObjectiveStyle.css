@@ -137,7 +137,7 @@
 
 .objective .objective-card:hover .objective-details {
     opacity: 1;
-    transform: translate(-14px,-20px);
+    transform: translate(1px,1px);
 }
 
 .objective .objective-details p {

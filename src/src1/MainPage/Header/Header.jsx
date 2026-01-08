@@ -17,14 +17,13 @@ function Header({ isMembers = false , style = { background: "rgba(242, 240, 234,
                         <div className="nav-brand">
                             <div className="logo-container">
                                 <img
-                                    src="/logo.png"
+                                    src="/logo.webp"
                                     alt="Sengunthar in Business Logo"
                                     className="logo-image"
                                 />
                             </div>
                             <div className="brand-info">
                                 <span className="brand-text">Sengunthar in Business</span>
-                                <span className="brand-location">Erode</span>
                             </div>
                         </div>
 

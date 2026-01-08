@@ -136,9 +136,6 @@ function Hero() {
                         <span className="title-line animate-typewriter" data-text="Sengunthar in Business">
                             Sengunthar in Business
                         </span>
-                        <span className="title-line animate-typewriter" data-text="SIB - Erode" data-delay="1000">
-                            SIB - Erode
-                        </span>
                     </h1>
                     <p className="hero-tagline animate-fade-up" data-delay="2000">
                         Empowering Business Excellence Through Unity
@@ -146,6 +143,11 @@ function Hero() {
                     <p className="hero-description animate-fade-up" data-delay="2500">
                         Building a strong network of successful entrepreneurs and business leaders within the Sengunthar community across diverse industries
                     </p>
+                     <div class="hero-image-section">
+                    <a href="https://www.facebook.com/VoiceOfSengunthar" target="_blank">
+                        <img src="assets/nandhagopal.webp" alt="Founder" class="founder-image" />
+                    </a>
+                </div>
                     <div className="hero-actions animate-fade-up" data-delay="3000">
                         {renderButtons()}
                     </div>
@@ -154,8 +156,7 @@ function Hero() {
                     </div>
                 </div>
             </div>
-            <div className="hero-scroll-indicator">
-            </div>
+            
         </section>
     )
 }

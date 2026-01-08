@@ -68,7 +68,7 @@ function Header() {
 
         <Zoom>
           <img
-            src="/assets/logo.png"
+            src="/assets/logo.webp"
             alt="logo"
             height={60}
             width={60}

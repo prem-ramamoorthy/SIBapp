@@ -1,12 +1,18 @@
 :root {
-  --warm-gold: #BFA181;
-  --light-gold: #D4B896;
-  --accent-blue: #0056b3;
-  --gradient-gold: linear-gradient(135deg, var(--warm-gold) 0%, var(--light-gold) 100%);
+    --warm-gold: #BFA181;
+    --light-gold: #D4B896;
+    --accent-blue: #0056b3;
+    --gradient-gold: linear-gradient(135deg, var(--warm-gold) 0%, var(--light-gold) 100%);
 }
 
 .about .container {
     max-width: 100%;
+}
+
+@media (max-width: 420px) {
+    .section-bg {
+        background-size: 40rem 35rem;
+    }
 }
 
 .about .section-header {
@@ -74,7 +80,7 @@
 }
 
 .about .timeline-image img {
-    width: 450px;
+    width: 100%;
     height: auto;
     box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 15px;
     border-radius: 10px;
@@ -84,7 +90,7 @@
     box-shadow: rgba(0, 0, 0, 0.1) 0px 8px 32px;
     display: flex;
     flex-direction: row;
-    gap:2rem;
+    gap: 2rem;
     overflow: hidden;
     border-width: 1.5px;
     border-style: solid;
@@ -97,7 +103,7 @@
     height: auto;
     position: relative;
     transition: transform 0.3s ease-in;
-    width : 80% ;
+    width: 80%;
 }
 
 .about .timeline-item-container:hover {
@@ -118,11 +124,11 @@
     gap: 3rem;
 }
 
-.about .timeline-item{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.about .timeline-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 @media screen and (max-width: 900px) {
@@ -139,7 +145,7 @@
         height: auto;
     }
 
-    .about .section-header{
+    .about .section-header {
         margin: 2rem 2rem;
     }
 }

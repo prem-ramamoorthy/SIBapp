@@ -27,6 +27,7 @@ import CSAEPolicy from './Notfound/CSAEPolicy'
 
 import './index.css'
 import MainPage from './src1/MainPage/MainPage';
+import Album from './src1/MainPage/Album/Album';
 
 const router = createBrowserRouter([
   { path: '/sib', element: <SignInPage />, errorElement: <ErrorDisplay /> },
@@ -62,6 +63,7 @@ const router = createBrowserRouter([
   { path: '/noteligible', element: <AnimatedRoute><NotEligibleRole /></AnimatedRoute> },
   { path: '/child-safety-standards', element: <AnimatedRoute><CSAEPolicy /></AnimatedRoute> },
   { path: '/', element: <MainPage /> },
+  { path: '/album', element: <Album /> },
   { path: '*', element: <NotFound404 /> },
 ]);
 
