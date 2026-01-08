@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
-  Calendar, Heart, MailCheck, PencilLine, Phone, Pin, Save
+  Calendar, Heart, MailCheck, PencilLine, Phone, Pin, Save,
+  User
 } from "lucide-react";
 
 const DetailRow = ({
@@ -31,6 +32,7 @@ const DetailRow = ({
 );
 
 const fieldConfig = [
+  { key: "displayName", label: "Nickname", icon: <User />, type :"text" },
   { key: "phone", label: "Phone", icon: <Phone className="h-5 w-5" />, type :"text"  },
   { key: "email", label: "Email", icon: <MailCheck className="h-5 w-5" />, type :"text"  },
   { key: "address", label: "Address", icon: <Pin className="h-5 w-5" />, colSpan: 2 , type :"text" },
@@ -45,6 +47,7 @@ const fieldConfig = [
 
 const ProfileCard = ({
   data = {
+    displayName: "John Smith",
     phone: "+91 98765 43210",
     email: "john.smith@email.com",
     address: "123, Main Street, Erode, Tamil Nadu, 638001, India",
@@ -84,6 +87,7 @@ const ProfileCard = ({
     if (isEditing) {
       try {
         const serverdata = {
+          display_name: localData.displayName,
           company_phone : localData.phone,
           company_email : localData.email,
           company_address: localData.address,
@@ -152,8 +156,8 @@ const ProfileCard = ({
         <div className="my-4 h-px w-full bg-slate-200/70 dark:bg-gray-700" />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          {fieldConfig.slice(0, 3).map(field => (
-            field.colSpan === 2 ? (
+          {fieldConfig.slice(0, 4).map(field => (
+            field.colSpan === 3 ? (
               <div className="md:col-span-2" key={field.key}>
                 <DetailRow
                   editable={isEditing}

@@ -126,6 +126,9 @@ function ButtonPage({ onClose = () => { } }) {
             ? result
             : result?.message || "TYB submitted successfully.";
         setResponse(String(okText));
+        setTimeout(() => {
+          onClose();
+        }, 500);
       }
     } catch (err) {
       setError(err?.message ? String(err.message) : "Network error.");

@@ -31,13 +31,16 @@ function Members() {
   });
 
   const { data: verticalnamesRaw } = useFetch(
-    `${import.meta.env.VITE_BACKEND_SERVER}/admin/vertical/getallverticals`
+    `${import.meta.env.VITE_BACKEND_SERVER}/admin/vertical/getallverticals`,
+    { method: "GET", credentials: "include" }
   );
   const { data: chapternamesRaw } = useFetch(
-    `${import.meta.env.VITE_BACKEND_SERVER}/chapter/main/getallchapternames`
+    `${import.meta.env.VITE_BACKEND_SERVER}/chapter/main/getallchapternames`,
+    { method: "GET", credentials: "include" }
   );
   const { data: regionnamesRaw } = useFetch(
-    `${import.meta.env.VITE_BACKEND_SERVER}/admin/region/getallregions`
+    `${import.meta.env.VITE_BACKEND_SERVER}/admin/region/getallregions`,
+    { method: "GET", credentials: "include" }
   );
 
   const verticalnames = Array.isArray(verticalnamesRaw) ? verticalnamesRaw : [];

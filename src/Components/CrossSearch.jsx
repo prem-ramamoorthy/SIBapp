@@ -7,13 +7,15 @@ function CrossChapterSearch({
   label = "To",
   offsubmit = false,
   searchdomain = "searchuser",
-  readonly = false
+  readonly = false,
+  userstate = null,
 }) {
   const [crosschapter, setcrosschapter] = useState(false);
   const [searchTerm, setSearchTerm] = useState(value || "");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [names, setNames] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchdomainstate, setSearchdomainstate] = useState("");
 
@@ -55,7 +57,9 @@ function CrossChapterSearch({
         );
 
         const data = await res.json();
-
+        if(userstate && data?.userdata){
+          userstate(data.userdata);
+        }
         if (!res.ok || data?.errors || data?.message) {
           const errMsg =
             data?.errors?.[0]?.msg || data?.message || "An unknown error occurred.";
@@ -64,6 +68,7 @@ function CrossChapterSearch({
         } else {
           const resData = data?.results || [];
           setResults(resData);
+          setNames(data?.names || []);
           setShowDropdown(true);
         }
       } catch (err) {
@@ -127,9 +132,9 @@ function CrossChapterSearch({
               <li
                 key={idx}
                 onClick={() => handleSelect(username)}
-                className="cursor-pointer px-4 py-2 text-sm text-gray-800 hover:bg-yellow-100 dark:text-gray-200 dark:hover:bg-yellow-600/30"
+                className="cursor-pointer px-4 py-2 text-sm text-gray-800 hover:bg-yellow-100 dark:text-gray-200 dark:hover:bg-yellow-600/30 flex justify-between"
               >
-                {username || "Unnamed User"}
+                {username || "Unnamed User"} <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{names[idx] ? `${names[idx]}` : ""}</span>
               </li>
             ))}
           </ul>
