@@ -2,6 +2,7 @@ import { useEffect, useMemo, useCallback } from "react";
 import Filter from "./Components/Filter";
 import FilterButton from "./Components/FilterButton";
 import debounce from "lodash/debounce";
+import { UserSearch } from "lucide-react";
 
 const SORT_OPTIONS = ["Name A-Z", "Name Z-A", "Chapter", "Region"];
 
@@ -85,13 +86,16 @@ export default function PublicFilters({
       </div>
 
       <div className="mt-4 flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-        <input
-          type="text"
-          className="border rounded-3xl px-3 py-2 w-full md:w-64 bg-gray-200 border-gray-300 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          placeholder="Search members..."
-          value={searchterm}
-          onChange={(e) => onChange({ searchterm: e.target.value })}
-        />
+        <div className="flex items-center gap-2"><UserSearch className="dark:text-amber-50" />
+          <input
+            type="text"
+            className="border rounded-3xl px-3 py-2 w-full md:w-64 bg-gray-200 border-gray-300 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            placeholder="Search members/verticals..."
+            value={searchterm}
+            onChange={(e) => onChange({ searchterm: e.target.value })}
+          />
+        </div>
+
 
         <div className="flex gap-3 md:justify-end">
           <FilterButton
