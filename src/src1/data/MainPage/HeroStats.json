@@ -26,7 +26,7 @@
         },
         {
             "name": "Connect With Us",
-            "content": "→",
+            "content": "",
             "type": "secondary magnetic-btn"
         }
     ]

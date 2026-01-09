@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Lightbox & Plugins
 import Lightbox from "yet-another-react-lightbox";
@@ -14,6 +15,7 @@ import "./Album.css";
 const BACKEND_SERVER_URL = import.meta.env.VITE_BACKEND_SERVER; 
 
 const Album = () => {
+  const navigate = useNavigate();
   const [albums, setAlbums] = useState([]);
   const [currentView, setCurrentView] = useState("home"); // 'home' or 'album'
   const [selectedAlbum, setSelectedAlbum] = useState(null);
@@ -133,7 +135,7 @@ const Album = () => {
               <span className="icon">←</span> Back to Collections
             </button>
           ) : (
-            <button className="back-btn-modern" onClick={() => window.location.href = '/'}>
+            <button className="back-btn-modern" onClick={() => navigate('/')}>
               <span className="icon">←</span> Back to Main
             </button>
           )}
