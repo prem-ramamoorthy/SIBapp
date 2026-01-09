@@ -47,7 +47,7 @@
 .hed .nav-brand {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 2.5rem;
 }
 
 .hed .logo-container {
@@ -224,7 +224,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1200px) {
     .hed .header {
         margin: 0.5rem 1rem;
     }

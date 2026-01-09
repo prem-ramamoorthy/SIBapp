@@ -4,33 +4,27 @@ import data from '../../data/MainPage/About.json'
 function About() {
 
     const renderAbout = data.map((about, index) => {
-        return (<div className="timeline-item-container" style={{ width: "100px !important" }} key={index}>
-            <div className="timeline-item">
-                <h3>{about.title}</h3>
-                <p className="tamil">{about.description_tamil}</p>
-                <p className="en">{about.description_en}</p>
+        return (
+            // Note: Inline styles like width !important are often better handled in CSS classes
+            // but kept here as per your original structure.
+            <div className="timeline-item-container" style={{ width: "100px !important" }} key={index}>
+                <div className="timeline-item">
+                    <h3>{about.title}</h3>
+                    <p className="tamil">{about.description_tamil}</p>
+                    <p className="en">{about.description_en}</p>
+                </div>
+                <div className="timeline-image">
+                    <img src={about.image} alt={about.image_alt} />
+                </div>
             </div>
-            <div className="timeline-image">
-                <img src={about.image} alt={about.image_alt} />
-            </div>
-        </div>)
+        )
     })
 
     return (
         <section id="about" className="about">
-            <div className="section-bg" style={{
-                backgroundImage: 'url(/assets/logo.webp)',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                opacity: 0.1,
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: -1
-            }}>
-            </div>
+            {/* The background watermark image is now handled by the CSS class .section-bg */}
+            <div className="section-bg"></div>
+            
             <div className="container">
                 <div className="section-header">
                     <div className="section-tag">About Us</div>

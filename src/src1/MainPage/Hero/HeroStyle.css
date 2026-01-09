@@ -140,8 +140,8 @@
 .hero .hero-stats {
   display: flex;
   gap: 3rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  width: 100%;
+  flex-direction: row;
 }
 
 .hero .stat-item {
@@ -158,6 +158,12 @@
   background-clip: text;
 }
 
+@media (max-width: 768px) {
+  .hero .stat-number {
+  font-size: 1.5rem;
+}
+}
+
 .hero .stat-label {
   font-size: 0.9rem;
   opacity: 0.8;
@@ -165,13 +171,6 @@
   letter-spacing: 1px;
 }
 
-.hero .hero-scroll-indicator {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: hero-bounce 2s infinite;
-}
 
 .hero .btn {
   position: relative;
@@ -316,7 +315,7 @@
 }
 
 /* ===== MOBILE VIEW (768px and below) ===== */
-@media (max-width: 768px) {
+@media (max-width: 850px) {
   .hero-image-section {
     width: 250px;
     height: 260px;
@@ -415,11 +414,11 @@
   .hero {
     min-height: 100vh;
     padding: 2rem 0;
-    margin-left: -8%;
+    /* margin-left: -8%; */
   }
 
   .hero .hero-content {
-    padding: 0 1rem;
+    padding: 0 5pt;
   }
 
   .hero .hero-stats {

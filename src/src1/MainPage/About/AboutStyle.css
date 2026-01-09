@@ -5,15 +5,40 @@
     --gradient-gold: linear-gradient(135deg, var(--warm-gold) 0%, var(--light-gold) 100%);
 }
 
-.about .container {
-    max-width: 100%;
+/* --- Main Section Setup --- */
+.about {
+    position: relative; /* Vital: This contains the absolute positioned background */
+    overflow: hidden;   /* Ensures the image doesn't spill out */
 }
 
-@media (max-width: 420px) {
-    .section-bg {
-        background-size: 40rem 35rem;
-    }
+/* --- Watermark Background --- */
+.about .section-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* Image setup */
+    background-image: url('../../../../public/logo.webp');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain; /* 'contain' fits the logo nicely. Use 'cover' to fill entire space */
+    
+    /* Watermark effect */
+    opacity: 0.1; 
+    z-index: 1; /* Low z-index */
+    pointer-events: none; /* Allows clicking through the image if needed */
 }
+
+/* --- Content Container --- */
+.about .container {
+    max-width: 100%;
+    position: relative; /* Vital: Creates a stacking context */
+    z-index: 2; /* Ensures text sits ON TOP of the watermark */
+}
+
+/* --- Existing Styles --- */
 
 .about .section-header {
     text-align: center;
@@ -96,14 +121,13 @@
     border-style: solid;
     border-color: rgba(180, 180, 230, 0.12);
     border-image: initial;
-    background: rgba(255, 255, 255, 0.68);
+    background: rgba(255, 255, 255, 0.85); /* Increased opacity slightly to read text over watermark */
     border-radius: 1.5rem;
     padding: 2.5rem 2rem 2rem;
     margin: 0px 1rem;
     height: auto;
     position: relative;
     transition: transform 0.3s ease-in;
-    width: 80%;
 }
 
 .about .timeline-item-container:hover {
@@ -129,6 +153,14 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+/* --- Media Queries --- */
+
+@media (max-width: 420px) {
+    .about .section-bg {
+        background-size: 300%; /* Adjust size for mobile if needed */
+    }
 }
 
 @media screen and (max-width: 900px) {
