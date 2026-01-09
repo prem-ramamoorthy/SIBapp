@@ -13,6 +13,7 @@ const getQueryString = filters => {
   if (filters.vertical && filters.vertical !== "All Verticals") params.append("vertical", filters.vertical);
   if (filters.sort) params.append("sort", filters.sort);
   if (filters.myChapterOnly) params.append("myChapterOnly", "true");
+  if (filters.search) params.append("search", filters.search);
   return params.toString() ? `?${params.toString()}` : "";
 };
 
@@ -22,12 +23,14 @@ function Members() {
   const [vertical, setVertical] = useState("All Verticals");
   const [myChapterOnly, setMyChapterOnly] = useState(true);
   const [sort, setSort] = useState("Name A-Z");
+  const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({
     region: "All Regions",
     chapter: "All Chapters",
     vertical: "All Verticals",
     myChapterOnly: true,
-    sort: "Name A-Z"
+    sort: "Name A-Z",
+    search: "",
   });
 
   const { data: verticalnamesRaw } = useFetch(
@@ -105,6 +108,7 @@ function Members() {
             sort={sort} setSort={setSort}
             onChange={handleFilterChange}
             onClear={handleClear}
+            search={search} setSearch={setSearch}
           />
         </section>
 

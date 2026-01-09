@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import Filter from "./Components/Filter";
 import Checkbox from "./Components/Checkbox";
 import FilterButton from "./Components/FilterButton";
+import { useRef } from "react";
 
 export default function DirectoryFilters({
   region, setRegion,
@@ -9,6 +10,7 @@ export default function DirectoryFilters({
   vertical, setVertical,
   myChapterOnly, setMyChapterOnly,
   sort, setSort,
+  search, setSearch,
   regions = ["All Regions", "North", "South", "East", "West"],
   chapters = ["All Chapters", "Alpha", "Beta", "Gamma"],
   verticals = ["All Verticals", "Engineering", "Design", "Marketing"],
@@ -19,9 +21,9 @@ export default function DirectoryFilters({
 }) {
   useEffect(() => {
     onChange({
-      region, chapter, vertical, myChapterOnly, sort
+      region, chapter, vertical, myChapterOnly, sort, search
     });
-  }, [region, chapter, vertical, myChapterOnly, sort]);
+  }, [region, chapter, vertical, myChapterOnly, sort, search]);
 
   const clear = () => {
     setRegion(regions[0]);
@@ -29,7 +31,19 @@ export default function DirectoryFilters({
     setVertical(verticals[0]);
     setSort(sorts[0]);
     setMyChapterOnly(false);
+    setSearch("");
     onClear?.();
+  };
+
+  // Debounce search input
+  const debounceTimeout = useRef();
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {
+      setSearch(value);
+    }, 500);
   };
 
   return (
@@ -42,7 +56,16 @@ export default function DirectoryFilters({
       </div>
 
       <div className="mt-1 sm:mt-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 px-4 pt-3 pb-3">
-        <Checkbox state={myChapterOnly} update={setMyChapterOnly} content="Show My Chapter Only" />
+        <div className="flex gap-3 items-center">
+          <input
+            type="text"
+            className="border rounded-3xl px-3 py-2 w-full md:w-64 bg-gray-200 border-gray-300 text-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            placeholder="Search members/verticals..."
+            defaultValue={search}
+            onChange={handleSearchChange}
+          />
+          <Checkbox state={myChapterOnly} update={setMyChapterOnly} content="Show My Chapter Only" />
+        </div>
         <div className="flex gap-3 md:justify-end">
           <FilterButton
             content="Clear Filter"
