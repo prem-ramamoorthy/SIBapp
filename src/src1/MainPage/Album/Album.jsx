@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Lightbox & Plugins
 import Lightbox from "yet-another-react-lightbox";
@@ -14,6 +15,7 @@ import "./Album.css";
 const BACKEND_SERVER_URL = import.meta.env.VITE_BACKEND_SERVER; 
 
 const Album = () => {
+  const navigate = useNavigate();
   const [albums, setAlbums] = useState([]);
   const [currentView, setCurrentView] = useState("home"); // 'home' or 'album'
   const [selectedAlbum, setSelectedAlbum] = useState(null);
@@ -67,8 +69,22 @@ const Album = () => {
     setCurrentImageIndex(index);
   }, []);
 
+  // Helper: Format Date
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    } catch (e) {
+      return dateString;
+    }
+  };
+
   // Helper: Normalize photos to ensure they have a 'src' property
-  // This handles cases where the API returns an array of strings or objects with 'url' instead of 'src'
   const formattedPhotos = useMemo(() => {
     if (!selectedAlbum || !selectedAlbum.photos) return [];
     
@@ -76,7 +92,6 @@ const Album = () => {
       if (typeof photo === 'string') {
         return { src: photo };
       }
-      // If it's an object, check for 'src' or 'url' or fallback
       return { 
         src: photo.src || photo.url || photo.link || "",
         ...photo 
@@ -120,7 +135,9 @@ const Album = () => {
               <span className="icon">←</span> Back to Collections
             </button>
           ) : (
-             <div className="brand-title">Event Gallery</div>
+            <button className="back-btn-modern" onClick={() => navigate('/')}>
+              <span className="icon">←</span> Back to Main
+            </button>
           )}
           
           <h2 className="page-title fade-in">
@@ -144,7 +161,6 @@ const Album = () => {
                     onClick={() => handleFolderClick(album)}
                 >
                     <div className="image-container">
-                        {/* Fallback if coverImg is null/undefined */}
                         <img 
                             src={album.coverImg || "https://via.placeholder.com/400x300?text=No+Cover"} 
                             alt={album.title} 
@@ -153,7 +169,8 @@ const Album = () => {
                         <div className="overlay-gradient"></div>
                     </div>
                     <div className="card-content">
-                        <span className="date-badge">{album.date}</span>
+                        {/* Updated Date Formatting */}
+                        <span className="date-badge">{formatDate(album.date)}</span>
                         <h3>{album.title}</h3>
                         <p className="photo-count">
                             {(album.photos || []).length} Moments
@@ -169,7 +186,7 @@ const Album = () => {
         {currentView === "album" && selectedAlbum && (
           <div className="photos-container animate-up">
             
-            {/* Inline Back Button for easier navigation within grid flow */}
+            {/* Inline Back Button */}
             <div style={{ marginBottom: '20px', display: 'flex' }}>
                 <button className="back-btn-modern" onClick={handleBackClick}>
                     <span className="icon">←</span> Back
@@ -188,7 +205,6 @@ const Album = () => {
                     alt={`Gallery item ${index}`} 
                     loading="lazy" 
                   />
-                  {/* Enhanced Overlay */}
                   <div className="img-overlay">
                     <span>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -57,6 +57,7 @@ function Gallery() {
                 </div>
 
                 <div className="slideshow-container">
+                    <Link to="/album">
                     <div className="slide active">
                         <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=1200" alt="Gallery Image 1" />
                     </div>
@@ -72,6 +73,7 @@ function Gallery() {
                     <div className="slide">
                         <img src="" alt="Gallery Image 5" />
                     </div>
+                    </Link>
 
                     <button className="nav-button prev" onClick={() => changeSlide(-1)}>&#10094;</button>
                     <button className="nav-button next" onClick={() => changeSlide(1)}>&#10095;</button>

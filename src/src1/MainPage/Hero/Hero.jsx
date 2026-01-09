@@ -1,12 +1,48 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './HeroStyle.css'
 import data from '../../data/MainPage/HeroStats.json'
+
+// REPLACE THIS with your actual Backend URL or import it
+const Backend_Server_URL = import.meta.env.VITE_BACKEND_SERVER; 
 
 function Hero() {
     const statsRef = useRef(null);
     const typewriterRef = useRef(null);
     const isAnimatedRef = useRef(false);
+    
+    // Initialize with local data to prevent layout shift before fetch
+    const [stats, setStats] = useState(data.stats);
 
+    // Fetch Dynamic Stats
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response = await fetch(`${Backend_Server_URL}/public/stats`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const apiData = await response.json();
+                
+                // Map API data to the UI structure including the new 'chaptercount'
+                // Ensure the order is pleasing for the UI (Chapters -> Members -> Verticals -> Referrals -> Business)
+                const dynamicStats = [
+                    { name: "Chapters", value: apiData.chaptercount },
+                    { name: "Members", value: apiData.membershipcount },
+                    { name: "Verticals", value: apiData.verticalcount },
+                    { name: "Referrals", value: apiData.referralcount },
+                    { name: "Business Value", value: apiData.bussinessamount }
+                ];
+                
+                setStats(dynamicStats);
+            } catch (error) {
+                console.error("Failed to fetch dynamic stats, using fallback:", error);
+                // We keep the initial data.stats as fallback if fetch fails
+            }
+        };
+
+        fetchStats();
+    }, []);
+
+    // Observer and Animation Logic
     useEffect(() => {
         const setupTypewriterEffect = () => {
             const typewriterElements = document.querySelectorAll('.hero .animate-typewriter');
@@ -72,6 +108,11 @@ function Hero() {
             });
         };
 
+        // Re-run animation if stats update while already visible
+        if (isAnimatedRef.current) {
+            animateCounters('.hero .stat-number');
+        }
+
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting && !isAnimatedRef.current) {
@@ -100,7 +141,7 @@ function Hero() {
                 observer.unobserve(statsRef.current);
             }
         };
-    }, []);
+    }, [stats]); // Add stats dependency so observer/animations react to new data
 
     const renderButtons = () => {
         return data.buttons.map((button, index) => (
@@ -112,8 +153,9 @@ function Hero() {
     };
 
     const renderStats = () => {
-        return data.stats.map((stat, index) => (
+        return stats.map((stat, index) => (
             <div key={index} className="stat-item"> 
+                {/* Reset to 0 in DOM to ensure animation flows from 0 to target */}
                 <span className="stat-number" data-count={stat.value}>0</span>
                 <span className="stat-label">{stat.name}</span>
             </div>
