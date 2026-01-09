@@ -28,9 +28,13 @@ import CSAEPolicy from './Notfound/CSAEPolicy'
 import './index.css'
 import MainPage from './src1/MainPage/MainPage';
 import Album from './src1/MainPage/Album/Album';
+import ExistingSession from './hooks/ExistingSession';
 
 const router = createBrowserRouter([
-  { path: '/sib', element: <SignInPage />, errorElement: <ErrorDisplay /> },
+  {
+    path: '/sib', element: <ExistingSession />, errorElement: <ErrorDisplay />
+  },
+  { path: '/signin', element: <AnimatedRoute><SignInPage /></AnimatedRoute> },
   {
     element: <ProtectedRoute />,
     errorElement: <ErrorDisplay />,
