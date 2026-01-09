@@ -24,7 +24,9 @@ function Profile() {
   const user = queryParams.get("user");
 
   const { data: showProfileData, loading: loading1, error: error1 } = useFetch(
-    `${import.meta.env.VITE_BACKEND_SERVER}/profile/showprofile`,
+    id
+      ? `${import.meta.env.VITE_BACKEND_SERVER}/public/showprofile`
+      : `${import.meta.env.VITE_BACKEND_SERVER}/profile/showprofile`,
     {
       method: "GET",
       credentials: "include"
@@ -33,7 +35,7 @@ function Profile() {
 
   const { data: getProfileData, loading: loading2, error: error2 } = useFetch(
     id
-      ? `${import.meta.env.VITE_BACKEND_SERVER}/profile/getprofilebyid/${id}?user=${user}`
+      ? `${import.meta.env.VITE_BACKEND_SERVER}/public/getprofilebyid/${id}?user=${user}`
       : `${import.meta.env.VITE_BACKEND_SERVER}/profile/getprofile`,
     {
       method: "GET",
