@@ -351,6 +351,8 @@
     .led .new-phone {
         font-size: 0.75rem;
         letter-spacing: 0;
+        white-space: nowrap;
+        gap: 0px;
     }
     
     .led .new-phone::before {

@@ -1,13 +1,12 @@
-import './AboutStyle.css'
-import data from '../../data/MainPage/About.json'
+import React from 'react';
+import './AboutStyle.css';
+import data from '../../data/MainPage/About.json';
 
 function About() {
 
     const renderAbout = data.map((about, index) => {
         return (
-            // Note: Inline styles like width !important are often better handled in CSS classes
-            // but kept here as per your original structure.
-            <div className="timeline-item-container" style={{ width: "100px !important" }} key={index}>
+            <div className="timeline-item-container" key={index}>
                 <div className="timeline-item">
                     <h3>{about.title}</h3>
                     <p className="tamil">{about.description_tamil}</p>
@@ -22,7 +21,7 @@ function About() {
 
     return (
         <section id="about" className="about">
-            {/* The background watermark image is now handled by the CSS class .section-bg */}
+            {/* Background container for the fixed watermark */}
             <div className="section-bg"></div>
             
             <div className="container">

@@ -19,7 +19,7 @@
   align-items: center;
   background: url('/hero.avif') no-repeat center center/cover;
   overflow: hidden;
-    background-attachment: fixed;
+  background-attachment: fixed;
 
 }
 
@@ -137,15 +137,23 @@
   flex-wrap: wrap;
 }
 
+/* === MODIFIED STATS SECTION === */
 .hero .hero-stats {
   display: flex;
   gap: 3rem;
   width: 100%;
   flex-direction: row;
+  justify-content: center; /* Center the stats group */
+  flex-wrap: wrap;         /* Allow wrapping */
 }
 
 .hero .stat-item {
   text-align: center;
+  display: flex;           /* Use flex to align content vertically */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;        /* Ensure items have some width */
 }
 
 .hero .stat-number {
@@ -160,8 +168,8 @@
 
 @media (max-width: 768px) {
   .hero .stat-number {
-  font-size: 1.5rem;
-}
+    font-size: 1.5rem;
+  }
 }
 
 .hero .stat-label {
@@ -405,8 +413,9 @@
     max-width: 280px;
   }
 
+  /* MODIFIED: Adjusted gap for mobile stats */
   .hero .hero-stats {
-    gap: 2rem;
+    gap: 1.5rem;
   }
 }
 
@@ -421,9 +430,18 @@
     padding: 0 5pt;
   }
 
+  /* MODIFIED: Strict 2 per row for mobile */
   .hero .hero-stats {
-    flex-direction: column;
-    gap: 1.5rem;
+    flex-direction: row; /* Override to row */
+    flex-wrap: wrap;     /* Allow wrapping */
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .hero .stat-item {
+    /* 45% width to fit 2 per row (accounting for gap) */
+    flex: 0 0 45%; 
+    margin-bottom: 10px;
   }
 
   .hero .hero-title {
@@ -431,7 +449,7 @@
   }
 
   .hero .title-line {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
     font-weight: bold;
   }
 }

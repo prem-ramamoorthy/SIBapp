@@ -143,11 +143,11 @@ function Hero() {
                     <p className="hero-description animate-fade-up" data-delay="2500">
                         Building a strong network of successful entrepreneurs and business leaders within the Sengunthar community across diverse industries
                     </p>
-                     <div class="hero-image-section">
-                    <a href="https://www.facebook.com/VoiceOfSengunthar" target="_blank">
-                        <img src="assets/nandhagopal.webp" alt="Founder" class="founder-image" />
-                    </a>
-                </div>
+                    <div className="hero-image-section">
+                        <a href="https://www.facebook.com/VoiceOfSengunthar" target="_blank" rel="noreferrer">
+                            <img src="assets/nandhagopal.webp" alt="Founder" className="founder-image" />
+                        </a>
+                    </div>
                     <div className="hero-actions animate-fade-up" data-delay="3000">
                         {renderButtons()}
                     </div>

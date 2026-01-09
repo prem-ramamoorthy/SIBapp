@@ -137,11 +137,16 @@
     display: none;
     flex-direction: column;
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.4rem;
     gap: 4px;
     z-index: 1001;
     position: relative;
     left: -10%;
+}
+@media (max-width: 400px) {
+    .hed .burger-menu {
+    left: -2%;
+}
 }
 
 .hed .burger-line {
