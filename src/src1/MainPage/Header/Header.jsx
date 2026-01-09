@@ -11,7 +11,7 @@ function Header({ isMembers = false , style = { background: "rgba(242, 240, 234,
 
     return (
         <div className="hed">
-            <header className="header" id="header" style = {style}>
+            <header className="header" id="header" style={style}>
                 <nav className="navbar">
                     <div className="container">
                         <div className="nav-brand">
@@ -23,7 +23,15 @@ function Header({ isMembers = false , style = { background: "rgba(242, 240, 234,
                                 />
                             </div>
                             <div className="brand-info">
-                                <span className="brand-text">Sengunthar in Business</span>
+                                <span
+                                    className="brand-text"
+                                    style={{
+                                        color: isMembers ? "white" : undefined,
+                                        fontWeight: isMembers ? "100" : undefined
+                                    }}
+                                >
+                                    Sengunthar in Business
+                                </span>
                             </div>
                         </div>
 

@@ -24,13 +24,19 @@ import NotEligibleRole from './Notfound/NotEligible';
 import ErrorDisplay from './Notfound/ErrorDisplay';
 import CoordinatorRoute from './hooks/CoordinatorRoute'
 import CSAEPolicy from './Notfound/CSAEPolicy'
+import PublicMembers from './Members/PublicMembers';
 
 import './index.css'
 import MainPage from './src1/MainPage/MainPage';
 import Album from './src1/MainPage/Album/Album';
+import ExistingSession from './hooks/ExistingSession';
 
 const router = createBrowserRouter([
-  { path: '/sib', element: <SignInPage />, errorElement: <ErrorDisplay /> },
+  {
+    path: '/sib', element: <ExistingSession />, errorElement: <ErrorDisplay />
+  },
+  { path: '/signin', element: <AnimatedRoute><SignInPage /></AnimatedRoute> },
+  { path: '/public-members', element:<PublicMembers /> },
   {
     element: <ProtectedRoute />,
     errorElement: <ErrorDisplay />,
