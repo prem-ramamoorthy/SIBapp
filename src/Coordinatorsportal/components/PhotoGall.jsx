@@ -1,19 +1,18 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   X, ChevronLeft, ChevronRight, ZoomIn, Image as ImageIcon, 
   Plus, Trash2, Upload, FolderPlus, ArrowLeft, Loader2, AlertCircle, CheckCircle2,
-  LayoutDashboard, Calendar
+   Calendar,
+  ArrowLeftIcon
 } from 'lucide-react';
 
-// Importing the JSON data directly
-import initialData from './data.json';
-
-// NOTE: Replace this with your actual backend server URL.
-// We use a fallback to localhost to ensure the code compiles if the env var is missing.
 const BACKEND_SERVER_URL = import.meta.env.VITE_BACKEND_SERVER; 
 const UPLOAD_API_URL = `${BACKEND_SERVER_URL}/auth/upload/photo`;
-
-// --- UI COMPONENTS ---
+const GALLERY_API_URL = `${BACKEND_SERVER_URL}/gallery/all`;
+const GALLERY_CREATE_URL = `${BACKEND_SERVER_URL}/gallery/upload`;
+const GALLERY_ADD_PHOTOS_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/add-photos/${eventId}`;
+const GALLERY_DELETE_PHOTO_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/delete-photo/${eventId}`;
+const GALLERY_DELETE_ALBUM_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/${eventId}`;
 
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
@@ -60,7 +59,6 @@ const ConfirmationModal = ({ isOpen, title, message, onConfirm, onCancel, isDest
   );
 };
 
-// 1. Lightbox Component
 const Lightbox = ({ isOpen, image, onClose, onNext, onPrev, hasNext, hasPrev }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -118,7 +116,6 @@ const Lightbox = ({ isOpen, image, onClose, onNext, onPrev, hasNext, hasPrev }) 
   );
 };
 
-// 2. Album Card Component
 const AlbumCard = ({ album, onClick, onDelete }) => (
   <div 
     onClick={onClick}
@@ -140,7 +137,7 @@ const AlbumCard = ({ album, onClick, onDelete }) => (
       <h3 className="text-white font-bold text-xl mb-1">{album.title}</h3>
       <div className="flex items-center text-neutral-300 text-sm mb-2">
         <Calendar size={14} className="mr-1.5 opacity-75" />
-        {album.date}
+        {album.date && (new Date(album.date)).toLocaleDateString()}
       </div>
       <div className="flex items-center text-xs text-neutral-400">
         <span className="bg-neutral-700/50 px-2 py-1 rounded backdrop-blur-sm">
@@ -159,31 +156,53 @@ const AlbumCard = ({ album, onClick, onDelete }) => (
   </div>
 );
 
-// --- MAIN APP ---
 export default function PhotoGallery({ onBack }) {
-  // Initialize state directly from imported JSON
-  // Note: Changes made here (like creating albums or uploading photos) 
-  // will only persist in memory for the session, as the browser cannot 
-  // overwrite the 'data.json' file on the disk.
-  const [albums, setAlbums] = useState(initialData);
+  const [albums, setAlbums] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [selectedAlbumId, setSelectedAlbumId] = useState(null);
   
-  // UI State
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isCreatingAlbum, setIsCreatingAlbum] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [newAlbumDate, setNewAlbumDate] = useState("");
   
-  // Toasts & Modals
   const [toasts, setToasts] = useState([]);
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "", onConfirm: () => {} });
 
-  // Forms
   const [newAlbumTitle, setNewAlbumTitle] = useState("");
   const fileInputRef = useRef(null);
 
-  // --- HELPERS ---
+  useEffect(() => {
+    setLoading(true);
+    fetch(GALLERY_API_URL , { method: 'GET' , credentials: 'include' })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch gallery data");
+        return res.json();
+      })
+      .then(data => {
+        const normalized = (data || []).map(album => ({
+          id: album._id || album.id,
+          title: album.title,
+          date: album.date,
+          coverImg: album.coverImg,
+          photos: (album.photos || []).map(url => ({
+            src: url,
+            width: 1000,
+            height: 800
+          }))
+        }));
+        setAlbums(normalized);
+      })
+      .catch(() => {
+        setAlbums([]);
+        addToast("Failed to load gallery data", "error");
+      })
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line
+  }, []);
+
   const addToast = (message, type = 'success') => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
@@ -208,38 +227,76 @@ export default function PhotoGallery({ onBack }) {
 
   // --- ACTIONS ---
 
-  const handleCreateAlbum = (e) => {
+  const handleCreateAlbum = async (e) => {
     e.preventDefault();
     if (!newAlbumTitle.trim()) return;
 
-    // Create album matching the new JSON structure
-    const newAlbum = {
-      id: Date.now(),
+    const payload = {
       title: newAlbumTitle,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      coverImg: null,
+      date: newAlbumDate ? new Date(newAlbumDate).toISOString() : "",
+      coverImg: "",
       photos: []
     };
 
-    setAlbums(prev => [newAlbum, ...prev]);
-    setNewAlbumTitle("");
-    setIsCreatingAlbum(false);
-    addToast("Album created successfully");
+    try {
+      const res = await fetch(GALLERY_CREATE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Failed to create album");
+      const album = await res.json();
+
+      const normalized = {
+        id: album._id,
+        title: album.title,
+        date: album.date,
+        coverImg: album.coverImg,
+        photos: (album.photos || []).map(url => ({
+          src: url,
+          width: 1000,
+          height: 800
+        }))
+      };
+
+      setAlbums(prev => [normalized, ...prev]);
+      setNewAlbumTitle("");
+      setNewAlbumDate("");
+      setIsCreatingAlbum(false);
+      addToast("Album created successfully");
+    } catch (err) {
+      console.error("Create album error:", err);
+      addToast("Failed to create album", "error");
+    }
   };
 
+  // --- UPDATED DELETE ALBUM LOGIC ---
   const handleDeleteAlbum = (albumToDelete) => {
     openConfirm(
       "Delete Album",
       `Are you sure you want to delete "${albumToDelete.title}"? This action cannot be undone.`,
-      () => {
-        setAlbums(prev => prev.filter(e => e.id !== albumToDelete.id));
-        if (selectedAlbumId === albumToDelete.id) setSelectedAlbumId(null);
-        addToast("Album deleted");
+      async () => {
+        try {
+          const res = await fetch(GALLERY_DELETE_ALBUM_URL(albumToDelete.id), {
+            method: 'DELETE',
+            credentials: 'include',
+          });
+          if (!res.ok) throw new Error("Failed to delete album");
+          const data = await res.json();
+          setAlbums(prev => prev.filter(e => e.id !== albumToDelete.id));
+          if (selectedAlbumId === albumToDelete.id) setSelectedAlbumId(null);
+          addToast(data.message || "Album deleted");
+        } catch (err) {
+          console.error("Delete album error:", err);
+          addToast("Failed to delete album", "error");
+        }
       },
       true 
     );
   };
 
+  // --- MODIFIED UPLOAD LOGIC ---
   const handleFileUpload = async (e) => {
     const files = e.target.files;
     if (!files || files.length === 0 || !selectedAlbumId) return;
@@ -247,16 +304,15 @@ export default function PhotoGallery({ onBack }) {
     setIsUploading(true);
 
     try {
-      const newPhotos = [];
+      const uploadedUrls = [];
       let successCount = 0;
-      
+
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const formData = new FormData();
         formData.append('photo', file);
-        
+
         try {
-          // Calls your backend which returns { url: '...' }
           const response = await fetch(UPLOAD_API_URL, {
             method: 'POST',
             body: formData,
@@ -266,36 +322,47 @@ export default function PhotoGallery({ onBack }) {
             const errorData = await response.json().catch(() => ({}));
             throw new Error(errorData.error || 'Upload failed');
           }
-          
+
           const data = await response.json();
           const imageUrl = data.url; 
-          
+
           if (!imageUrl) throw new Error("No URL returned from backend");
 
-          // Convert backend response to match our new photo structure
-          const photoObj = {
-            src: imageUrl,
-            width: 1000, 
-            height: 800
-          };
-          newPhotos.push(photoObj);
+          uploadedUrls.push(imageUrl);
           successCount++;
         } catch (innerErr) {
           console.error(`Failed to upload ${file.name}:`, innerErr);
         }
       }
 
-      if (newPhotos.length > 0) {
-        setAlbums(prevAlbums => prevAlbums.map(alb => {
-          if (alb.id === selectedAlbumId) {
-            const updatedPhotos = [...(alb.photos || []), ...newPhotos];
-            // Use first image as cover if none exists
-            const updatedCover = alb.coverImg || newPhotos[0].src;
-            return { ...alb, photos: updatedPhotos, coverImg: updatedCover };
-          }
-          return alb;
-        }));
-        
+      if (uploadedUrls.length > 0) {
+        // Now POST to /gallery/add-photos/:eventid
+        const addPhotosRes = await fetch(GALLERY_ADD_PHOTOS_URL(selectedAlbumId), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ photos: uploadedUrls })
+        });
+
+        if (!addPhotosRes.ok) {
+          throw new Error('Failed to add photos to album');
+        }
+
+        const updatedAlbum = await addPhotosRes.json();
+
+        const normalized = {
+          id: updatedAlbum._id,
+          title: updatedAlbum.title,
+          date: updatedAlbum.date,
+          coverImg: updatedAlbum.coverImg,
+          photos: (updatedAlbum.photos || []).map(url => ({
+            src: url,
+            width: 1000,
+            height: 800
+          }))
+        };
+
+        setAlbums(prevAlbums => prevAlbums.map(alb => alb.id === normalized.id ? normalized : alb));
         addToast(`Uploaded ${successCount} photo(s)`);
       } else {
         addToast("No photos were uploaded successfully", "error");
@@ -310,32 +377,46 @@ export default function PhotoGallery({ onBack }) {
     }
   };
 
-  const handleDeletePhoto = (photoToDelete) => {
+  // --- MODIFIED DELETE PHOTO LOGIC ---
+  const handleDeletePhoto = async (photoToDelete) => {
     openConfirm(
       "Delete Photo",
       "Are you sure you want to remove this photo?",
-      () => {
-        setAlbums(prevAlbums => prevAlbums.map(alb => {
-          if (alb.id === selectedAlbumId) {
-            const updatedPhotos = alb.photos.filter(p => p.src !== photoToDelete.src);
-            // Update cover if we deleted the current cover
-            let updatedCover = alb.coverImg;
-            if (alb.coverImg === photoToDelete.src) {
-               updatedCover = updatedPhotos.length > 0 ? updatedPhotos[0].src : null;
-            }
-            return { ...alb, photos: updatedPhotos, coverImg: updatedCover };
-          }
-          return alb;
-        }));
+      async () => {
+        try {
+          const res = await fetch(GALLERY_DELETE_PHOTO_URL(selectedAlbumId), {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ photo: photoToDelete.src })
+          });
+          if (!res.ok) throw new Error("Failed to delete photo");
+          const updatedAlbum = await res.json();
 
-        if (lightboxOpen) setLightboxOpen(false);
-        addToast("Photo deleted");
+          const normalized = {
+            id: updatedAlbum._id,
+            title: updatedAlbum.title,
+            date: updatedAlbum.date,
+            coverImg: updatedAlbum.coverImg,
+            photos: (updatedAlbum.photos || []).map(url => ({
+              src: url,
+              width: 1000,
+              height: 800
+            }))
+          };
+
+          setAlbums(prevAlbums => prevAlbums.map(alb => alb.id === normalized.id ? normalized : alb));
+          if (lightboxOpen) setLightboxOpen(false);
+          addToast("Photo deleted");
+        } catch (err) {
+          console.error("Delete photo error:", err);
+          addToast("Failed to delete photo", "error");
+        }
       },
       true
     );
   };
 
-  // --- HELPER ---
   const selectedAlbum = albums.find(a => a.id === selectedAlbumId);
   const currentPhotos = selectedAlbum ? (selectedAlbum.photos || []) : [];
 
@@ -347,7 +428,6 @@ export default function PhotoGallery({ onBack }) {
     setCurrentImageIndex((prev) => (prev - 1 >= 0 ? prev - 1 : currentPhotos.length - 1));
   }, [currentPhotos.length]);
 
-  // --- RENDER ---
   return (
     <div className="min-h-screen bg-neutral-900 text-neutral-100 font-sans selection:bg-emerald-500/30">
       
@@ -381,7 +461,7 @@ export default function PhotoGallery({ onBack }) {
                 className="mr-2 p-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-neutral-400 hover:text-white transition-colors"
                 title="Back to Portal"
               >
-                <LayoutDashboard size={20} />
+                <ArrowLeftIcon size={20} />
               </button>
             )}
             
@@ -424,7 +504,11 @@ export default function PhotoGallery({ onBack }) {
                 <p className="text-neutral-400">Select an album to view or manage photos.</p>
              </div>
 
-             {albums.length === 0 ? (
+             {loading ? (
+               <div className="flex justify-center items-center py-20">
+                 <Loader2 className="animate-spin text-neutral-500" size={32} />
+               </div>
+             ) : albums.length === 0 ? (
                <div className="text-center py-20 border-2 border-dashed border-neutral-800 rounded-xl">
                  <FolderPlus className="mx-auto h-12 w-12 text-neutral-600 mb-4" />
                  <h3 className="text-lg font-medium text-white">No albums yet</h3>
@@ -461,7 +545,7 @@ export default function PhotoGallery({ onBack }) {
                   <h2 className="text-3xl font-bold text-white">{selectedAlbum.title}</h2>
                   <div className="flex items-center text-neutral-400 mt-1 text-sm">
                      <Calendar size={14} className="mr-1.5" />
-                     {selectedAlbum.date}
+                     {selectedAlbum.date && (new Date(selectedAlbum.date)).toLocaleDateString()}
                   </div>
                 </div>
               </div>
@@ -512,7 +596,7 @@ export default function PhotoGallery({ onBack }) {
                     {/* Delete Image Button */}
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo); }}
-                      className="absolute top-2 right-2 p-1.5 bg-red-500/90 hover:bg-red-600 text-white rounded-md opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0"
+                      className="absolute top-0 right-1 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-md group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0"
                       title="Delete Image"
                     >
                       <Trash2 size={14} />
@@ -553,6 +637,18 @@ export default function PhotoGallery({ onBack }) {
                   type="text" 
                   value={newAlbumTitle}
                   onChange={(e) => setNewAlbumTitle(e.target.value)}
+                  className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                  placeholder="e.g., Summer Vacation 2024"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-400 mb-1">Album Date</label>
+                <input 
+                  type="date" 
+                  value={newAlbumDate}
+                  onChange={(e) => setNewAlbumDate(e.target.value)}
                   className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                   placeholder="e.g., Summer Vacation 2024"
                   autoFocus
