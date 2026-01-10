@@ -30,12 +30,16 @@ import './index.css'
 import MainPage from './src1/MainPage/MainPage';
 import Album from './src1/MainPage/Album/Album';
 import ExistingSession from './hooks/ExistingSession';
+import Admin from './Admin/Admin';
+import AdminRegion from './Admin/AdminRegion';
 
 const router = createBrowserRouter([
   {
     path: '/sib', element: <ExistingSession />, errorElement: <ErrorDisplay />
   },
   { path: '/signin', element: <AnimatedRoute><SignInPage /></AnimatedRoute> },
+  { path: '/admin', element: <Admin /> },
+  { path: '/adminregion', element: <AdminRegion /> },
   { path: '/public-members', element:<PublicMembers /> },
   {
     element: <ProtectedRoute />,

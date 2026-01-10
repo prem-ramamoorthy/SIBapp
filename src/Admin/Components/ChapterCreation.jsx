@@ -1,0 +1,749 @@
+import React, { useState, useMemo } from 'react';
+import { 
+  Plus, 
+  Trash2, 
+  MapPin, 
+  Clock, 
+  Calendar, 
+  ChevronDown, 
+  ChevronUp, 
+  Globe, 
+  ShieldAlert, 
+  Building,
+  Edit2,
+  Search,
+  ExternalLink,
+  Activity,
+  Moon,
+  Sun
+} from 'lucide-react';
+
+// --- Components ---
+
+// 1. High-Security Delete Modal
+const SecurityDeleteModal = ({ isOpen, onClose, onConfirm, entityName, entityType }) => {
+  const [confirmationInput, setConfirmationInput] = useState('');
+
+  if (!isOpen) return null;
+
+  const isMatch = confirmationInput === entityName;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-opacity">
+      <div className="bg-white dark:bg-gray-900 border-t-4 border-red-600 rounded-lg shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4 text-red-600">
+            <ShieldAlert className="w-8 h-8" />
+            <h2 className="text-xl font-bold uppercase tracking-wider">Security Check</h2>
+          </div>
+          
+          <p className="text-gray-800 dark:text-gray-200 font-medium mb-2">
+            You are about to permanently delete the {entityType}:
+          </p>
+          <p className="font-mono text-lg font-bold text-black dark:text-white bg-yellow-100 dark:bg-yellow-900/30 p-2 border border-yellow-300 dark:border-yellow-700 rounded mb-6 text-center select-all">
+            {entityName}
+          </p>
+          
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            To confirm, please type the exact name above:
+          </p>
+          <input
+            type="text"
+            value={confirmationInput}
+            onChange={(e) => setConfirmationInput(e.target.value)}
+            className="w-full p-3 border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded focus:border-red-600 dark:focus:border-red-500 focus:outline-none font-bold text-gray-900 dark:text-white placeholder-gray-400"
+            placeholder={`Type "${entityName}" here`}
+            autoFocus
+          />
+        </div>
+
+        <div className="bg-gray-50 dark:bg-gray-950 px-6 py-4 flex justify-end gap-3 border-t border-gray-200 dark:border-gray-800">
+          <button
+            onClick={() => { setConfirmationInput(''); onClose(); }}
+            className="px-4 py-2 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-200 dark:hover:bg-gray-800 rounded transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              if (isMatch) {
+                onConfirm();
+                setConfirmationInput('');
+              }
+            }}
+            disabled={!isMatch}
+            className={`px-4 py-2 rounded font-bold uppercase tracking-wide transition-all ${
+              isMatch 
+                ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg' 
+                : 'bg-gray-300 dark:bg-gray-800 text-gray-500 dark:text-gray-600 cursor-not-allowed'
+            }`}
+          >
+            Delete Permanently
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 2. Status Badge Component
+const StatusBadge = ({ status }) => {
+  const styles = {
+    Active: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800',
+    Forming: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800',
+    Suspended: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
+    Inactive: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700',
+  };
+
+  const style = styles[status] || styles.Inactive;
+
+  return (
+    <span className={`px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded border ${style}`}>
+      {status}
+    </span>
+  );
+};
+
+// 3. Main Dashboard Component
+export default function RegionChapterManager() {
+  // --- State Management ---
+  const [regions, setRegions] = useState([
+    {
+      id: 1,
+      name: 'North America West',
+      code: 'NA-W-01',
+      country: 'United States',
+      status: 'Active',
+      chapters: [
+        {
+          id: 101,
+          name: 'Golden Gate Founders',
+          code: 'GGF-SF',
+          status: 'Active',
+          meetingDay: 'Wednesday',
+          meetingTime: '07:00',
+          meetingLocation: 'Hilton Union Square',
+          meetingAddress: '333 O\'Farrell St, San Francisco, CA'
+        }
+      ]
+    },
+    {
+      id: 2,
+      name: 'Europe Central',
+      code: 'EU-C-BER',
+      country: 'Germany',
+      status: 'Active',
+      chapters: [
+         {
+          id: 102,
+          name: 'Berlin Innovators',
+          code: 'BER-INN',
+          status: 'Forming',
+          meetingDay: 'Thursday',
+          meetingTime: '08:30',
+          meetingLocation: 'WeWork Sony Center',
+          meetingAddress: 'Kemperplatz 1, Berlin'
+        }
+      ]
+    }
+  ]);
+
+  // Form States
+  const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
+  const [isChapterModalOpen, setIsChapterModalOpen] = useState(false);
+  const [activeRegionId, setActiveRegionId] = useState(null); 
+  const [editingId, setEditingId] = useState(null); // ID of entity being edited (null = create mode)
+  
+  // Security Modal State
+  const [deleteTarget, setDeleteTarget] = useState(null); 
+  
+  // Search State
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Dark Mode State
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Input States
+  const [regionForm, setRegionForm] = useState({ name: '', code: '', country: '', status: 'Active' });
+  const [chapterForm, setChapterForm] = useState({ 
+    name: '', code: '', status: 'Active', day: 'Monday', time: '07:00', location: '', address: '' 
+  });
+
+  // Toggle State for Accordion
+  const [expandedRegions, setExpandedRegions] = useState({});
+
+  // --- Search Logic ---
+  const filteredRegions = useMemo(() => {
+    if (!searchQuery) return regions;
+    const lowerQuery = searchQuery.toLowerCase();
+    
+    return regions.filter(region => {
+      const regionMatch = region.name.toLowerCase().includes(lowerQuery) || region.code.toLowerCase().includes(lowerQuery);
+      const chapterMatch = region.chapters.some(c => c.name.toLowerCase().includes(lowerQuery) || c.code.toLowerCase().includes(lowerQuery));
+      return regionMatch || chapterMatch;
+    });
+  }, [regions, searchQuery]);
+
+  // --- Handlers ---
+
+  const toggleRegion = (id) => {
+    setExpandedRegions(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  // Region Handlers
+  const openRegionModal = (region = null) => {
+    if (region) {
+      setEditingId(region.id);
+      setRegionForm({ 
+        name: region.name, 
+        code: region.code, 
+        country: region.country, 
+        status: region.status || 'Active' 
+      });
+    } else {
+      setEditingId(null);
+      setRegionForm({ name: '', code: '', country: '', status: 'Active' });
+    }
+    setIsRegionModalOpen(true);
+  };
+
+  const handleRegionSubmit = (e) => {
+    e.preventDefault();
+    if (editingId) {
+      // Edit Mode
+      setRegions(regions.map(r => r.id === editingId ? { ...r, ...regionForm } : r));
+    } else {
+      // Create Mode
+      const newRegion = {
+        id: Date.now(),
+        ...regionForm,
+        chapters: []
+      };
+      setRegions([...regions, newRegion]);
+    }
+    setIsRegionModalOpen(false);
+  };
+
+  const confirmDeleteRegion = (region) => {
+    setDeleteTarget({ type: 'region', id: region.id, name: region.name });
+  };
+
+  // Chapter Handlers
+  const openChapterModal = (regionId, chapter = null) => {
+    setActiveRegionId(regionId);
+    if (chapter) {
+      setEditingId(chapter.id);
+      setChapterForm({
+        name: chapter.name,
+        code: chapter.code,
+        status: chapter.status || 'Active',
+        day: chapter.meetingDay,
+        time: chapter.meetingTime,
+        location: chapter.meetingLocation,
+        address: chapter.meetingAddress
+      });
+    } else {
+      setEditingId(null);
+      setChapterForm({ 
+        name: '', code: '', status: 'Active', day: 'Monday', time: '07:00', location: '', address: '' 
+      });
+    }
+    setIsChapterModalOpen(true);
+  };
+
+  const handleChapterSubmit = (e) => {
+    e.preventDefault();
+    const newChapterData = {
+      name: chapterForm.name,
+      code: chapterForm.code,
+      status: chapterForm.status,
+      meetingDay: chapterForm.day,
+      meetingTime: chapterForm.time,
+      meetingLocation: chapterForm.location,
+      meetingAddress: chapterForm.address
+    };
+
+    setRegions(regions.map(region => {
+      if (region.id === activeRegionId) {
+        if (editingId) {
+          // Edit Mode
+          return {
+            ...region,
+            chapters: region.chapters.map(c => c.id === editingId ? { ...c, id: editingId, ...newChapterData } : c)
+          };
+        } else {
+          // Create Mode
+          return {
+            ...region,
+            chapters: [...region.chapters, { id: Date.now(), ...newChapterData }]
+          };
+        }
+      }
+      return region;
+    }));
+    
+    setIsChapterModalOpen(false);
+    if (!editingId) {
+      setExpandedRegions(prev => ({ ...prev, [activeRegionId]: true }));
+    }
+  };
+
+  const confirmDeleteChapter = (chapter, regionId) => {
+    setDeleteTarget({ type: 'chapter', id: chapter.id, parentId: regionId, name: chapter.name });
+  };
+
+  const executeDelete = () => {
+    if (!deleteTarget) return;
+
+    if (deleteTarget.type === 'region') {
+      setRegions(regions.filter(r => r.id !== deleteTarget.id));
+    } else if (deleteTarget.type === 'chapter') {
+      setRegions(regions.map(r => {
+        if (r.id === deleteTarget.parentId) {
+          return { ...r, chapters: r.chapters.filter(c => c.id !== deleteTarget.id) };
+        }
+        return r;
+      }));
+    }
+    setDeleteTarget(null);
+  };
+
+  // Stats
+  const totalRegions = regions.length;
+  const totalChapters = regions.reduce((acc, curr) => acc + curr.chapters.length, 0);
+
+  return (
+    <div className={`${isDarkMode ? 'dark' : ''}`}>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans selection:bg-yellow-200 dark:selection:bg-yellow-900 transition-colors duration-200">
+        
+        {/* --- Main Dashboard Container --- */}
+        <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+          
+          {/* --- Heading Section (Formerly Header) --- */}
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 border-b border-gray-200 dark:border-gray-800 pb-8">
+            
+            {/* Title & Stats */}
+            <div className="space-y-4 w-full lg:w-auto">
+              <div className="flex items-center gap-3">
+                 <div className="w-12 h-12 bg-red-600 rounded flex items-center justify-center font-bold text-2xl text-white shadow-lg shadow-red-600/30">
+                   B
+                 </div>
+                 <div>
+                   <h1 className="text-3xl font-extrabold uppercase tracking-tight leading-none text-gray-900 dark:text-white">
+                     Admin Operations
+                   </h1>
+                   <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-1 font-mono">
+                      <span className="bg-gray-100 dark:bg-gray-900 px-2 py-0.5 rounded">REGIONS: {totalRegions}</span>
+                      <span className="text-gray-300 dark:text-gray-700">|</span>
+                      <span className="bg-gray-100 dark:bg-gray-900 px-2 py-0.5 rounded">CHAPTERS: {totalChapters}</span>
+                   </div>
+                 </div>
+              </div>
+            </div>
+
+            {/* Actions (Search, Toggle, Create) */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full lg:w-auto">
+              
+              {/* Search Bar */}
+              <div className="relative flex-grow sm:flex-grow-0 sm:w-64 group">
+                <input 
+                  type="text" 
+                  placeholder="Search regions or chapters..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-lg text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 focus:border-yellow-400 dark:focus:border-yellow-500 focus:outline-none transition-all shadow-sm"
+                />
+                <Search className="absolute left-3.5 top-3.5 text-gray-400 dark:text-gray-500 w-5 h-5 group-focus-within:text-yellow-500 transition-colors" />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={toggleDarkMode}
+                  className="p-3 bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-800 rounded-lg text-gray-600 dark:text-gray-300 hover:border-yellow-400 dark:hover:border-yellow-500 transition-colors shadow-sm"
+                  title="Toggle Theme"
+                >
+                  {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+
+                <button 
+                  onClick={() => openRegionModal()}
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition-all shadow-lg shadow-red-600/20 whitespace-nowrap active:transform active:scale-95"
+                >
+                  <Plus size={20} />
+                  Create Region
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* --- Content Area --- */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+               <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                 <Building size={16} />
+                 <span className="text-sm font-bold uppercase tracking-wider">Network Structure</span>
+               </div>
+            </div>
+
+            {filteredRegions.length === 0 ? (
+              <div className="text-center py-20 bg-white dark:bg-gray-900 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-xl">
+                <Globe className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-700 mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white">No matching records found</h3>
+                <p className="text-gray-500 dark:text-gray-400 mt-2">Try adjusting your search filters or create a new region.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {filteredRegions.map((region) => (
+                  <div key={region.id} className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden transition-all hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 group">
+                    
+                    {/* Region Header Card */}
+                    <div className="border-l-8 border-red-600 p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 relative">
+                      
+                      {/* Decorative Yellow accent */}
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-yellow-50 to-transparent dark:from-yellow-900/10 dark:to-transparent rounded-bl-full pointer-events-none"></div>
+
+                      <div className="flex-1 z-10 space-y-3">
+                        <div className="flex items-center gap-4">
+                          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{region.name}</h2>
+                          <StatusBadge status={region.status} />
+                        </div>
+                        
+                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600 dark:text-gray-400">
+                          <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-mono text-xs rounded border border-gray-200 dark:border-gray-700 font-bold">
+                            {region.code}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <Globe size={16} className="text-yellow-500 dark:text-yellow-400" />
+                            <span className="font-medium">{region.country}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-gray-400 dark:text-gray-600">
+                            <span>|</span>
+                            <span className="text-gray-500 dark:text-gray-400">{region.chapters.length} Chapters Active</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 z-10 pt-2 md:pt-0">
+                         <button 
+                            onClick={() => openChapterModal(region.id)}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-900 bg-yellow-400 hover:bg-yellow-500 rounded-lg transition-colors shadow-sm"
+                          >
+                            <Plus size={16} />
+                            Add Chapter
+                          </button>
+                          
+                          <div className="h-8 w-px bg-gray-200 dark:bg-gray-700 mx-2 hidden md:block"></div>
+
+                          <button 
+                            onClick={() => openRegionModal(region)}
+                            className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                            title="Edit Region"
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button 
+                            onClick={() => confirmDeleteRegion(region)}
+                            className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            title="Delete Region"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                          <button 
+                            onClick={() => toggleRegion(region.id)}
+                            className={`p-2.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors ${expandedRegions[region.id] ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
+                          >
+                            {expandedRegions[region.id] ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                          </button>
+                      </div>
+                    </div>
+
+                    {/* Chapters List (Accordion Content) */}
+                    {expandedRegions[region.id] && (
+                      <div className="bg-gray-50 dark:bg-black/20 border-t border-gray-100 dark:border-gray-800 p-6 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                        {region.chapters.length === 0 ? (
+                          <div className="text-center py-8 text-gray-400 dark:text-gray-600 italic text-sm border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50/50 dark:bg-transparent">
+                            No chapters established in this region yet.
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                            {region.chapters.map(chapter => (
+                              <div key={chapter.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-5 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors flex flex-col sm:flex-row justify-between group/chapter relative overflow-hidden shadow-sm">
+                                {/* Subtle Yellow Side strip on hover */}
+                                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-yellow-400 transform -translate-x-full group-hover/chapter:translate-x-0 transition-transform"></div>
+                                
+                                <div className="pl-2 flex-1">
+                                  <div className="flex items-center gap-3 mb-3">
+                                    <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{chapter.name}</h3>
+                                    <span className="text-xs bg-gray-900 dark:bg-gray-700 text-white px-2 py-0.5 rounded font-mono border border-transparent dark:border-gray-600">{chapter.code}</span>
+                                    <StatusBadge status={chapter.status} />
+                                  </div>
+                                  
+                                  <div className="space-y-2 mt-4">
+                                    <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                                      <div className="w-6 flex justify-center"><Clock size={16} className="text-red-600 dark:text-red-500" /></div>
+                                      <span className="font-medium">{chapter.meetingDay}s at {chapter.meetingTime}</span>
+                                    </div>
+                                    <div className="flex items-start gap-3 text-sm text-gray-500 dark:text-gray-400">
+                                      <div className="w-6 flex justify-center mt-0.5"><MapPin size={16} className="text-red-600 dark:text-red-500 flex-shrink-0" /></div>
+                                      <div className="flex-1">
+                                        <span className="block text-gray-700 dark:text-gray-200 font-bold">{chapter.meetingLocation}</span>
+                                        <span className="text-xs block mb-1 opacity-80">{chapter.meetingAddress}</span>
+                                        <a 
+                                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(chapter.meetingAddress)}`} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline mt-1"
+                                        >
+                                          View on Map <ExternalLink size={10} />
+                                        </a>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="flex sm:flex-col items-center sm:items-end gap-2 mt-5 sm:mt-0 sm:pl-5 sm:border-l border-gray-100 dark:border-gray-700">
+                                  <button 
+                                    onClick={() => openChapterModal(region.id, chapter)}
+                                    className="flex-1 sm:flex-none w-full sm:w-auto px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-md transition-colors flex items-center justify-center gap-1.5"
+                                  >
+                                    <Edit2 size={12} /> Edit
+                                  </button>
+                                  <button 
+                                    onClick={() => confirmDeleteChapter(chapter, region.id)}
+                                    className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                                    title="Delete Chapter"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* --- Modals --- */}
+
+        {/* 1. Create/Edit Region Modal */}
+        {isRegionModalOpen && (
+          <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 border border-gray-200 dark:border-gray-700">
+              <div className="bg-black dark:bg-gray-950 text-white px-6 py-5 flex justify-between items-center border-b-4 border-red-600">
+                <h2 className="text-lg font-bold uppercase tracking-wider flex items-center gap-2">
+                  {editingId ? <Edit2 size={18} /> : <Plus size={18} />}
+                  {editingId ? 'Edit Region' : 'New Region Setup'}
+                </h2>
+                <button onClick={() => setIsRegionModalOpen(false)} className="text-gray-500 hover:text-white transition-colors">&times;</button>
+              </div>
+              <form onSubmit={handleRegionSubmit} className="p-8 space-y-6">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Region Name</label>
+                  <input 
+                    required 
+                    type="text" 
+                    value={regionForm.name}
+                    onChange={(e) => setRegionForm({...regionForm, name: e.target.value})}
+                    className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-yellow-400 dark:focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-400 transition-all placeholder-gray-400"
+                    placeholder="e.g. London South"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Region Code</label>
+                    <input 
+                      required 
+                      type="text" 
+                      value={regionForm.code}
+                      onChange={(e) => setRegionForm({...regionForm, code: e.target.value})}
+                      className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-yellow-400 dark:focus:border-yellow-500 focus:outline-none transition-all placeholder-gray-400"
+                      placeholder="e.g. LON-S"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Country</label>
+                    <input 
+                      required 
+                      type="text" 
+                      value={regionForm.country}
+                      onChange={(e) => setRegionForm({...regionForm, country: e.target.value})}
+                      className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-yellow-400 dark:focus:border-yellow-500 focus:outline-none transition-all placeholder-gray-400"
+                      placeholder="e.g. United Kingdom"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Status</label>
+                  <div className="relative">
+                    <select 
+                      value={regionForm.status}
+                      onChange={(e) => setRegionForm({...regionForm, status: e.target.value})}
+                      className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-yellow-400 dark:focus:border-yellow-500 focus:outline-none appearance-none cursor-pointer"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-3.5 text-gray-400 w-5 h-5 pointer-events-none" />
+                  </div>
+                </div>
+
+                <div className="pt-6 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-800">
+                  <button type="button" onClick={() => setIsRegionModalOpen(false)} className="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">Cancel</button>
+                  <button type="submit" className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black font-bold rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 border-b-4 border-yellow-500 active:border-b-0 active:mt-1 transition-all">
+                    {editingId ? 'Save Changes' : 'Create Region'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 2. Create/Edit Chapter Modal */}
+        {isChapterModalOpen && (
+          <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200 border border-gray-200 dark:border-gray-700">
+              <div className="bg-yellow-400 dark:bg-yellow-500 text-black px-6 py-5 flex justify-between items-center">
+                <h2 className="text-lg font-bold uppercase tracking-wider flex items-center gap-2">
+                  {editingId ? <Edit2 size={18} /> : <Plus size={18} />}
+                  {editingId ? 'Edit Chapter Details' : 'Launch New Chapter'}
+                </h2>
+                <button onClick={() => setIsChapterModalOpen(false)} className="text-black/60 hover:text-black hover:bg-black/10 rounded-full p-1 transition-colors">&times;</button>
+              </div>
+              
+              <form onSubmit={handleChapterSubmit} className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                {/* Left Column: Identity */}
+                <div className="space-y-5">
+                  <h3 className="text-sm font-bold text-red-600 dark:text-red-500 uppercase border-b border-gray-200 dark:border-gray-700 pb-2">Chapter Identity</h3>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Chapter Name</label>
+                    <input 
+                      required 
+                      type="text" 
+                      value={chapterForm.name}
+                      onChange={(e) => setChapterForm({...chapterForm, name: e.target.value})}
+                      className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none transition-all placeholder-gray-400"
+                      placeholder="e.g. Prosperity Creators"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Code</label>
+                      <input 
+                        required 
+                        type="text" 
+                        value={chapterForm.code}
+                        onChange={(e) => setChapterForm({...chapterForm, code: e.target.value})}
+                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none transition-all"
+                        placeholder="e.g. PC-01"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Status</label>
+                      <div className="relative">
+                        <select 
+                          value={chapterForm.status}
+                          onChange={(e) => setChapterForm({...chapterForm, status: e.target.value})}
+                          className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none appearance-none cursor-pointer"
+                        >
+                          <option value="Active">Active</option>
+                          <option value="Forming">Forming</option>
+                          <option value="Suspended">Suspended</option>
+                        </select>
+                        <ChevronDown className="absolute right-3 top-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: Logistics */}
+                <div className="space-y-5">
+                  <h3 className="text-sm font-bold text-red-600 dark:text-red-500 uppercase border-b border-gray-200 dark:border-gray-700 pb-2">Meeting Logistics</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Day</label>
+                      <div className="relative">
+                        <select 
+                          required
+                          value={chapterForm.day}
+                          onChange={(e) => setChapterForm({...chapterForm, day: e.target.value})}
+                          className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg appearance-none focus:border-black dark:focus:border-white focus:outline-none cursor-pointer"
+                        >
+                          {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
+                            <option key={d} value={d}>{d}</option>
+                          ))}
+                        </select>
+                        <Calendar className="absolute right-3 top-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Time</label>
+                      <input 
+                        required 
+                        type="time" 
+                        value={chapterForm.time}
+                        onChange={(e) => setChapterForm({...chapterForm, time: e.target.value})}
+                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Venue Name</label>
+                    <input 
+                      required 
+                      type="text" 
+                      value={chapterForm.location}
+                      onChange={(e) => setChapterForm({...chapterForm, location: e.target.value})}
+                      className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none placeholder-gray-400"
+                      placeholder="e.g. Grand Hotel"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Full Address</label>
+                    <textarea 
+                      required 
+                      rows="2"
+                      value={chapterForm.address}
+                      onChange={(e) => setChapterForm({...chapterForm, address: e.target.value})}
+                      className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none text-sm placeholder-gray-400"
+                      placeholder="Street, City, Zip"
+                    />
+                  </div>
+                </div>
+
+                <div className="md:col-span-2 pt-6 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700 mt-2">
+                  <button type="button" onClick={() => setIsChapterModalOpen(false)} className="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">Cancel</button>
+                  <button type="submit" className="px-6 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 shadow-lg shadow-red-600/30 transition-all">
+                    {editingId ? 'Update Chapter' : 'Launch Chapter'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 3. Security Deletion Modal */}
+        <SecurityDeleteModal 
+          isOpen={!!deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={executeDelete}
+          entityName={deleteTarget?.name || ''}
+          entityType={deleteTarget?.type || ''}
+        />
+
+      </div>
+    </div>
+  );
+}
