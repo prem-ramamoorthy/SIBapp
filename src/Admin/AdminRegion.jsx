@@ -223,7 +223,7 @@ export default function RegionChapterManager() {
 
   return (
     <div className={`${isDarkMode ? 'dark' : ''}`}>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans selection:bg-yellow-200 dark:selection:bg-yellow-900 transition-colors duration-200">
+      <div className="min-h-screen  text-gray-900 dark:text-gray-100 font-sans selection:bg-yellow-200 dark:selection:bg-yellow-900 transition-colors duration-200">
         
         {/* --- Main Dashboard Container --- */}
         <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -234,9 +234,7 @@ export default function RegionChapterManager() {
             {/* Title & Stats */}
             <div className="space-y-4 w-full lg:w-auto">
               <div className="flex items-center gap-3">
-                 <div className="w-12 h-12 bg-red-600 rounded flex items-center justify-center font-bold text-2xl text-white shadow-lg shadow-red-600/30">
-                   B
-                 </div>
+                 
                  <div>
                    <h1 className="text-3xl font-extrabold uppercase tracking-tight leading-none text-gray-900 dark:text-white">
                      Admin Operations

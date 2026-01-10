@@ -4,6 +4,7 @@ import Stats from './Components/Stat'
 import StatTable from './Components/StatTable'
 import LineGraph from './Components/LineGraph'
 import RevenueByChapterChart from './Components/Graph'
+import RegionChapterManager from './AdminRegion'
 
 export default function Admin() {
   return (
@@ -17,6 +18,7 @@ export default function Admin() {
           {/* Additional admin components can be added here */}
         </div>
         <Stats />
+        <RegionChapterManager />
         <StatTable />
         <LineGraph />
         <RevenueByChapterChart />
