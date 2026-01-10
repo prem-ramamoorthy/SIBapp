@@ -42,6 +42,7 @@ function Verticals() {
         slidesToShow: initialSlides, 
         slidesToScroll: 1,
         autoplay: true,
+        swipeToSlide: true,
         autoplaySpeed: 3500,
         pauseOnHover: false,
         arrows: false,
