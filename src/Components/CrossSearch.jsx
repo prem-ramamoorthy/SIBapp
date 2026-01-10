@@ -16,6 +16,7 @@ function CrossChapterSearch({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [names, setNames] = useState([]);
+  const [chapters, setChapters] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchdomainstate, setSearchdomainstate] = useState("");
 
@@ -57,7 +58,7 @@ function CrossChapterSearch({
         );
 
         const data = await res.json();
-        if(userstate && data?.userdata){
+        if (userstate && data?.userdata) {
           userstate(data.userdata);
         }
         if (!res.ok || data?.errors || data?.message) {
@@ -69,6 +70,7 @@ function CrossChapterSearch({
           const resData = data?.results || [];
           setResults(resData);
           setNames(data?.names || []);
+          setChapters(data?.chapters || []);
           setShowDropdown(true);
         }
       } catch (err) {
@@ -134,7 +136,11 @@ function CrossChapterSearch({
                 onClick={() => handleSelect(username)}
                 className="cursor-pointer px-4 py-2 text-sm text-gray-800 hover:bg-yellow-100 dark:text-gray-200 dark:hover:bg-yellow-600/30 flex justify-between"
               >
-                {username || "Unnamed User"} <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{names[idx] ? `${names[idx]}` : ""}</span>
+                {username || "Unnamed User"}
+                <div>
+                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{names[idx] ? `${names[idx]}` : ""}</span> 
+                  {crosschapter && <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{chapters[idx] ? `: ${chapters[idx]}` : ""}</span>}
+                </div>
               </li>
             ))}
           </ul>
