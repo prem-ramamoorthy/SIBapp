@@ -171,9 +171,23 @@ function One2OneMeetingsTable() {
     }, 800);
   }
 
-  function openModal(record) {
-    setSelectedRecord(record);
-    setShowModal(true);
+  async function openModal(record) {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/slips/one2one/getone2onebyid/${record._id}`,
+        { credentials: 'include' }
+      );
+      if (!response.ok) throw new Error('Could not fetch meeting details');
+      const data = await response.json();
+      setSelectedRecord(data);
+      setShowModal(true);
+    } catch (err) {
+      setError(err.message || 'Unexpected error');
+    } finally {
+      setLoading(false);
+    }
   }
 
   function closeModal() {
@@ -295,7 +309,7 @@ function One2OneMeetingsTable() {
                         key={col.key}
                         onClick={() => col.sortable && handleSort(col.key)}
                         className={`px-3 sm:px-4 py-3 text-left text-xs font-bold text-white uppercase tracking-wide ${col.width} ${col.sortable ? 'cursor-pointer hover:bg-gray-700 dark:hover:bg-gray-800' : ''
-                          } transition-colors`}
+                          } transition-colors whitespace-nowrap`}
                       >
                         <div className="flex items-center gap-2">
                           <span>{col.label}</span>
@@ -332,7 +346,7 @@ function One2OneMeetingsTable() {
                         if (!visibleColumns[col.key]) return null;
                         if (col.key === 'action') {
                           return (
-                            <div key={col.key} className={`px-3 flex sm:px-4 py-3 text-xs sm:text-sm font-medium ${col.width}`}>
+                            <td key={col.key} className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium flex flex-row ${col.width} whitespace-nowrap`}>
                               <button
                                 onClick={() => openModal(row)}
                                 className="px-3 py-1 mr-2 bg-amber-300 hover:bg-amber-400 text-black rounded text-xs font-semibold transition"
@@ -346,14 +360,15 @@ function One2OneMeetingsTable() {
                               >
                                 <Delete />
                               </button>
-                            </div>
+                            </td>
                           );
                         }
                         let value = colValue(row, col.key);
                         return (
                           <td
                             key={col.key}
-                            className={`px-3 sm:px-4 dark:text-white py-3 text-xs sm:text-sm font-medium ${col.width}`}
+                            className={`px-3 sm:px-4 dark:text-white py-3 text-xs sm:text-sm font-medium ${col.width} whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]`}
+                            title={typeof value === 'string' ? value : undefined}
                           >
                             {value}
                           </td>
@@ -451,20 +466,31 @@ function One2OneMeetingsTable() {
                 </button>
               </div>
               <div className="p-6 space-y-6">
+                {selectedRecord.image_url && (
+                  <div className="flex justify-center mb-6">
+                    <img
+                      src={selectedRecord.image_url}
+                      alt="Meeting"
+                      className="max-h-64 rounded-lg border border-gray-200 dark:border-gray-700 object-contain bg-gray-100 dark:bg-gray-900"
+                      style={{ maxWidth: '100%' }}
+                    />
+                  </div>
+                )}
+
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-50 mb-3">Participants</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
                       <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Member 1</p>
                       <p className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                        {selectedRecord.member1?.username}
+                        {selectedRecord.member1?.username }
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{selectedRecord.member1?.email}</p>
                     </div>
                     <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
                       <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">Member 2</p>
                       <p className="text-lg font-bold text-gray-900 dark:text-gray-50">
-                        {selectedRecord.member2?.username}
+                        {selectedRecord.member2?.username || selectedRecord.member2Name || selectedRecord.member2?.name || 'N/A'}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{selectedRecord.member2?.email}</p>
                     </div>

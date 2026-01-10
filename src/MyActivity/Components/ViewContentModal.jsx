@@ -36,7 +36,7 @@ export function ModalViewer({ content = {} }) {
 
     const formatCurrency = (amount) => {
         if (!amount) return '₹0.00';
-        
+
         if (amount.$numberDecimal) {
             const num = parseFloat(amount.$numberDecimal);
             return '₹' + num.toLocaleString('en-IN', {
@@ -44,7 +44,7 @@ export function ModalViewer({ content = {} }) {
                 maximumFractionDigits: 2
             });
         }
-        
+
         const num = parseFloat(amount);
         return '₹' + num.toLocaleString('en-IN', {
             minimumFractionDigits: 2,
@@ -297,6 +297,9 @@ export function ModalViewer({ content = {} }) {
                 <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide">Meeting ID</p>
                 <p className="font-mono text-base text-gray-900 dark:text-gray-100 mt-1">{safeGet(data, '_id')}</p>
             </div>
+            <div className="flex justify-center">
+                <img src={safeGet(data, 'image_url')} alt="Meeting Visual" />
+            </div>
 
             <div className="rounded-lg p-4 bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-amber-700">
                 <div className="flex items-center gap-2 mb-3">
@@ -405,7 +408,7 @@ export function ModalViewer({ content = {} }) {
 
     const getTypeLabel = () => {
         const type = content.type?.toLowerCase();
-        switch(type) {
+        switch (type) {
             case 'tyftb': return 'TYB Slip';
             case 'referral': return 'Referral';
             case 'm2m': return 'One-to-One Meeting';
