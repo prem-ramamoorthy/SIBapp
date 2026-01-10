@@ -1,15 +1,12 @@
-import Header from './AdminHeader'
 import React, { useState, useMemo } from 'react';
 import { 
   Plus, 
-  Trash2, 
   MapPin, 
   Clock, 
   Calendar, 
   ChevronDown, 
   ChevronUp, 
   Globe, 
-  ShieldAlert, 
   Building,
   Edit2,
   Search,
@@ -21,73 +18,7 @@ import {
 
 // --- Components ---
 
-// 1. High-Security Delete Modal
-const SecurityDeleteModal = ({ isOpen, onClose, onConfirm, entityName, entityType }) => {
-  const [confirmationInput, setConfirmationInput] = useState('');
-
-  if (!isOpen) return null;
-
-  const isMatch = confirmationInput === entityName;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 transition-opacity">
-      <div className="bg-white dark:bg-gray-800 border-t-4 border-red-600 rounded-lg shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="p-6">
-          <div className="flex items-center gap-3 mb-4 text-red-600">
-            <ShieldAlert className="w-8 h-8" />
-            <h2 className="text-xl font-bold uppercase tracking-wider">Security Check</h2>
-          </div>
-          
-          <p className="text-gray-800 dark:text-gray-200 font-medium mb-2">
-            You are about to permanently delete the {entityType}:
-          </p>
-          <p className="font-mono text-lg font-bold text-black dark:text-white bg-yellow-100 dark:bg-yellow-900/40 p-2 border border-yellow-300 dark:border-yellow-600 rounded mb-6 text-center select-all">
-            {entityName}
-          </p>
-          
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-            To confirm, please type the exact name above:
-          </p>
-          <input
-            type="text"
-            value={confirmationInput}
-            onChange={(e) => setConfirmationInput(e.target.value)}
-            className="w-full p-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded focus:border-red-600 dark:focus:border-red-500 focus:outline-none font-bold text-gray-900 dark:text-white placeholder-gray-400"
-            placeholder={`Type "${entityName}" here`}
-            autoFocus
-          />
-        </div>
-
-        <div className="bg-gray-50 dark:bg-gray-900 px-6 py-4 flex justify-end gap-3 border-t border-gray-200 dark:border-gray-700">
-          <button
-            onClick={() => { setConfirmationInput(''); onClose(); }}
-            className="px-4 py-2 text-gray-700 dark:text-gray-300 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => {
-              if (isMatch) {
-                onConfirm();
-                setConfirmationInput('');
-              }
-            }}
-            disabled={!isMatch}
-            className={`px-4 py-2 rounded font-bold uppercase tracking-wide transition-all ${
-              isMatch 
-                ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg' 
-                : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-600 cursor-not-allowed'
-            }`}
-          >
-            Delete Permanently
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// 2. Status Badge Component
+// 1. Status Badge Component
 const StatusBadge = ({ status }) => {
   const styles = {
     Active: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800',
@@ -105,7 +36,7 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-// 3. Main Dashboard Component
+// 2. Main Dashboard Component
 export default function RegionChapterManager() {
   // --- State Management ---
   const [regions, setRegions] = useState([
@@ -154,9 +85,6 @@ export default function RegionChapterManager() {
   const [isChapterModalOpen, setIsChapterModalOpen] = useState(false);
   const [activeRegionId, setActiveRegionId] = useState(null); 
   const [editingId, setEditingId] = useState(null); // ID of entity being edited (null = create mode)
-  
-  // Security Modal State
-  const [deleteTarget, setDeleteTarget] = useState(null); 
   
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
@@ -229,10 +157,6 @@ export default function RegionChapterManager() {
     setIsRegionModalOpen(false);
   };
 
-  const confirmDeleteRegion = (region) => {
-    setDeleteTarget({ type: 'region', id: region.id, name: region.name });
-  };
-
   // Chapter Handlers
   const openChapterModal = (regionId, chapter = null) => {
     setActiveRegionId(regionId);
@@ -293,26 +217,6 @@ export default function RegionChapterManager() {
     }
   };
 
-  const confirmDeleteChapter = (chapter, regionId) => {
-    setDeleteTarget({ type: 'chapter', id: chapter.id, parentId: regionId, name: chapter.name });
-  };
-
-  const executeDelete = () => {
-    if (!deleteTarget) return;
-
-    if (deleteTarget.type === 'region') {
-      setRegions(regions.filter(r => r.id !== deleteTarget.id));
-    } else if (deleteTarget.type === 'chapter') {
-      setRegions(regions.map(r => {
-        if (r.id === deleteTarget.parentId) {
-          return { ...r, chapters: r.chapters.filter(c => c.id !== deleteTarget.id) };
-        }
-        return r;
-      }));
-    }
-    setDeleteTarget(null);
-  };
-
   // Stats
   const totalRegions = regions.length;
   const totalChapters = regions.reduce((acc, curr) => acc + curr.chapters.length, 0);
@@ -362,7 +266,7 @@ export default function RegionChapterManager() {
               </div>
 
               <div className="flex items-center gap-3">
-               
+              
 
                 <button 
                   onClick={() => openRegionModal()}
@@ -440,13 +344,7 @@ export default function RegionChapterManager() {
                           >
                             <Edit2 size={18} />
                           </button>
-                          <button 
-                            onClick={() => confirmDeleteRegion(region)}
-                            className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                            title="Delete Region"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                          
                           <button 
                             onClick={() => toggleRegion(region.id)}
                             className={`p-2.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors ${expandedRegions[region.id] ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
@@ -506,13 +404,6 @@ export default function RegionChapterManager() {
                                     className="flex-1 sm:flex-none w-full sm:w-auto px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-md transition-colors flex items-center justify-center gap-1.5"
                                   >
                                     <Edit2 size={12} /> Edit
-                                  </button>
-                                  <button 
-                                    onClick={() => confirmDeleteChapter(chapter, region.id)}
-                                    className="p-2 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
-                                    title="Delete Chapter"
-                                  >
-                                    <Trash2 size={16} />
                                   </button>
                                 </div>
                               </div>
@@ -728,15 +619,6 @@ export default function RegionChapterManager() {
             </div>
           </div>
         )}
-
-        {/* 3. Security Deletion Modal */}
-        <SecurityDeleteModal 
-          isOpen={!!deleteTarget}
-          onClose={() => setDeleteTarget(null)}
-          onConfirm={executeDelete}
-          entityName={deleteTarget?.name || ''}
-          entityType={deleteTarget?.type || ''}
-        />
 
       </div>
     </div>
