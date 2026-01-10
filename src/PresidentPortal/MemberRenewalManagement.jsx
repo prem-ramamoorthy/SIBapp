@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { HiArrowUp, HiArrowDown } from "react-icons/hi";
 
-const MemberCard = ({ member, onSendReminder, loading }) => (
+const MemberCard = ({ member, onSendReminder, loading, onrenewuser }) => (
   <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 mb-3 shadow-sm transition-colors duration-200">
     <div className="flex-1 mb-4 sm:mb-0">
       <div className="font-bold text-lg text-gray-900 dark:text-gray-50">
@@ -17,13 +17,22 @@ const MemberCard = ({ member, onSendReminder, loading }) => (
         Status: {member.status}
       </div>
     </div>
-    <button
-      onClick={() => onSendReminder(member)}
-      disabled={loading}
-      className="ml-4 px-4 py-2 rounded-lg font-medium text-sm border border-amber-300 bg-amber-300 text-gray-900 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-    >
-      {loading ? 'Sending...' : 'Send Reminder'}
-    </button>
+    <div>
+      <button
+        onClick={() => onSendReminder(member)}
+        disabled={loading}
+        className="ml-4 px-4 py-2 rounded-lg font-medium text-sm border border-amber-300 bg-amber-300 text-gray-900 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+      >
+        {loading ? 'Sending...' : 'Send Reminder'}
+      </button>
+      <button
+        onClick={() => onrenewuser(member)}
+        disabled={loading}
+        className="ml-4 px-4 py-2 rounded-lg font-medium text-sm border border-amber-300 bg-amber-300 text-gray-900 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+      >
+        {loading ? 'Renewing...' : 'Renew user'}
+      </button>
+    </div>
   </div>
 );
 
@@ -37,8 +46,8 @@ const FilterButton = ({ label, value, isActive, onClick, isAlert }) => (
           ? 'border-red-400 bg-red-300 text-red-900 dark:bg-red-700 dark:border-red-500 dark:text-red-100'
           : 'border-amber-400 bg-amber-300 text-gray-900 dark:bg-amber-600 dark:border-amber-500 dark:text-gray-900'
         : isAlert
-        ? 'border-red-300 bg-red-50 text-red-700 dark:bg-red-950 dark:border-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900'
-        : 'border-gray-300 bg-gray-50 text-gray-900 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+          ? 'border-red-300 bg-red-50 text-red-700 dark:bg-red-950 dark:border-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900'
+          : 'border-gray-300 bg-gray-50 text-gray-900 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
       }
     `}
   >
@@ -59,10 +68,10 @@ function getStatus(renewal, active) {
 
 function formatDate(d) {
   if (!d) return "";
-  return new Date(d).toLocaleDateString('en-US', { 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  return new Date(d).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
   });
 }
 
@@ -83,6 +92,9 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
   const [activeFilter, setActiveFilter] = useState(null);
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
+  const [renewModalOpen, setRenewModalOpen] = useState(false);
+  const [memberToRenew, setMemberToRenew] = useState(null);
+  const [renewDate, setRenewDate] = useState("");
 
   useEffect(() => {
     fetchMembers();
@@ -213,6 +225,60 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
     } finally {
       setLoading(false);
       setSelectedReminder(null);
+    }
+  };
+
+  const handleRenewUser = async (member) => {
+    setRenewModalOpen(true);
+    setMemberToRenew(member);
+  };
+
+  const handleRenewUserrequest = async () => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const payload = {
+        renewal_date: renewDate,
+        membership_status : true
+      };
+
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/chapter/membership/updatemembershipbyid/${memberToRenew.id}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+      await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+        receiver: memberToRenew.name,
+        header: "Membership Renewal Date Updated",
+        content: `Hello ${memberToRenew.name},\n\nGood news! Your membership renewal date has been successfully updated.\n\nNew Renewal Due Date: ${renewDate}\n\nChapter: ${memberToRenew.chapter}\n\nPlease ensure timely completion of your renewal to maintain your membership benefits.\n\nIf you have any questions, please contact your chapter administrator.\n\nThank you!`
+          })
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to renew membership");
+      }
+      setSuccess(`Membership renewed for ${memberToRenew.name}`);
+    }
+    catch (err) {
+      setError(`Failed to renew membership for ${memberToRenew.name}: ${err.message}`);
+    }
+    finally {
+      setRenewModalOpen(false);
+      setLoading(false);
+      setMemberToRenew(null);
+      setRenewDate("");
     }
   };
 
@@ -413,6 +479,26 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         )}
       </div>
 
+      {renewModalOpen && (
+        <div className="fixed inset-0 bg-black/20 bg-opacity-50 flex flex-row items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-md shadow-lg">
+            <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-50">Renew Membership</h3>
+            <input type="date" value={renewDate} onChange={(e) => setRenewDate(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-amber-300 focus:ring-amber-300 dark:focus:border-amber-300 dark:focus:ring-amber-300" />
+            <div className="flex flex-row justify-center items-center gap-10">
+              <button
+                onClick={() => setRenewModalOpen(false)}
+                className="mt-4 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+              >
+                Close
+              </button>
+              <button onClick={handleRenewUserrequest} disabled={loading} className={`mt-4 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-amber-400 dark:bg-amber-400 text-gray-900 dark:text-gray-900 hover:bg-amber-700 dark:hover:bg-amber-700 transition-colors duration-200`}>
+                {loading ? "Renewing..." : "Renew"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {fetching && (
         <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
           <p className="text-sm text-blue-700 dark:text-blue-200">Loading members...</p>
@@ -439,6 +525,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
                 key={member.id}
                 member={member}
                 onSendReminder={handleSendReminder}
+                onrenewuser={handleRenewUser}
                 loading={loading && selectedReminder === member.id}
               />
             ))}
