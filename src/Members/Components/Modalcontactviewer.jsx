@@ -15,9 +15,9 @@ export function ModalViewer({contactdetails = {}}) {
     <>
       <Button
         onClick={() => setOpenModal(true)}
-        className="h-[40px] cursor-pointer w-1/2 text-nowrap bg-red-600 p-1 rounded-2xl hover:bg-red-500 border-2 text-[12px] font-bold border-gray-400 dark:border-gray-600 text-amber-50 transition-colors duration-300 ml-4"
+        className="h-[35px] cursor-pointer w-3/4 text-nowrap bg-red-600 p-1 rounded-2xl hover:bg-red-500 border-2 text-[12px] font-bold border-gray-400 dark:border-gray-600 text-amber-50 transition-colors duration-300 mr-5 ml-1" // Adjusted margin-left
       >
-        Contact
+        <Phone className="w-4 h-4 text-amber-50" />
       </Button>
 
       <Modal

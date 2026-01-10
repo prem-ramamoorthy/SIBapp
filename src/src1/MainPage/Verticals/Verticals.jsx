@@ -1,69 +1,98 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import './Verticals.css';
-import data from '../../data/MainPage/Verticals.json';
+// Ensure this path matches your project structure
+import data from '../../data/MainPage/Verticals.json'; 
 
 function Verticals() {
+    // STATE:
+    // domLoaded: Ensures we only render after hydration (prevents UI glitches).
+    // initialSlides: We calculate this ONCE on mount to determine if we are starting on Mobile or Desktop.
+    const [domLoaded, setDomLoaded] = useState(false);
+    const [initialSlides, setInitialSlides] = useState(4); // Default to 4 (safe for desktop)
 
+    useEffect(() => {
+        // 1. Detect screen width immediately upon mount
+        const updateInitialSlides = () => {
+            const width = window.innerWidth;
+            if (width < 600) {
+                setInitialSlides(1);
+            } else if (width < 900) {
+                setInitialSlides(2);
+            } else if (width < 1200) {
+                setInitialSlides(3);
+            } else {
+                setInitialSlides(5);
+            }
+        };
+
+        updateInitialSlides();
+        setDomLoaded(true);
+    }, []);
+
+    // CONFIGURATION: 
+    // We use standard Desktop-First logic but inject 'initialSlides' as the default.
     const settings = {
         dots: true,
         infinite: true,
         speed: 800,
-        slidesToShow: 5,
+        // DYNAMIC DEFAULT: This prevents the "Stretch" on desktop and "Squeeze" on mobile
+        slidesToShow: initialSlides, 
         slidesToScroll: 1,
         autoplay: true,
         autoplaySpeed: 3500,
         pauseOnHover: false,
         arrows: false,
-        cssEase: "cubic-bezier(0.87, 0, 0.13, 1)", // Premium easing function
+        cssEase: "cubic-bezier(0.87, 0, 0.13, 1)",
+        // Standard Desktop-First Breakpoints (max-width)
         responsive: [
             {
-                breakpoint: 1400,
-                settings: {
-                    slidesToShow: 4,
-                }
-            },
-            {
-                breakpoint: 1100,
+                breakpoint: 1200, // < 1200px
                 settings: {
                     slidesToShow: 3,
                 }
             },
             {
-                breakpoint: 768,
+                breakpoint: 900, // < 900px
                 settings: {
                     slidesToShow: 2,
                 }
             },
             {
-                breakpoint: 480,
+                breakpoint: 600, // < 600px
                 settings: {
                     slidesToShow: 1,
-                    dots: false, // Hidden on mobile to prevent clutter
-                    centerMode: true, // Shows a sliver of next/prev cards
-                    centerPadding: '20px'
+                    centerMode: true,
+                    centerPadding: '20px',
+                    dots: false 
                 }
             }
         ]
     };
 
     const renderVerticals = () => {
+        if (!data || data.length === 0) return <p className="text-center">No verticals available</p>;
+        
         return data.map((vertical, index) => (
             <div className="slide-wrapper" key={index}>
                 <div className="vertical-card flip-card">
                     <div className="flip-card-inner">
+                        {/* Front Side */}
                         <div className="flip-card-front">
                             <div className="card-shine"></div>
                             <div className="vertical-image">
-                                <img src={vertical.img} alt={vertical.title} />
+                                <img src={vertical.img} alt={vertical.title} loading="lazy" />
                             </div>
                             <div className="content-front">
                                 <h3>{vertical.title}</h3>
-                                <div className="member-badge">{vertical.members}</div>
+                                {vertical.members && (
+                                    <div className="member-badge">{vertical.members}</div>
+                                )}
                             </div>
                         </div>
+                        {/* Back Side */}
                         <div className="flip-card-back">
                             <div className="card-shine"></div>
                             <h4>{vertical.title}</h4>
@@ -90,9 +119,12 @@ function Verticals() {
                     </div>
                     
                     <div className="verticals-slider-container">
-                        <Slider {...settings}>
-                            {renderVerticals()}
-                        </Slider>
+                        {/* Only render slider when we know the screen size */}
+                        {domLoaded && (
+                            <Slider {...settings} key={initialSlides}>
+                                {renderVerticals()}
+                            </Slider>
+                        )}
                     </div>
                 </div>
             </section>
