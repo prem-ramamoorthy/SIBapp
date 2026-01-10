@@ -20,6 +20,10 @@
   --ease-premium: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+.ver * {
+  box-sizing: border-box;
+}
+
 .ver .container {
   max-width: 95%;
   margin: 0 auto;
@@ -75,11 +79,17 @@
   width: 100%;
   margin: 0 auto;
   padding-bottom: 2rem;
+  /* Hides the slider until it's fully ready to prevent layout shift */
+  overflow: hidden; 
+  display: block;
+  min-height: 400px; 
 }
 
+/* Ensure individual slides don't collapse */
 .ver .slide-wrapper {
-  padding: 15px; /* Comfortable gap */
-  box-sizing: border-box;
+  padding: 15px; 
+  width: 100%;
+  display: block;
 }
 
 /* Premium Dots */
@@ -94,14 +104,14 @@
 .ver .slick-dots li button:before {
   color: var(--royal-blue);
   opacity: 0.2;
-  font-size: 8px; /* Smaller dots */
+  font-size: 8px; 
   transition: all 0.3s ease;
 }
 
 .ver .slick-dots li.slick-active button:before {
   color: var(--warm-gold);
   opacity: 1;
-  font-size: 10px; /* Active dot slightly larger */
+  font-size: 10px; 
 }
 
 /* --- Flip Card Styles --- */
@@ -109,8 +119,8 @@
 .ver .flip-card {
   background-color: transparent;
   width: 100%;
-  height: 320px; /* Slightly taller for better proportions */
-  perspective: 1500px; /* Deeper 3D effect */
+  height: 320px; 
+  perspective: 1500px; 
   cursor: pointer;
 }
 
@@ -123,6 +133,7 @@
   transform-style: preserve-3d;
   box-shadow: var(--shadow-glass);
   border-radius: 24px;
+  background-color: white; 
 }
 
 .ver .flip-card:hover .flip-card-inner {
@@ -144,7 +155,7 @@
   padding: 0;
   overflow: hidden;
   -webkit-backface-visibility: hidden;
-  background: white; /* Fallback */
+  background: white; 
 }
 
 /* --- Front Design --- */
@@ -161,6 +172,10 @@
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid rgba(0,0,0,0.05);
+  background-color: #e0e0e0; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .ver .vertical-image img {
@@ -168,6 +183,7 @@
   height: 100%;
   object-fit: cover;
   transition: transform 0.8s ease;
+  display: block; 
 }
 
 .ver .flip-card:hover .vertical-image img {
@@ -268,6 +284,7 @@
     opacity: 1;
 }
 
+/* --- Mobile Adjustments --- */
 @media (max-width: 768px) {
   .ver .container {
       padding: 0 1rem;
@@ -283,8 +300,11 @@
       font-size: 2rem;
   }
   
-  /* Ensure centered card on mobile looks good */
   .ver .slide-wrapper {
       padding: 10px;
+  }
+  
+  .ver .slick-dots {
+      display: none !important;
   }
 }
