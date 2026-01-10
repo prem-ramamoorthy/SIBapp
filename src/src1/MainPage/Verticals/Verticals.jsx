@@ -43,7 +43,7 @@ function Verticals() {
         slidesToScroll: 1,
         autoplay: true,
         swipeToSlide: true,
-        autoplaySpeed: 3500,
+        autoplaySpeed: 2500,
         pauseOnHover: false,
         arrows: false,
         cssEase: "cubic-bezier(0.87, 0, 0.13, 1)",
