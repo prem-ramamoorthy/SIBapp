@@ -31,7 +31,7 @@ export default function Admin() {
           <LineGraph />
           <Graph />
         </div>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+        <div className="bg-white p-1 rounded-xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-4">
           <div>
             <h2 className="text-xl font-bold text-gray-800">Event Gallery</h2>
             <p className="text-gray-500 text-sm mt-1">Manage event photos and collections</p>
@@ -45,7 +45,7 @@ export default function Admin() {
           </button>
         </div>
       </div>
-        <AlertSystem />
+      <AlertSystem />
     </div>
   )
 }
