@@ -31,13 +31,13 @@ import MainPage from './src1/MainPage/MainPage';
 import Album from './src1/MainPage/Album/Album';
 import ExistingSession from './hooks/ExistingSession';
 import Admin from './Admin/Admin';
+import AdminRoute from './hooks/AdminRoute';
 
 const router = createBrowserRouter([
   {
     path: '/sib', element: <ExistingSession />, errorElement: <ErrorDisplay />
   },
   { path: '/signin', element: <AnimatedRoute><SignInPage /></AnimatedRoute> },
-  { path: '/admin', element: <Admin /> },
   { path: '/public-members', element:<PublicMembers /> },
   {
     element: <ProtectedRoute />,
@@ -52,6 +52,12 @@ const router = createBrowserRouter([
       { path: '/slips', element: <AnimatedRoute><FunctionalPage /></AnimatedRoute> },
       { path: '/profile', element: <AnimatedRoute><Profile /></AnimatedRoute> },
       { path: '/allnotifications', element: <AnimatedRoute><NotificationsPage /></AnimatedRoute> },
+    ]
+  },
+  {
+    element: <AdminRoute />,
+    children: [
+      { path: '/admin', element: <AnimatedRoute><Admin /></AnimatedRoute> },
     ]
   },
   {

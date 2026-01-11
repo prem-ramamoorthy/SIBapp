@@ -48,12 +48,17 @@ export default function SignInForm() {
         body: JSON.stringify({ idToken, user_id }),
       });
 
+      const data = await res.json();
       if (!res.ok) {
-        const data = await res.json();
         throw new Error(data.error || "Login failed");
       }
-
-      navigate("/dashboard");
+      console.log("Login successful", data);
+      if (user_id && data.isadmin === true) {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
+      return;
     } catch (err) {
       console.error(err);
       setGlobalError(err.message || "Invalid email or password");
@@ -80,9 +85,9 @@ export default function SignInForm() {
         onChange={onChange}
         error={errors.email}
         autoComplete="username"
-          autoCapitalize="none"
-  autoCorrect="off"
-  inputMode="email"
+        autoCapitalize="none"
+        autoCorrect="off"
+        inputMode="email"
         className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:placeholder-gray-400"
       />
 
@@ -92,7 +97,7 @@ export default function SignInForm() {
         value={values.password}
         onChange={onChange}
         error={errors.password}
-          autoComplete="current-password"
+        autoComplete="current-password"
         className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:placeholder-gray-400"
       />
 
