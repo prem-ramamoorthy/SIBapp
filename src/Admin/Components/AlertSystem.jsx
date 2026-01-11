@@ -122,7 +122,7 @@ const AlertSystem = () => {
       <div className="min-h-screen p-3 sm:p-6 flex items-start justify-center transition-colors duration-300 font-sans ">
         
         {/* Main Card */}
-        <div className="w-full lg:w-1/2 bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300">
+        <div className="w-full bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300">
           
           {/* Header */}
           <div className="px-5 py-5 sm:px-8 sm:py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start sm:items-center bg-white dark:bg-slate-900">
