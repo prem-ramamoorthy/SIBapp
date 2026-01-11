@@ -298,16 +298,34 @@
 }
 
 /* ===== TABLET VIEW (1024px and below) ===== */
-@media (max-width: 1024px) {
+@media (max-width: 1250px) {
   .hero-image-section {
     position: relative;
     left: auto;
     top: auto;
     transform: none;
-    width: 200px;
+    width: 270px;
     height: 250px;
     margin: 0 auto 2rem;
     animation: slideInUp 0.8s ease-out 0.3s backwards;
+  }
+  .hero .hero-title {
+    margin-top: 100px;
+  }
+
+  .hero .hero-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero .hero-actions .btn {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  /* MODIFIED: Adjusted gap for mobile stats */
+  .hero .hero-stats {
+    gap: 1.5rem;
   }
 }
 

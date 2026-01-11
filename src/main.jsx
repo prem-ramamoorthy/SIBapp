@@ -32,6 +32,7 @@ import Album from './src1/MainPage/Album/Album';
 import ExistingSession from './hooks/ExistingSession';
 import Admin from './Admin/Admin';
 import AdminRoute from './hooks/AdminRoute';
+import ChapterDetails from './Admin/Chapterdetails.jsx';
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
   },
   { path: '/signin', element: <AnimatedRoute><SignInPage /></AnimatedRoute> },
   { path: '/public-members', element:<PublicMembers /> },
+  {path:'/chapterdetails', element:<ChapterDetails />},
   {
     element: <ProtectedRoute />,
     errorElement: <ErrorDisplay />,
