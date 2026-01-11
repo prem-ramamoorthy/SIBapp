@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Bell, 
   Send, 
@@ -7,12 +7,11 @@ import {
   Check, 
   ChevronDown, 
   Mail, 
-  Moon, 
-  Sun, 
   AlertTriangle,
   Info,
-  CheckCircle,
-  AlertOctagon
+  Megaphone,
+  Calendar,
+  Smartphone
 } from 'lucide-react';
 
 const AlertSystem = () => {
@@ -20,34 +19,80 @@ const AlertSystem = () => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isChapterDropdownOpen, setIsChapterDropdownOpen] = useState(false);
 
+  // Mock Data - Regions
+  const regions = [
+    { id: 'na', name: 'North America' },
+    { id: 'eu', name: 'Europe' },
+    { id: 'apac', name: 'Asia Pacific' },
+    { id: 'mea', name: 'Middle East & Africa' }
+  ];
+
+  // Mock Data - Chapters mapped to regions
+  const allChapters = [
+    { id: 1, name: 'New York Chapter', regionId: 'na' },
+    { id: 2, name: 'San Francisco Chapter', regionId: 'na' },
+    { id: 3, name: 'London Chapter', regionId: 'eu' },
+    { id: 4, name: 'Paris Chapter', regionId: 'eu' },
+    { id: 5, name: 'Berlin Chapter', regionId: 'eu' },
+    { id: 6, name: 'Tokyo Chapter', regionId: 'apac' },
+    { id: 7, name: 'Sydney Chapter', regionId: 'apac' },
+    { id: 8, name: 'Singapore Chapter', regionId: 'apac' },
+    { id: 9, name: 'Dubai Chapter', regionId: 'mea' },
+    { id: 10, name: 'Cape Town Chapter', regionId: 'mea' },
+  ];
+
   // Form State
   const [formData, setFormData] = useState({
+    region: '', // Default empty to force selection
     selectedChapters: [],
-    alertType: 'info',
-    recipient: 'all_members',
+    alertType: 'announcement',
     title: '',
     message: '',
-    notifyViaMail: false
+    notifyViaMail: false,
+    notifyInApp: true
   });
 
-  // Mock Data
-  const chapters = [
-    { id: 1, name: 'New York Chapter' },
-    { id: 2, name: 'London Chapter' },
-    { id: 3, name: 'Tokyo Chapter' },
-    { id: 4, name: 'Dubai Chapter' },
-    { id: 5, name: 'Sydney Chapter' },
-    { id: 6, name: 'Paris Chapter' },
-  ];
+  // Filter chapters based on selected region
+  const availableChapters = formData.region 
+    ? allChapters.filter(chapter => chapter.regionId === formData.region)
+    : [];
 
   const alertTypes = [
-    { id: 'info', label: 'General Information', icon: Info, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-500/10', border: 'border-blue-200 dark:border-blue-500/20' },
-    { id: 'warning', label: 'Maintenance Warning', icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-500/10', border: 'border-amber-200 dark:border-amber-500/20' },
-    { id: 'success', label: 'Success/Achievement', icon: CheckCircle, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-500/10', border: 'border-emerald-200 dark:border-emerald-500/20' },
-    { id: 'critical', label: 'Urgent Action', icon: AlertOctagon, color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-500/10', border: 'border-rose-200 dark:border-rose-500/20' },
+    { 
+      id: 'announcement', 
+      label: 'Announcement', 
+      icon: Megaphone, 
+      color: 'text-blue-500', 
+      bg: 'bg-blue-50 dark:bg-blue-500/10', 
+      border: 'border-blue-200 dark:border-blue-500/20' 
+    },
+    { 
+      id: 'urgent', 
+      label: 'Urgent', 
+      icon: AlertTriangle, 
+      color: 'text-rose-500', 
+      bg: 'bg-rose-50 dark:bg-rose-500/10', 
+      border: 'border-rose-200 dark:border-rose-500/20' 
+    },
+    { 
+      id: 'event_info', 
+      label: 'Event Info', 
+      icon: Calendar, 
+      color: 'text-purple-500', 
+      bg: 'bg-purple-50 dark:bg-purple-500/10', 
+      border: 'border-purple-200 dark:border-purple-500/20' 
+    },
   ];
 
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
+  // Reset selected chapters when region changes
+  const handleRegionChange = (e) => {
+    setFormData({
+      ...formData,
+      region: e.target.value,
+      selectedChapters: [] // Clear chapters when switching regions
+    });
+    setIsChapterDropdownOpen(false);
+  };
 
   const handleChapterToggle = (chapterId) => {
     setFormData(prev => {
@@ -61,9 +106,11 @@ const AlertSystem = () => {
   };
 
   const getSelectedChapterNames = () => {
+    if (!formData.region) return 'Select a region first...';
     if (formData.selectedChapters.length === 0) return 'Select chapters...';
-    if (formData.selectedChapters.length === chapters.length) return 'All Chapters';
-    const selected = chapters.filter(c => formData.selectedChapters.includes(c.id));
+    if (formData.selectedChapters.length === availableChapters.length && availableChapters.length > 0) return 'All Regional Chapters';
+    
+    const selected = availableChapters.filter(c => formData.selectedChapters.includes(c.id));
     if (selected.length > 2) return `${selected.length} chapters selected`;
     return selected.map(c => c.name).join(', ');
   };
@@ -72,7 +119,7 @@ const AlertSystem = () => {
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      <div className="min-h-screen  p-3 sm:p-6 flex items-start justify-center transition-colors duration-300 font-sans">
+      <div className="min-h-screen p-3 sm:p-6 flex items-start justify-center transition-colors duration-300 font-sans ">
         
         {/* Main Card */}
         <div className="w-full lg:w-1/2 bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-300">
@@ -87,7 +134,7 @@ const AlertSystem = () => {
                 Send Alert Notification
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1.5 ml-1">
-                Dispatch notifications to chapter members instantly.
+                Dispatch targeted notifications to regional chapters.
               </p>
             </div>
           </div>
@@ -98,64 +145,77 @@ const AlertSystem = () => {
             {/* Target Audience Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
               
-              {/* Chapter Selection (Multi-select) */}
+              {/* Region Selection */}
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 ml-1">
+                  Select Region
+                </label>
+                <div className="relative">
+                  <select 
+                    value={formData.region}
+                    onChange={handleRegionChange}
+                    className="w-full appearance-none px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200"
+                  >
+                    <option value="" disabled>Select a region...</option>
+                    {regions.map(region => (
+                      <option key={region.id} value={region.id}>{region.name}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Chapter Selection (Multi-select) - Dependent on Region */}
               <div className="space-y-2 relative">
-                <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 ml-1">Target Chapters</label>
+                <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 ml-1">
+                  Target Chapters
+                </label>
                 <button 
                   type="button"
+                  disabled={!formData.region}
                   onClick={() => setIsChapterDropdownOpen(!isChapterDropdownOpen)}
-                  className={`w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200 ${isChapterDropdownOpen ? 'border-indigo-500 ring-2 ring-indigo-500/20' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`}
+                  className={`w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border rounded-xl text-sm font-medium transition-all duration-200 
+                    ${!formData.region 
+                      ? 'opacity-60 cursor-not-allowed border-slate-200 dark:border-slate-700 text-slate-400' 
+                      : `text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 ${isChapterDropdownOpen ? 'border-indigo-500 ring-2 ring-indigo-500/20' : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}`
+                    }`}
                 >
                   <span className="truncate">{getSelectedChapterNames()}</span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isChapterDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {/* Dropdown Menu */}
-                {isChapterDropdownOpen && (
+                {isChapterDropdownOpen && formData.region && (
                   <div className="absolute z-20 w-full mt-2 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-xl max-h-60 overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200">
-                    {chapters.map(chapter => (
-                      <div 
-                        key={chapter.id}
-                        onClick={() => handleChapterToggle(chapter.id)}
-                        className="flex items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border-b border-slate-50 dark:border-slate-700/50 last:border-0 transition-colors"
-                      >
-                        <div className={`w-5 h-5 rounded-md border flex items-center justify-center mr-3 transition-all duration-200 ${
-                          formData.selectedChapters.includes(chapter.id) 
-                            ? 'bg-indigo-600 border-indigo-600' 
-                            : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'
-                        }`}>
-                          {formData.selectedChapters.includes(chapter.id) && <Check className="w-3.5 h-3.5 text-white" />}
+                    {availableChapters.length > 0 ? (
+                      availableChapters.map(chapter => (
+                        <div 
+                          key={chapter.id}
+                          onClick={() => handleChapterToggle(chapter.id)}
+                          className="flex items-center px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer border-b border-slate-50 dark:border-slate-700/50 last:border-0 transition-colors"
+                        >
+                          <div className={`w-5 h-5 rounded-md border flex items-center justify-center mr-3 transition-all duration-200 ${
+                            formData.selectedChapters.includes(chapter.id) 
+                              ? 'bg-indigo-600 border-indigo-600' 
+                              : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700'
+                          }`}>
+                            {formData.selectedChapters.includes(chapter.id) && <Check className="w-3.5 h-3.5 text-white" />}
+                          </div>
+                          <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{chapter.name}</span>
                         </div>
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{chapter.name}</span>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-sm text-slate-500 text-center">No chapters found in this region.</div>
+                    )}
                   </div>
                 )}
-              </div>
-
-              {/* Recipient Group */}
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 ml-1">Recipient Group</label>
-                <div className="relative">
-                    <select 
-                    value={formData.recipient}
-                    onChange={(e) => setFormData({...formData, recipient: e.target.value})}
-                    className="w-full appearance-none px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200"
-                    >
-                    <option value="all_members">All Members</option>
-                    <option value="chapter_presidents">Chapter Presidents</option>
-                    <option value="leadership_team">Leadership Team</option>
-                    <option value="visitors">Visitors/Guests</option>
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-                </div>
               </div>
             </div>
 
             {/* Alert Details */}
             <div className="space-y-3">
-              <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 ml-1">Alert Type</label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+              <label className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 ml-1">Alert Category</label>
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
                 {alertTypes.map((type) => (
                   <button
                     key={type.id}
@@ -167,7 +227,7 @@ const AlertSystem = () => {
                         : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
                     }`}
                   >
-                    <type.icon className={`w-5 h-5 sm:w-6 sm:h-6 mb-2 sm:mb-2.5 transition-colors ${formData.alertType === type.id ? type.color : 'text-slate-400 dark:text-slate-500'}`} />
+                    <type.icon className={`w-5 h-5 sm:w-6 sm:h-6 mb-2 transition-colors ${formData.alertType === type.id ? type.color : 'text-slate-400 dark:text-slate-500'}`} />
                     <span className={`text-[10px] sm:text-xs font-semibold text-center transition-colors ${formData.alertType === type.id ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'}`}>
                         {type.label}
                     </span>
@@ -182,7 +242,7 @@ const AlertSystem = () => {
                 type="text" 
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
-                placeholder="e.g., Weekly Meeting Cancelled"
+                placeholder="e.g., Annual Summit Registration Open"
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200"
               />
             </div>
@@ -201,26 +261,53 @@ const AlertSystem = () => {
               </p>
             </div>
 
-            {/* Notification Options */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 gap-4 sm:gap-0 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700/50">
-              <div className="flex items-center gap-4">
-                <div className={`p-2.5 rounded-lg transition-colors ${formData.notifyViaMail ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
-                  <Mail className="w-5 h-5" />
+            {/* Notification Channels */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              
+              {/* Email Notification Toggle */}
+              <div className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 ${formData.notifyViaMail ? 'bg-indigo-50 dark:bg-indigo-900/10 border-indigo-200 dark:border-indigo-800/30' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50'}`}>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg transition-colors ${formData.notifyViaMail ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Email</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Send via email</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">Notify via Email</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Send a copy to registered email addresses</p>
-                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={formData.notifyViaMail}
+                    onChange={(e) => setFormData({...formData, notifyViaMail: e.target.checked})}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600"></div>
+                </label>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer self-end sm:self-auto">
-                <input 
-                  type="checkbox" 
-                  checked={formData.notifyViaMail}
-                  onChange={(e) => setFormData({...formData, notifyViaMail: e.target.checked})}
-                  className="sr-only peer" 
-                />
-                <div className="w-12 h-7 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-500/20 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-slate-600 peer-checked:bg-indigo-600"></div>
-              </label>
+
+              {/* In-App Notification Toggle */}
+              <div className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-200 ${formData.notifyInApp ? 'bg-purple-50 dark:bg-purple-900/10 border-purple-200 dark:border-purple-800/30' : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-700/50'}`}>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg transition-colors ${formData.notifyInApp ? 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                    <Smartphone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">In-App</p>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400">Push to device</p>
+                  </div>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={formData.notifyInApp}
+                    onChange={(e) => setFormData({...formData, notifyInApp: e.target.checked})}
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-purple-600"></div>
+                </label>
+              </div>
+
             </div>
 
             {/* Actions */}
@@ -265,10 +352,9 @@ const AlertSystem = () => {
             {/* Modal Content - Simulating the Alert Card */}
             <div className="p-5 sm:p-6 bg-slate-50 dark:bg-slate-950/50">
               <div className={`p-5 rounded-xl border-l-4 shadow-sm bg-white dark:bg-slate-800 ${
-                  currentAlertType.id === 'info' ? 'border-l-blue-500' :
-                  currentAlertType.id === 'warning' ? 'border-l-amber-500' :
-                  currentAlertType.id === 'success' ? 'border-l-emerald-500' :
-                  'border-l-rose-500'
+                  currentAlertType.id === 'announcement' ? 'border-l-blue-500' :
+                  currentAlertType.id === 'urgent' ? 'border-l-rose-500' :
+                  'border-l-purple-500'
                 }`}>
                 
                 <div className="flex items-start gap-4">
@@ -295,22 +381,35 @@ const AlertSystem = () => {
               {/* Delivery Metadata */}
               <div className="mt-6 flex flex-col gap-2 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800/50">
                 <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-500 dark:text-slate-400 font-medium">Recipient</span>
-                    <span className="text-slate-900 dark:text-slate-200 font-semibold">{formData.recipient.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">Region</span>
+                    <span className="text-slate-900 dark:text-slate-200 font-semibold">
+                      {regions.find(r => r.id === formData.region)?.name || 'Not Selected'}
+                    </span>
                 </div>
                 <div className="w-full h-px bg-slate-100 dark:bg-slate-800"></div>
                 <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-500 dark:text-slate-400 font-medium">Chapters</span>
                     <span className="text-slate-900 dark:text-slate-200 font-semibold text-right max-w-[50%] sm:max-w-[60%] truncate">{getSelectedChapterNames()}</span>
                 </div>
-                {formData.notifyViaMail && (
-                    <>
+                
+                {(formData.notifyViaMail || formData.notifyInApp) && (
+                  <>
                     <div className="w-full h-px bg-slate-100 dark:bg-slate-800"></div>
-                    <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-semibold mt-1">
-                        <Mail className="w-3.5 h-3.5" /> 
-                        Email notification enabled
+                    <div className="flex flex-col gap-1 mt-1">
+                      {formData.notifyViaMail && (
+                        <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-semibold">
+                            <Mail className="w-3.5 h-3.5" /> 
+                            Email notification enabled
+                        </div>
+                      )}
+                      {formData.notifyInApp && (
+                        <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 text-xs font-semibold">
+                            <Smartphone className="w-3.5 h-3.5" /> 
+                            In-App notification enabled
+                        </div>
+                      )}
                     </div>
-                    </>
+                  </>
                 )}
               </div>
             </div>

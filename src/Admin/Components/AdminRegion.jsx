@@ -66,7 +66,7 @@ export default function RegionChapterManager() {
       country: 'Germany',
       status: 'Active',
       chapters: [
-         {
+          {
           id: 102,
           name: 'Berlin Innovators',
           code: 'BER-INN',
@@ -325,7 +325,7 @@ export default function RegionChapterManager() {
                       </div>
 
                       <div className="flex items-center gap-3 z-10 pt-2 md:pt-0">
-                         <button 
+                          <button 
                             onClick={() => openChapterModal(region.id)}
                             className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-900 bg-yellow-400 hover:bg-yellow-500 rounded-lg transition-colors shadow-sm"
                           >
@@ -467,21 +467,6 @@ export default function RegionChapterManager() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Status</label>
-                  <div className="relative">
-                    <select 
-                      value={regionForm.status}
-                      onChange={(e) => setRegionForm({...regionForm, status: e.target.value})}
-                      className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-yellow-400 dark:focus:border-yellow-500 focus:outline-none appearance-none cursor-pointer"
-                    >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-3.5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  </div>
-                </div>
-
                 <div className="pt-6 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700">
                   <button type="button" onClick={() => setIsRegionModalOpen(false)} className="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancel</button>
                   <button type="submit" className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black font-bold rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 border-b-4 border-yellow-500 active:border-b-0 active:mt-1 transition-all">
@@ -521,33 +506,16 @@ export default function RegionChapterManager() {
                       placeholder="e.g. Prosperity Creators"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Code</label>
-                      <input 
-                        required 
-                        type="text" 
-                        value={chapterForm.code}
-                        onChange={(e) => setChapterForm({...chapterForm, code: e.target.value})}
-                        className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none transition-all"
-                        placeholder="e.g. PC-01"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Status</label>
-                      <div className="relative">
-                        <select 
-                          value={chapterForm.status}
-                          onChange={(e) => setChapterForm({...chapterForm, status: e.target.value})}
-                          className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none appearance-none cursor-pointer"
-                        >
-                          <option value="Active">Active</option>
-                          <option value="Forming">Forming</option>
-                          <option value="Suspended">Suspended</option>
-                        </select>
-                        <ChevronDown className="absolute right-3 top-3.5 text-gray-400 w-4 h-4 pointer-events-none" />
-                      </div>
-                    </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-2">Code</label>
+                    <input 
+                      required 
+                      type="text" 
+                      value={chapterForm.code}
+                      onChange={(e) => setChapterForm({...chapterForm, code: e.target.value})}
+                      className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none transition-all"
+                      placeholder="e.g. PC-01"
+                    />
                   </div>
                 </div>
 
