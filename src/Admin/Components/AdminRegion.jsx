@@ -331,7 +331,7 @@ export default function RegionChapterManager() {
 
   return (
     <div className={`${isDarkMode ? 'dark' : ''}`}>
-      <div className="min-h-screen  text-gray-900 dark:text-gray-100 font-sans selection:bg-yellow-200 dark:selection:bg-yellow-900 transition-colors duration-200">
+      <div className="text-gray-900 dark:text-gray-100 font-sans selection:bg-yellow-200 dark:selection:bg-yellow-900 transition-colors duration-200 mb-10">
         {/* --- Main Dashboard Container --- */}
         <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
           {/* --- Heading Section (Formerly Header) --- */}
@@ -667,6 +667,7 @@ export default function RegionChapterManager() {
           </div>
         )}
       </div>
+      <br className=''/>
     </div>
   );
 }
