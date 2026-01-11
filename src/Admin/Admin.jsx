@@ -19,8 +19,10 @@ export default function Admin() {
         <div className="mt-15 max-w-7xl mx-auto space-y-6">
           <h1 className="text-3xl font-bold dark:text-white">Reports</h1>
         </div>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'> 
         <LineGraph />
         <Graph />
+        </div>
         <AlertSystem />
       </div>
     </div>

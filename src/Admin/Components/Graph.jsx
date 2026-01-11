@@ -67,13 +67,9 @@ const Graph = () => {
   };
 
   return (
-    <div className={`min-h-screen p-4 flex items-start justify-center transition-colors duration-300 `}>
-      
-      {/* Container Constraint: 
-        w-full lg:w-1/2 sets it to half width on large screens.
-        max-w-3xl prevents it from getting too wide on huge screens.
-      */}
-      <div className="w-full lg:w-1/2 max-w-4xl animate-fade-in-up">
+    <div className={`min-h-screen p-4 flex items-start justify-center transition-colors duration-300`}>
+
+      <div className="w-full max-w-4xl animate-fade-in-up">
         
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-300">
           

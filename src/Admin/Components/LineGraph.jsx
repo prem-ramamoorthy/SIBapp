@@ -57,12 +57,12 @@ const LineGraph = () => {
   };
 
   return (
-    <div className={isDarkMode ? 'dark' : ''}>
+    <div className={'w-1/2'+isDarkMode ? 'dark' : ''}>
       {/* Main Container: 
           - lg:w-1/2 restricts width to 50% on desktop screens.
           - w-full ensures it takes full width on mobile.
       */}
-      <div className="w-full lg:w-1/2 p-6 transition-colors duration-200">
+      <div className="w-full p-6 transition-colors duration-200">
         
         {/* Chart Card */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
