@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
-import { Moon, Sun, Download, Calendar } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 
 const LineGraph = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -30,13 +30,11 @@ const LineGraph = () => {
     { name: 'Dec', referrals: 4800, tyb: 6000, members: 2900 },
   ];
 
-  const toggleTheme = () => setIsDarkMode(!isDarkMode);
-
   // Custom Tooltip for professional look
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className=" p-4 border border-gray-100 dark:border-gray-700 shadow-lg rounded-lg text-sm">
+        <div className="bg-white dark:bg-gray-800 p-4 border border-gray-100 dark:border-gray-700 shadow-lg rounded-lg text-sm">
           <p className="font-semibold text-gray-900 dark:text-white mb-2">{label}</p>
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2 mb-1">
@@ -60,17 +58,21 @@ const LineGraph = () => {
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      <div className="w-full min-h-[500px]  p-6 transition-colors duration-200">
+      {/* Main Container: 
+          - lg:w-1/2 restricts width to 50% on desktop screens.
+          - w-full ensures it takes full width on mobile.
+      */}
+      <div className="w-full lg:w-1/2 p-6 transition-colors duration-200">
         
         {/* Chart Card */}
-        <div className="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Monthly Performance Trend</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Monthly Trends</h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                Comparative analysis of Referrals, TYB, and Member growth.
+                Referrals vs TYB vs MtoM
               </p>
             </div>
             
@@ -78,20 +80,20 @@ const LineGraph = () => {
             <div className="flex items-center gap-2">
                <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                 <Calendar className="w-4 h-4" />
-                Last 12 Months
+                12 Months
               </button>
             </div>
           </div>
 
           {/* Chart Area */}
-          <div className="h-[400px] w-full">
+          <div className="h-[350px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={data}
                 margin={{
                   top: 5,
-                  right: 30,
-                  left: 20,
+                  right: 10,
+                  left: 0,
                   bottom: 5,
                 }}
               >
@@ -126,7 +128,7 @@ const LineGraph = () => {
                   name="Referrals"
                   stroke="#2563EB" // Blue-600
                   strokeWidth={3}
-                  dot={{ r: 4, fill: "#2563EB", strokeWidth: 0 }}
+                  dot={{ r: 0 }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
 
@@ -137,7 +139,7 @@ const LineGraph = () => {
                   name="TYB"
                   stroke="#10B981" // Emerald-500
                   strokeWidth={3}
-                  dot={{ r: 4, fill: "#10B981", strokeWidth: 0 }}
+                  dot={{ r: 0 }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
 
@@ -148,7 +150,7 @@ const LineGraph = () => {
                   name="Members"
                   stroke="#F59E0B" // Amber-500
                   strokeWidth={3}
-                  dot={{ r: 4, fill: "#F59E0B", strokeWidth: 0 }}
+                  dot={{ r: 0 }}
                   activeDot={{ r: 6, strokeWidth: 0 }}
                 />
               </LineChart>
