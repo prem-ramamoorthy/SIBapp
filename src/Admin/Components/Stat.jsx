@@ -1,70 +1,181 @@
+import React, { useState } from 'react';
+import { Users, FileCheck, IndianRupee, MapPin, Globe, ChevronDown, Calendar } from 'lucide-react';
+
+// Utility: Auto-format numbers to Indian System (k, L, Cr)
+const formatIndianNumber = (num, isCurrency = false) => {
+    if (!num && num !== 0) return "0";
+
+    // Ensure we are working with a pure number
+    const cleanNum = Number(String(num).replace(/,/g, '').replace(/[^0-9.]/g, ''));
+
+    let formattedValue = "";
+    let suffix = "";
+
+    if (cleanNum >= 10000000) {
+        formattedValue = (cleanNum / 10000000).toFixed(2); // Crores
+        suffix = "Cr";
+    } else if (cleanNum >= 100000) {
+        formattedValue = (cleanNum / 100000).toFixed(2); // Lakhs
+        suffix = "L";
+    } else if (cleanNum >= 1000) {
+        formattedValue = (cleanNum / 1000).toFixed(1); // Thousands
+        suffix = "k";
+    } else {
+        formattedValue = cleanNum;
+    }
+
+    // Clean up decimal places (e.g. "45.00" -> "45")
+    formattedValue = String(formattedValue).replace(/\.00$/, '').replace(/\.0$/, '');
+
+    const prefix = isCurrency ? "₹ " : "";
+    return `${prefix}${formattedValue}${suffix}`;
+};
+
 const Stats = () => {
-    // Data configuration
-    const statsData = [
+    const [timeRange, setTimeRange] = useState('ytd');
+
+    // Simulated Data for different time ranges
+    // In a real app, you would fetch this from an API based on the timeRange state
+    const dataBase = {
+        'ytd': {
+            referrals: 12543,
+            members: 2845,
+            revenue: 45200000, // 4.52 Cr
+            chapters: 142,
+            regions: 24
+        },
+        '12m': {
+            referrals: 18420,
+            members: 3100,
+            revenue: 68500000, // 6.85 Cr
+            chapters: 156,
+            regions: 26
+        },
+        'last_month': {
+            referrals: 1250,
+            members: 120,
+            revenue: 4500000, // 45 L
+            chapters: 4,
+            regions: 1
+        },
+        'last_week': {
+            referrals: 340,
+            members: 35,
+            revenue: 850000, // 8.5 L
+            chapters: 1,
+            regions: 0
+        }
+    };
+
+    const currentData = dataBase[timeRange];
+
+    // Card Configuration
+    const statsConfig = [
         {
             id: 1,
             label: "Referrals Passed",
-            value: "12,543",
-            trend: "+15% from last month",
-            trendColor: "text-emerald-600 dark:text-emerald-600"
+            value: currentData.referrals,
+            isCurrency: false,
+            icon: FileCheck,
+            color: "text-blue-600",
+            bg: "bg-blue-50 dark:bg-blue-900/20"
         },
         {
             id: 2,
             label: "Total Members",
-            value: "2,845",
-            trend: "+5% from last month",
-            trendColor: "text-emerald-600 dark:text-emerald-600"
+            value: currentData.members,
+            isCurrency: false,
+            icon: Users,
+            color: "text-violet-600",
+            bg: "bg-violet-50 dark:bg-violet-900/20"
         },
         {
             id: 3,
             label: "Total Revenue",
-            value: "$45.2M",
-            trend: "+12% from last month",
-            trendColor: "text-emerald-600 dark:text-emerald-600"
+            value: currentData.revenue,
+            isCurrency: true,
+            icon: IndianRupee,
+            color: "text-emerald-600",
+            bg: "bg-emerald-50 dark:bg-emerald-900/20"
         },
         {
             id: 4,
             label: "Chapter Count",
-            value: "142",
-            trend: "No change",
-            trendColor: "text-gray-500 dark:text-gray-500"
+            value: currentData.chapters,
+            isCurrency: false,
+            icon: MapPin,
+            color: "text-orange-600",
+            bg: "bg-orange-50 dark:bg-orange-900/20"
         },
         {
             id: 5,
             label: "Total Regions",
-            value: "24",
-            trend: "+2 new regions",
-            trendColor: "text-emerald-600 dark:text-emerald-600"
+            value: currentData.regions,
+            isCurrency: false,
+            icon: Globe,
+            color: "text-indigo-600",
+            bg: "bg-indigo-50 dark:bg-indigo-900/20"
         },
     ];
 
     return (
-        <div className="w-full p-6 flex items-start justify-center">
-            {/* Main Grid Container */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 w-full max-w-7xl">
-                {statsData.map((stat) => (
-                    <div
-                        key={stat.id}
-                        className="bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 flex flex-col justify-between"
-                    >
-                        <div>
-                            {/* Label */}
-                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                                {stat.label}
-                            </p>
-                            
-                            {/* Main Value */}
-                            <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
-                                {stat.value}
-                            </h3>
-                        </div>
+        <div className="w-full p-6 flex flex-col items-center justify-start space-y-6">
+            
+            {/* Header Area with Dropdown */}
+            <div className="w-full max-w-7xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Overview</h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Track your community growth and revenue.</p>
+                </div>
 
-                        {/* Bottom Text / Trend */}
-                        <div className={`mt-4 text-xs font-medium ${stat.trendColor}`}>
-                            {stat.trend}
-                        </div>
+                <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Calendar className="h-4 w-4 text-gray-400" />
                     </div>
-                ))}
+                    <select
+                        value={timeRange}
+                        onChange={(e) => setTimeRange(e.target.value)}
+                        className="appearance-none bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 py-2 pl-10 pr-10 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 cursor-pointer shadow-sm hover:border-gray-300 transition-colors"
+                    >
+                        <option value="ytd">Year to Date</option>
+                        <option value="12m">Last 12 Months</option>
+                        <option value="last_month">Last Month</option>
+                        <option value="last_week">Last Week</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <ChevronDown className="h-4 w-4 text-gray-400" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Grid Container */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 w-full max-w-7xl">
+                {statsConfig.map((stat) => {
+                    const Icon = stat.icon;
+                    return (
+                        <div
+                            key={stat.id}
+                            className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-5 hover:shadow-md transition-all duration-300 hover:-translate-y-1 group"
+                        >
+                            {/* Icon Header */}
+                            <div className="flex items-center justify-between mb-4">
+                                <div className={`p-2.5 rounded-xl ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform duration-300`}>
+                                    <Icon size={20} strokeWidth={2.5} />
+                                </div>
+                            </div>
+                            
+                            {/* Data */}
+                            <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    {stat.label}
+                                </p>
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight transition-all duration-300">
+                                    {formatIndianNumber(stat.value, stat.isCurrency)}
+                                </h3>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
