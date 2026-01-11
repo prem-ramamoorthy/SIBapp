@@ -1,8 +1,10 @@
 import Stats from './Components/Stat'
 import StatTable from './Components/StatTable'
 import LineGraph from './Components/LineGraph'
-import RevenueByChapterChart from './Components/Graph'
-import RegionChapterManager from './AdminRegion'
+import Graph from './Components/Graph'
+import RegionChapterManager from './Components/AdminRegion'
+import AlertSystem from './Components/AlertSystem'
+
 
 export default function Admin() {
   return (
@@ -18,7 +20,8 @@ export default function Admin() {
           <h1 className="text-3xl font-bold dark:text-white">Reports</h1>
         </div>
         <LineGraph />
-        <RevenueByChapterChart />
+        <Graph />
+        <AlertSystem />
       </div>
     </div>
   )

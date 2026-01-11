@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { Moon, Sun, Download, Filter } from 'lucide-react';
 
-const RevenueByChapterChart = () => {
+const Graph = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Mock Data: Revenue by Chapter
@@ -147,4 +147,4 @@ const RevenueByChapterChart = () => {
   );
 };
 
-export default RevenueByChapterChart;
+export default Graph;
