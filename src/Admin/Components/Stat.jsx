@@ -1,16 +1,12 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Users, FileCheck, IndianRupee, MapPin, Globe, ChevronDown, Calendar } from 'lucide-react';
 
 // Utility: Auto-format numbers to Indian System (k, L, Cr)
 const formatIndianNumber = (num, isCurrency = false) => {
     if (!num && num !== 0) return "0";
-
-    // Ensure we are working with a pure number
     const cleanNum = Number(String(num).replace(/,/g, '').replace(/[^0-9.]/g, ''));
-
     let formattedValue = "";
     let suffix = "";
-
     if (cleanNum >= 10000000) {
         formattedValue = (cleanNum / 10000000).toFixed(2); // Crores
         suffix = "Cr";
@@ -23,58 +19,46 @@ const formatIndianNumber = (num, isCurrency = false) => {
     } else {
         formattedValue = cleanNum;
     }
-
-    // Clean up decimal places (e.g. "45.00" -> "45")
     formattedValue = String(formattedValue).replace(/\.00$/, '').replace(/\.0$/, '');
-
     const prefix = isCurrency ? "₹ " : "";
     return `${prefix}${formattedValue}${suffix}`;
 };
 
+const timeRangeToQuery = {
+    ytd: '', // all
+    '12m': 'year',
+    last_month: 'month',
+    last_week: 'week'
+};
+
 const Stats = () => {
     const [timeRange, setTimeRange] = useState('ytd');
+    const [stats, setStats] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-    // Simulated Data for different time ranges
-    // In a real app, you would fetch this from an API based on the timeRange state
-    const dataBase = {
-        'ytd': {
-            referrals: 12543,
-            members: 2845,
-            revenue: 45200000, // 4.52 Cr
-            chapters: 142,
-            regions: 24
-        },
-        '12m': {
-            referrals: 18420,
-            members: 3100,
-            revenue: 68500000, // 6.85 Cr
-            chapters: 156,
-            regions: 26
-        },
-        'last_month': {
-            referrals: 1250,
-            members: 120,
-            revenue: 4500000, // 45 L
-            chapters: 4,
-            regions: 1
-        },
-        'last_week': {
-            referrals: 340,
-            members: 35,
-            revenue: 850000, // 8.5 L
-            chapters: 1,
-            regions: 0
-        }
-    };
+    useEffect(() => {
+        const fetchStats = async () => {
+            setLoading(true);
+            let query = timeRangeToQuery[timeRange];
+            let url = `${import.meta.env.VITE_BACKEND_SERVER}/public/stats`;
+            if (query) url += `?time=${query}`;
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+                setStats(data);
+            } catch {
+                setStats(null);
+            }
+            setLoading(false);
+        };
+        fetchStats();
+    }, [timeRange]);
 
-    const currentData = dataBase[timeRange];
-
-    // Card Configuration
     const statsConfig = [
         {
             id: 1,
             label: "Referrals Passed",
-            value: currentData.referrals,
+            value: stats?.referralcount ?? 0,
             isCurrency: false,
             icon: FileCheck,
             color: "text-blue-600",
@@ -83,7 +67,7 @@ const Stats = () => {
         {
             id: 2,
             label: "Total Members",
-            value: currentData.members,
+            value: stats?.membershipcount ?? 0,
             isCurrency: false,
             icon: Users,
             color: "text-violet-600",
@@ -92,7 +76,7 @@ const Stats = () => {
         {
             id: 3,
             label: "Total Revenue",
-            value: currentData.revenue,
+            value: stats?.bussinessamount ?? 0,
             isCurrency: true,
             icon: IndianRupee,
             color: "text-emerald-600",
@@ -101,7 +85,7 @@ const Stats = () => {
         {
             id: 4,
             label: "Chapter Count",
-            value: currentData.chapters,
+            value: stats?.chaptercount ?? 0,
             isCurrency: false,
             icon: MapPin,
             color: "text-orange-600",
@@ -110,7 +94,7 @@ const Stats = () => {
         {
             id: 5,
             label: "Total Regions",
-            value: currentData.regions,
+            value: stats?.regioncount ?? 0,
             isCurrency: false,
             icon: Globe,
             color: "text-indigo-600",
@@ -120,14 +104,12 @@ const Stats = () => {
 
     return (
         <div className="w-full p-6 flex flex-col items-center justify-start space-y-6">
-            
             {/* Header Area with Dropdown */}
             <div className="w-full max-w-7xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Overview</h2>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Track your community growth and revenue.</p>
                 </div>
-
                 <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Calendar className="h-4 w-4 text-gray-400" />
@@ -147,7 +129,6 @@ const Stats = () => {
                     </div>
                 </div>
             </div>
-
             {/* Main Grid Container */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 w-full max-w-7xl">
                 {statsConfig.map((stat) => {
@@ -163,14 +144,13 @@ const Stats = () => {
                                     <Icon size={20} strokeWidth={2.5} />
                                 </div>
                             </div>
-                            
                             {/* Data */}
                             <div className="space-y-1">
                                 <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     {stat.label}
                                 </p>
                                 <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight transition-all duration-300">
-                                    {formatIndianNumber(stat.value, stat.isCurrency)}
+                                    {loading ? '...' : formatIndianNumber(stat.value, stat.isCurrency)}
                                 </h3>
                             </div>
                         </div>
