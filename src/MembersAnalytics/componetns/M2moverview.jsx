@@ -224,7 +224,7 @@ function One2OneMeetingsTable() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50 mb-2">
-            One-to-One Meetings
+            M-to-M Meetings
           </h1>
           <p className="text-gray-600 dark:text-gray-400 text-sm">
             Track and manage all one-to-one meetings between members in your chapter.

@@ -7,16 +7,7 @@
         "phone": "+91 98427 75676",
         "website": "https://www.senguntharinbusiness.in/profile/6915ee6c2df54005f0929e0d?user=6915e03fa56afcbd377ad70c"
     },
-    {
-        "img": "/assets/JPEG/144.jpg",
-        "name": "S.Kumaresavel",
-        "position": "Coordinator",
-        "business": "The Vogue Apparels",
-        "phone": "+91 95242 33350",
-        "website": ""
-    },
 
- 
     {
         "img": "/assets/JPEG/54.jpg",
         "name": "M.Baskar",
@@ -33,7 +24,15 @@
         "phone": "+91 94430 16079",
         "website": "https://example.com/deepak"
     },
-    {
+{
+    "img": "/assets/JPEG/Rajkumar.jpg",
+    "name": "S.Rajkumar",
+    "position": "Secretary",
+    "business": "MR Group of Companies",
+    "phone": "+91 88837 31408",
+    "website": "https://example.com/rajkumar"
+},
+{
         "img": "/assets/JPEG/101.jpg",
         "name": "R.Sethuraman",
         "position": "Coordinator",

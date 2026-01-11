@@ -83,7 +83,7 @@ const getSortValue = (value, columnKey) => {
     return value;
 };
 
-const MemberDetailedAnalyticsReport = () => {
+const MemberDetails= () => {
     const [members, setMembers] = useState([]);
     const [dateRange, setDateRange] = useState({ from: '', to: '' });
     const [searchTerm, setSearchTerm] = useState('');
@@ -194,7 +194,7 @@ const MemberDetailedAnalyticsReport = () => {
     };
 
     return (
-        <div className="mt-10 w-full max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 flex flex-col h-[85vh]">
+        <div className="w-full max-w-7xl mx-auto p-2 sm:p-4 lg:p-6 space-y-4 sm:space-y-6 bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 flex flex-col h-[85vh]">
             
             {/* Header Section */}
             <div className="flex flex-col gap-4 sm:gap-6 shrink-0">
@@ -424,4 +424,4 @@ const MemberDetailedAnalyticsReport = () => {
     );
 };
 
-export default MemberDetailedAnalyticsReport;
+export default MemberDetails;

@@ -2,8 +2,8 @@ import { Delete, DeleteIcon } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 
 const TABLE_COLUMNS = [
-    { key: 'referrer', label: 'REFERRER', sortable: true, width: 'min-w-[120px]' },
-    { key: 'referee', label: 'REFEREE', sortable: true, width: 'min-w-[120px]' },
+    { key: 'referrer', label: 'REFERRAL GIVER', sortable: true, width: 'min-w-[120px]' },
+    { key: 'referee', label: 'REFERRAL RECEIVER', sortable: true, width: 'min-w-[120px]' },
     { key: 'description', label: 'DESCRIPTION', sortable: true, width: 'min-w-[200px]' },
     { key: 'referral_type', label: 'TYPE', sortable: true, width: 'w-20' },
     { key: 'referral_status', label: 'STATUS', sortable: false, width: 'min-w-[120px]' },
