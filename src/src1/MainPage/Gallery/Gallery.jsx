@@ -59,19 +59,19 @@ function Gallery() {
                 <div className="slideshow-container">
                     <Link to="/album">
                     <div className="slide active">
-                        <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?w=1200" alt="Gallery Image 1" />
+                        <img src="../../../public/assets/IMG-20260110-WA0015.jpg" alt="Gallery Image 1" />
                     </div>
                     <div className="slide">
-                        <img src="" alt="Gallery Image 2" />
+                        <img src="../../../public/assets/IMG-20260110-WA0016.jpg" alt="Gallery Image 2" />
                     </div>
                     <div className="slide">
-                        <img src="" alt="Gallery Image 3" />
+                        <img src="../../../public/assets/IMG-20260110-WA0017.jpg" alt="Gallery Image 3" />
                     </div>
                     <div className="slide">
-                        <img src="" alt="Gallery Image 4" />
+                        <img src="../../../public/assets/IMG-20260110-WA0018.jpg" alt="Gallery Image 4" />
                     </div>
                     <div className="slide">
-                        <img src="" alt="Gallery Image 5" />
+                        <img src="../../../public/assets/IMG-20260110-WA0019.jpg" alt="Gallery Image 5" />
                     </div>
                     </Link>
 
