@@ -1,191 +1,320 @@
-/* ---------------------------
-   CONTACT SECTION STYLES
---------------------------- */
-
-.con.contact {
-    background: #f9f7f3;
-    padding: 4rem 1.5rem;
-    display: flex;
-    justify-content: center;
+/* -----------------------------------------------------------
+   THEME VARIABLES
+   Centralized colors for the SIB Theme (Navy & Gold)
+----------------------------------------------------------- */
+:root {
+  --sib-navy: #0a2342;
+  --sib-navy-light: #153359;
+  --sib-gold: #d4b896;
+  --sib-gold-hover: #bfa07a;
+  --sib-bg: #f9f7f3;
+  --sib-white: #ffffff;
+  --sib-text-main: #1f2937;
+  --sib-text-light: #6b7280;
+  --sib-border: #e5e7eb;
+  --sib-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --sib-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
 }
 
-
-/* Section Header */
-.section-header {
-    text-align: center;
-    margin-bottom: 3rem;
+/* -----------------------------------------------------------
+   SECTION LAYOUT
+----------------------------------------------------------- */
+.sib-contact-section {
+  background-color: var(--sib-bg);
+  padding: 5rem 1.5rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--sib-text-main);
+  display: flex;
+  justify-content: center;
 }
 
-.section-tag {
-    background: linear-gradient(135deg, var(--warm-gold) 0%, #D4B896 100%);
-    color: #ffffff;
-    padding: 0.3rem 1rem;
-    border-radius: 999px;
-    font-size: 0.85rem;
-    display: inline-block;
-    margin-bottom: 0.7rem;
-    font-weight: 600;
+.sib-container {
+  width: 100%;
+  max-width: 1100px;
 }
 
-.section-title {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 0.3rem;
-    color: #0a2342;
+/* -----------------------------------------------------------
+   HEADER
+----------------------------------------------------------- */
+.sib-header {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto 3.5rem auto;
 }
 
-.section-subtitle {
-    font-size: 1rem;
-    color: #6c6c6c;
+.sib-tag {
+  display: inline-block;
+  background-color: var(--sib-gold);
+  color: var(--sib-navy);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 1rem;
+  border-radius: 99px;
+  margin-bottom: 1rem;
 }
 
-/* Contact Layout */
-.contact-content {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+.sib-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--sib-navy);
+  margin: 0 0 1rem 0;
+  line-height: 1.2;
 }
 
-@media (max-width: 768px) {
-    .contact-content {
-        grid-template-columns: 1fr;
-    }
+.sib-subtitle {
+  color: var(--sib-text-light);
+  font-size: 1.1rem;
+  line-height: 1.6;
 }
 
-/* Glass Cards */
-.glass-card {
-    background: #ffffff;
-    border-radius: 1.2rem;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
-    padding: 1.5rem;
-    position: relative;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* -----------------------------------------------------------
+   GRID LAYOUT
+----------------------------------------------------------- */
+.sib-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr; /* Info is smaller, Form is larger */
+  gap: 2rem;
+  align-items: start;
 }
 
-.glass-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.12);
+/* -----------------------------------------------------------
+   CARDS & INFO COLUMN
+----------------------------------------------------------- */
+.sib-info-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-/* Contact Info Items */
-.contact-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+.sib-card {
+  background: var(--sib-white);
+  border: 1px solid var(--sib-border);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: var(--sib-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.contact-item h4 {
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 0.3rem;
+/* Info Card Specifics */
+.info-card {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
 }
 
-.contact-icon {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sib-shadow-hover);
 }
 
-.contact-details a {
-    color: #333;
-    text-decoration: none;
-    font-size: 0.95rem;
+.icon-wrapper {
+  background-color: rgba(212, 184, 150, 0.2); /* Transparent Gold */
+  color: var(--sib-navy);
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1.25rem;
+  flex-shrink: 0;
 }
 
-.contact-details a:hover {
-    text-decoration: underline;
+.icon-wrapper svg {
+  width: 24px;
+  height: 24px;
 }
 
-/* Contact Form */
-.contact-form h3 {
-    font-size: 1.3rem;
-    margin-bottom: 1.2rem;
-    font-weight: 700;
-    color: #0a2342;
+.info-text h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--sib-navy);
+  margin: 0 0 0.25rem 0;
 }
 
-.form-row {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
+.info-text address,
+.info-text a {
+  font-style: normal;
+  color: var(--sib-text-light);
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-@media (max-width: 600px) {
-    .form-row {
-        flex-direction: column;
-    }
+.link-hover {
+  transition: color 0.2s;
+}
+
+.info-card:hover .link-hover {
+  color: var(--sib-navy-light);
+  text-decoration: underline;
+}
+
+/* -----------------------------------------------------------
+   FORM STYLES
+----------------------------------------------------------- */
+.contact-form {
+  padding: 2.5rem;
+}
+
+.form-header-internal {
+  margin-bottom: 2rem;
+}
+
+.form-header-internal h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--sib-navy);
+  margin: 0 0 0.5rem 0;
+}
+
+.form-header-internal p {
+  color: var(--sib-text-light);
+  font-size: 0.95rem;
+}
+
+.form-grid-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
 }
 
-.form-label {
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 0.4rem;
-    color: #333;
+.form-grid-row .form-group {
+  margin-bottom: 0;
 }
 
-.form-input,
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--sib-navy);
+  margin-bottom: 0.5rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background-color: #fcfcfc;
+  border: 1px solid var(--sib-border);
+  border-radius: 0.5rem;
+  font-size: 1rem; /* 16px prevents iOS zoom */
+  color: var(--sib-text-main);
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--sib-navy);
+  background-color: var(--sib-white);
+  box-shadow: 0 0 0 3px rgba(10, 35, 66, 0.1);
+}
+
 textarea.form-input {
-    padding: 0.7rem 0.9rem;
-    border: 1px solid #ddd;
-    border-radius: 0.6rem;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.2s ease;
-}
-
-.form-input:focus,
-textarea.form-input:focus {
-    border-color: #0a66c2;
+  resize: vertical;
+  min-height: 120px;
 }
 
 /* Submit Button */
-.submit-btn {
-    background: linear-gradient(90deg, #003366, #0055aa);
-    color: white;
-    border: none;
-    padding: 0.9rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 0.6rem;
-    cursor: pointer;
-    margin-top: 1rem;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: background 0.2s ease;
+.sib-btn-primary {
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--sib-navy);
+  color: var(--sib-white);
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
-.submit-btn:hover {
-    background: linear-gradient(90deg, #00284d, #004b99);
+.sib-btn-primary:hover {
+  background-color: var(--sib-navy-light);
+  transform: translateY(-1px);
 }
 
-.form-result {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-align: center;
-    color: #007f5f;
+.sib-btn-primary:active {
+  transform: translateY(0);
 }
 
-.location{
-    text-decoration: none;
+/* Form Message */
+.form-message {
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
-.location h4 {
-    font-size: 1.3rem;
-    margin-bottom: 1.2rem;
-    font-weight: 700;
-    color: #0a2342;
+.form-message.success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
 }
 
-.location address {
-    color: #333;
-    text-decoration: none;
-    font-size: 0.95rem;
+.form-message.error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* -----------------------------------------------------------
+   MOBILE RESPONSIVENESS
+----------------------------------------------------------- */
+@media (max-width: 900px) {
+  .sib-content-grid {
+    grid-template-columns: 1fr; /* Stack layout */
+    gap: 2rem;
+  }
+  
+  .sib-info-column {
+    flex-direction: row; /* Horizontal info cards on tablets */
+    flex-wrap: wrap;
+  }
+  
+  .sib-card.info-card {
+    flex: 1;
+    min-width: 250px;
+  }
+}
+
+@media (max-width: 650px) {
+  .sib-contact-section {
+    padding: 3rem 1rem;
+  }
+
+  .sib-title {
+    font-size: 2rem;
+  }
+
+  .sib-info-column {
+    flex-direction: column; /* Back to vertical stack on phone */
+  }
+
+  .form-grid-row {
+    grid-template-columns: 1fr; /* Stack form inputs */
+    gap: 0;
+  }
+  
+  .form-grid-row .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-form {
+    padding: 1.5rem;
+  }
 }

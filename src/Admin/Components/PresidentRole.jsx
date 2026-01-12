@@ -8,7 +8,8 @@ import {
   CheckCircle2, 
   AlertCircle,
   X,
-  AlertTriangle
+  AlertTriangle,
+  User
 } from "lucide-react";
 
 const capitalize = (str) => {
@@ -137,8 +138,6 @@ export default function PresidentRoleManagement() {
   // Delete Logic
   const initiateDelete = () => {
     if (selected.length === 0) return;
-    // For simplicity in this demo, if multiple selected, we show a generic count
-    // If one selected, we show name.
     const name = selected.length === 1 
       ? members.find(m => m.id === selected[0])?.name 
       : `${selected.length} members`;
@@ -184,7 +183,7 @@ export default function PresidentRoleManagement() {
   );
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 sm:p-6 space-y-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 relative">
+    <div className="w-full max-w-5xl mx-auto p-4 sm:p-6 space-y-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 relative">
       
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
@@ -221,20 +220,20 @@ export default function PresidentRoleManagement() {
       )}
 
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
-            <ShieldCheck className="text-emerald-500" />
-            Chapter Leadership and Management
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+            <ShieldCheck className="text-emerald-500 shrink-0" />
+            <span>Chapter Leadership</span>
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Manage roles, assign the Chapter President and Remove The Member.
+            Manage roles, assign President, and remove members.
           </p>
         </div>
         <button
           onClick={fetchMembers}
           disabled={loading || saving}
-          className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
+          className="self-start md:self-auto p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
           title="Refresh List"
         >
           <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
@@ -243,68 +242,71 @@ export default function PresidentRoleManagement() {
 
       {/* Message Alert */}
       {message && (
-        <div className={`p-4 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300 ${
+        <div className={`p-4 rounded-xl flex items-start sm:items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300 ${
           message.type === 'success' 
             ? 'bg-emerald-50 text-emerald-800 border border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800' 
             : 'bg-red-50 text-red-800 border border-red-100 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800'
         }`}>
-          {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
-          <span className="text-sm font-medium">{message.text}</span>
-          <button onClick={() => setMessage(null)} className="ml-auto hover:opacity-75">
+          {message.type === 'success' ? <CheckCircle2 size={20} className="shrink-0 mt-0.5 sm:mt-0" /> : <AlertCircle size={20} className="shrink-0 mt-0.5 sm:mt-0" />}
+          <span className="text-sm font-medium break-words flex-1">{message.text}</span>
+          <button onClick={() => setMessage(null)} className="hover:opacity-75 p-1 shrink-0">
             <X size={16} />
           </button>
         </div>
       )}
 
       {/* Controls & Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center sticky top-0 z-20 bg-white dark:bg-gray-900 py-2">
+      <div className="flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center sticky top-0 z-20 bg-white dark:bg-gray-900 py-2">
         {/* Search */}
-        <div className="relative w-full sm:w-72 group">
+        <div className="relative w-full lg:w-72 group">
           <input
             type="text"
-            placeholder="Search by name or email..."
+            placeholder="Search members..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none text-sm"
           />
           <Search className="absolute left-3.5 top-3 text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
         </div>
 
-        {/* Action Buttons (Visible only when items selected) */}
-        <div className={`flex flex-wrap gap-2 transition-opacity duration-300 ${selected.length > 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        {/* Action Buttons */}
+        <div className={`flex flex-wrap sm:flex-nowrap gap-2 transition-all duration-300 ${selected.length > 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
           <button
             onClick={() => handleUpdateRole('president')}
             disabled={saving}
-            className="flex items-center gap-2 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium shadow-sm shadow-emerald-200 dark:shadow-none transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-medium shadow-sm transition-all active:scale-95 disabled:opacity-50 text-xs sm:text-sm whitespace-nowrap"
           >
             <ShieldCheck size={16} />
-            Make President
+            <span className="hidden sm:inline">Make President</span>
+            <span className="sm:hidden">Promote</span>
           </button>
           
           <button
             onClick={() => handleUpdateRole('Member')}
             disabled={saving}
-            className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 dark:hover:bg-amber-900/20 dark:hover:text-amber-400 dark:hover:border-amber-800 rounded-xl font-medium transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200 dark:hover:bg-amber-900/20 dark:hover:text-amber-400 dark:hover:border-amber-800 rounded-xl font-medium transition-all active:scale-95 disabled:opacity-50 text-xs sm:text-sm whitespace-nowrap"
           >
             <ShieldOff size={16} />
-            Revoke Role
+            <span className="hidden sm:inline">Revoke Role</span>
+            <span className="sm:hidden">Revoke</span>
           </button>
 
           <button
             onClick={initiateDelete}
             disabled={saving}
-            className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-red-600 dark:text-red-400 hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:border-red-800 rounded-xl font-medium transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            className="flex-none flex items-center justify-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-red-600 dark:text-red-400 hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-900/20 dark:hover:border-red-800 rounded-xl font-medium transition-all active:scale-95 disabled:opacity-50 text-xs sm:text-sm"
           >
             <Trash2 size={16} />
-            Delete
           </button>
         </div>
       </div>
 
-      {/* Table Section with Fixed Height and Scroll */}
-      <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm flex flex-col h-[500px]">
-        <div className="overflow-y-auto flex-1">
-          <table className="w-full text-left border-collapse">
+      {/* Main Content Area */}
+      <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm flex flex-col h-[60vh] sm:h-[500px]">
+        <div className="overflow-y-auto flex-1 bg-white dark:bg-gray-900">
+          
+          {/* --- DESKTOP VIEW (Table) --- */}
+          <table className="w-full text-left border-collapse hidden md:table">
             <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 shadow-sm">
               <tr className="border-b border-gray-200 dark:border-gray-700 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">
                 <th className="p-4 w-12 text-center bg-gray-50 dark:bg-gray-800">
@@ -327,14 +329,14 @@ export default function PresidentRoleManagement() {
                   <td colSpan={4} className="p-12 text-center text-gray-500">
                     <div className="flex flex-col items-center gap-3">
                       <RefreshCw className="animate-spin text-emerald-500" size={24} />
-                      <span className="text-sm font-medium">Loading membership data...</span>
+                      <span className="text-sm font-medium">Loading data...</span>
                     </div>
                   </td>
                 </tr>
               ) : filteredMembers.length === 0 ? (
                 <tr>
                   <td colSpan={4} className="p-12 text-center text-gray-500">
-                    <p className="text-sm">No members found matching your search.</p>
+                    <p className="text-sm">No members found.</p>
                   </td>
                 </tr>
               ) : (
@@ -363,9 +365,9 @@ export default function PresidentRoleManagement() {
                         }`}>
                           {member.name.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900 dark:text-gray-100">{member.name}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{member.email}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-900 dark:text-gray-100 truncate max-w-[150px] lg:max-w-xs">{member.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px] lg:max-w-xs">{member.email}</p>
                         </div>
                       </div>
                     </td>
@@ -380,7 +382,7 @@ export default function PresidentRoleManagement() {
                     </td>
                     <td className="p-4 text-center">
                       {member.isPresident && (
-                        <div className="flex justify-center" title="Chapter President">
+                        <div className="flex justify-center">
                           <ShieldCheck className="text-emerald-500 drop-shadow-sm" size={20} />
                         </div>
                       )}
@@ -390,14 +392,99 @@ export default function PresidentRoleManagement() {
               )}
             </tbody>
           </table>
+
+          {/* --- MOBILE VIEW (List Cards) --- */}
+          <div className="md:hidden">
+            {/* Mobile Select All Header */}
+            <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
+              <input
+                type="checkbox"
+                checked={filteredMembers.length > 0 && selected.length === filteredMembers.length}
+                onChange={handleSelectAll}
+                className="w-4 h-4 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
+                disabled={loading}
+              />
+              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                {selected.length > 0 ? `${selected.length} Selected` : 'Select All'}
+              </span>
+            </div>
+
+            {loading ? (
+              <div className="p-12 flex flex-col items-center justify-center text-gray-500 gap-3">
+                <RefreshCw className="animate-spin text-emerald-500" size={24} />
+                <span className="text-sm">Loading members...</span>
+              </div>
+            ) : filteredMembers.length === 0 ? (
+              <div className="p-12 text-center text-gray-500 text-sm">
+                No members found matching your search.
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                {filteredMembers.map(member => (
+                  <div 
+                    key={member.id} 
+                    className={`p-4 flex gap-3 transition-colors active:bg-gray-50 dark:active:bg-gray-800 ${
+                      selected.includes(member.id) ? 'bg-emerald-50/30 dark:bg-emerald-900/10' : ''
+                    }`}
+                    onClick={(e) => {
+                       // Allow clicking anywhere on card to select, unless clicking a button
+                       if (e.target.type !== 'checkbox') {
+                         handleSelect(member.id);
+                       }
+                    }}
+                  >
+                    <div className="pt-1 shrink-0">
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(member.id)}
+                        onChange={() => handleSelect(member.id)}
+                        className="w-5 h-5 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500 cursor-pointer"
+                        disabled={saving}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+                            member.isPresident 
+                              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' 
+                              : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                          }`}>
+                            {member.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-medium text-gray-900 dark:text-gray-100 text-sm truncate">{member.name}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{member.email}</p>
+                          </div>
+                        </div>
+                        {member.isPresident && (
+                          <ShieldCheck className="text-emerald-500 shrink-0" size={18} />
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center justify-between pl-12">
+                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wide ${
+                          member.isPresident
+                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200'
+                            : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                        }`}>
+                          {member.role}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         
         {/* Footer / Count */}
-        <div className="bg-gray-50 dark:bg-gray-800/50 px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0">
+        <div className="bg-gray-50 dark:bg-gray-800/50 px-4 sm:px-6 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0">
           <span>{filteredMembers.length} member{filteredMembers.length !== 1 && 's'}</span>
           <span>
             {selected.length > 0 ? (
-              <span className="text-emerald-600 dark:text-emerald-400">{selected.length} selected</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">{selected.length} selected</span>
             ) : 'Select to edit'}
           </span>
         </div>
