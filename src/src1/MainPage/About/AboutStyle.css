@@ -24,7 +24,7 @@
     pointer-events: none;
     
     /* Image setup */
-    background-image: url('../../../../public/logo.webp');
+    background-image: url('/logo.webp');
     background-position: center center;
     background-repeat: no-repeat;
     

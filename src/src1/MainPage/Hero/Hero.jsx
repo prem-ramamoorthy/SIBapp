@@ -13,6 +13,35 @@ function Hero() {
     // Initialize with local data to prevent layout shift before fetch
     const [stats, setStats] = useState(data.stats);
 
+    // --- Helper Function: Format Numbers to Indian System (k, Lakh, Crore) ---
+    const formatIndianNumber = (num) => {
+        if (!num) return 0;
+        
+        // Convert string to number if needed
+        const value = Number(num);
+
+        if (value >= 10000000) {
+            // Crores (e.g., 1.5 Cr)
+            return (value / 10000000).toFixed(1).replace(/\.0$/, '') + ' Crore+';
+        } else if (value >= 100000) {
+            // Lakhs (e.g., 1.5 Lakh)
+            return (value / 100000).toFixed(1).replace(/\.0$/, '') + ' Lakh+';
+        } else if (value >= 1000) {
+            // Thousands (e.g., 10 Thousand)
+            return (value / 1000).toFixed(1).replace(/\.0$/, '') + ' Thousand+';
+        }
+        
+        return value;
+    };
+
+    // --- Helper Function: Button Redirection ---
+    const handleRedirect = (link) => {
+        if (link) {
+            // Use window.open(link, '_blank') for new tab, or window.location.href = link for same tab
+            window.location.href = link; 
+        }
+    };
+
     // Fetch Dynamic Stats
     useEffect(() => {
         const fetchStats = async () => {
@@ -22,8 +51,6 @@ function Hero() {
                 
                 const apiData = await response.json();
                 
-                // Map API data to the UI structure including the new 'chaptercount'
-                // Ensure the order is pleasing for the UI (Chapters -> Members -> Verticals -> Referrals -> Business)
                 const dynamicStats = [
                     { name: "Chapters", value: apiData.chaptercount },
                     { name: "Members", value: apiData.membershipcount },
@@ -35,7 +62,6 @@ function Hero() {
                 setStats(dynamicStats);
             } catch (error) {
                 console.error("Failed to fetch dynamic stats, using fallback:", error);
-                // We keep the initial data.stats as fallback if fetch fails
             }
         };
 
@@ -82,7 +108,8 @@ function Hero() {
         const animateCounters = (selector) => {
             const counters = document.querySelectorAll(selector);
             counters.forEach(counter => {
-                const target = parseInt(counter.getAttribute('data-count')) || parseInt(counter.textContent);
+                // Get the raw numeric value from data attribute
+                const target = parseInt(counter.getAttribute('data-count'));
                 if (isNaN(target)) return;
 
                 const duration = 2500;
@@ -95,12 +122,14 @@ function Hero() {
                     const easeOutQuart = 1 - Math.pow(1 - progress, 4);
                     const current = Math.floor(target * easeOutQuart);
 
-                    counter.textContent = current;
+                    // Apply the formatting logic during animation
+                    counter.textContent = formatIndianNumber(current);
 
                     if (progress < 1) {
                         requestAnimationFrame(animate);
                     } else {
-                        counter.textContent = target;
+                        // Ensure final value is formatted correctly
+                        counter.textContent = formatIndianNumber(target);
                     }
                 };
 
@@ -108,9 +137,16 @@ function Hero() {
             });
         };
 
-        // Re-run animation if stats update while already visible
+        // Re-run logic if stats update while already visible
+        // FIX: Directly update the text instead of restarting the animation from 0
         if (isAnimatedRef.current) {
-            animateCounters('.hero .stat-number');
+            const counters = document.querySelectorAll('.hero .stat-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-count'));
+                if (!isNaN(target)) {
+                    counter.textContent = formatIndianNumber(target);
+                }
+            });
         }
 
         const observer = new IntersectionObserver((entries) => {
@@ -141,11 +177,15 @@ function Hero() {
                 observer.unobserve(statsRef.current);
             }
         };
-    }, [stats]); // Add stats dependency so observer/animations react to new data
+    }, [stats]); 
 
     const renderButtons = () => {
         return data.buttons.map((button, index) => (
-            <button key={index} className={`btn btn-${button.type}`}>
+            <button 
+                key={index} 
+                className={`btn btn-${button.type}`}
+                onClick={() => handleRedirect(button.link)}
+            >
                 <span>{button.name}</span>
                 <div className="btn-glow">{button.content}</div>
             </button>
@@ -155,7 +195,9 @@ function Hero() {
     const renderStats = () => {
         return stats.map((stat, index) => (
             <div key={index} className="stat-item"> 
-                {/* Reset to 0 in DOM to ensure animation flows from 0 to target */}
+                {/* data-count stores the raw number for calculation.
+                    The text content starts at 0 and is updated by JS.
+                */}
                 <span className="stat-number" data-count={stat.value}>0</span>
                 <span className="stat-label">{stat.name}</span>
             </div>

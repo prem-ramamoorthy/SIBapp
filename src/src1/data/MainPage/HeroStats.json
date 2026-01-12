@@ -1,33 +1,23 @@
 {
-    "stats": [
-        {
-            "name": "name",
-            "value": "139"
-        },
-        {
-            "name": "Business",
-            "value": "21Cr"
-        },
-        {
-            "name": "Referals",
-            "value": "1520"
-        },
-        {
-            "name": "Verticals",
-            "value": "15"
-        }
-    ] ,
-    "buttons" : [
-        {
-            "name": "Discover More",
-            "content": "",
-            "type": "primary ripple-btn"
-
-        },
-        {
-            "name": "Connect With Us",
-            "content": "",
-            "type": "secondary magnetic-btn"
-        }
-    ]
+  "buttons": [
+    {
+      "name": "Discover more",
+      "type": "primary",
+      "content": "",
+      "link": "#gallery"
+    },
+    {
+      "name": "Connect with us",
+      "type": "secondary",
+      "content": "",
+      "link": "#contact"
+    }
+  ],
+  "stats": [
+    { "name": "Chapters", "value": 2 },
+    { "name": "Members", "value": 100 },
+    { "name": "Verticals", "value": 50 },
+    { "name": "Referrals", "value": 150 },
+    { "name": "Business Value", "value": 999999 }
+  ]
 }

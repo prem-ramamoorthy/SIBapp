@@ -32,6 +32,7 @@ import ExistingSession from './hooks/ExistingSession';
 import Admin from './Admin/Admin';
 import AdminRoute from './hooks/AdminRoute';
 import ChapterDetails from './Admin/Chapterdetails.jsx';
+import PrivacyPanel from "./Settings/components/PrivacyPanel";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
   },
   { path: '/signin', element: <SignInPage /> },
   { path: '/public-members', element: <PublicMembers /> },
+  {path:'/privacy-policy', element:<PrivacyPanel />},
   {
     element: <ProtectedRoute />,
     errorElement: <ErrorDisplay />,

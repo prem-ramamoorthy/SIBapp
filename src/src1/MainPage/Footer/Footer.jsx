@@ -1,5 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Phone, Mail, MapPin, X, ChevronRight, Facebook, Instagram, Youtube } from 'lucide-react';
+import PrivacyPanel from "../../../Settings/components/PrivacyPanel";
+
+
+// REPLACE THIS with your actual Backend URL or import it
+const Backend_Server_URL = import.meta.env.VITE_BACKEND_SERVER;
 
 // --- MOCK DATA (Replace with your actual imports) ---
 const socialData = [
@@ -11,9 +16,9 @@ const socialData = [
 const MockHeaderLinks = ({ isMember }) => (
     <>
         <a href="#" className="footer-link"><ChevronRight size={14} /> Home</a>
-        <a href="#" className="footer-link"><ChevronRight size={14} /> About Us</a>
-        <a href="#" className="footer-link"><ChevronRight size={14} /> Members Directory</a>
-        <a href="#" className="footer-link"><ChevronRight size={14} /> Events</a>
+        <a href="#about" className="footer-link"><ChevronRight size={14} /> About Us</a>
+        <a href="/public-members" className="footer-link"><ChevronRight size={14} /> Members Directory</a>
+        <a href="/album" className="footer-link"><ChevronRight size={14} /> Events</a>
         {isMember && <a href="#" className="footer-link"><ChevronRight size={14} /> Member Portal</a>}
     </>
 );
@@ -21,6 +26,41 @@ const MockHeaderLinks = ({ isMember }) => (
 // --- MAIN COMPONENT ---
 function Footer({ margin = "auto", ismember = false }) {
     const [isIsoOpen, setIsoOpen] = useState(false);
+
+    // Initial stats state (with fallbacks matching your original hardcoded values)
+    const [stats, setStats] = useState({
+        members: 138,
+        verticals: 15,
+        chapters: 2 // Chapters is usually static or calculated differently, keeping default
+    });
+
+    // Fetch Dynamic Stats
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                if (!Backend_Server_URL) return;
+
+                const response = await fetch(`${Backend_Server_URL}/public/stats`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const apiData = await response.json();
+                
+                // Map API data to footer state
+                setStats(prev => ({
+                    ...prev,
+                    members: apiData.membershipcount || prev.members,
+                    verticals: apiData.verticalcount || prev.verticals,
+                    chapters: apiData.chaptercount || prev.chapters,
+                    // If your API returns years/chapters you can map them here
+                }));
+            } catch (error) {
+                console.error("Failed to fetch dynamic stats for footer:", error);
+                // Keep initial data as fallback
+            }
+        };
+
+        fetchStats();
+    }, []);
 
     // Toggle scroll lock when modal opens
     const toggleIsoModal = () => {
@@ -101,7 +141,7 @@ function Footer({ margin = "auto", ismember = false }) {
                                 </div>
 
                                 <p className="about-text">
-                                    A premier business community fostering growth, collaboration, and cultural heritage since the 1990s.
+                                    A premier business community fostering growth, collaboration, and cultural heritage.
                                 </p>
                                 
                                 <div className="social-links">
@@ -127,30 +167,30 @@ function Footer({ margin = "auto", ismember = false }) {
                                 <div className="contact-info">
                                     <div className="contact-item">
                                         <MapPin size={18} className="contact-icon" />
-                                        <p>123 Business Towers, Main Avenue,<br/>Chennai, Tamil Nadu - 600001</p>
+                                        <p>H96 Shop No5, Periyar Nagar Main Road,<br/>Erode, Tamil Nadu - 638009</p>
                                     </div>
                                     <div className="contact-item">
                                         <Phone size={18} className="contact-icon" />
-                                        <p>+91 98765 43210</p>
+                                        <p>+91 9842775676</p>
                                     </div>
                                     <div className="contact-item">
                                         <Mail size={18} className="contact-icon" />
-                                        <p>contact@sib-business.com</p>
+                                        <p>members@segentharinbusiness.in</p>
                                     </div>
                                 </div>
                                 
                                 <div className="stats-grid">
                                     <div className="stat-box">
-                                        <span className="stat-num">138+</span>
+                                        <span className="stat-num">{stats.members}+</span>
                                         <span className="stat-label">Members</span>
                                     </div>
                                     <div className="stat-box">
-                                        <span className="stat-num">15</span>
+                                        <span className="stat-num">{stats.verticals}</span>
                                         <span className="stat-label">Verticals</span>
                                     </div>
                                     <div className="stat-box">
-                                        <span className="stat-num">35+</span>
-                                        <span className="stat-label">Years</span>
+                                        <span className="stat-num">{stats.chapters}+</span>
+                                        <span className="stat-label">chapters</span>
                                     </div>
                                 </div>
                             </div>
@@ -160,11 +200,12 @@ function Footer({ margin = "auto", ismember = false }) {
                         <div className="footer-bottom">
                             <div className="footer-divider"></div>
                             <div className="bottom-content">
-                                <p>&copy; {currentYear} Sengunthar in Business (SIB). All rights reserved.</p>
+                                <p>&copy; {currentYear} Sengunthar in Business (SIB). All rights reserved. 
+                                    <br />ISO 9001:2015 Certified</p>
                                 <div className="legal-links">
-                                    <a href="#">Privacy Policy</a>
+                                    <a href="/privacy-policy">Privacy Policy</a>
                                     <span>•</span>
-                                    <a href="#">Terms of Service</a>
+                                    <a href="/privacy-policy">Terms of Service</a>
                                 </div>
                             </div>
                         </div>
