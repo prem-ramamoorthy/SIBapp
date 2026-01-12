@@ -7,20 +7,87 @@ import AlertSystem from './Components/AlertSystem'
 import { useState } from 'react'
 import PhotoGallery from '../Coordinatorsportal/components/PhotoGall'
 import { Image } from 'lucide-react'
+import { LogOut } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import classNames from '../utils/classname'
 
 
 
 export default function Admin() {
   const [showGallery, setShowGallery] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const logoutUrl = `${import.meta.env.VITE_BACKEND_SERVER}/auth/sessionLogout`;
+  const logoutOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+  };
 
   if (showGallery) {
     return <PhotoGallery onBack={() => setShowGallery(false)} />;
   }
+
+  async function onLogout() {
+    try {
+      setLoading(true);
+      const response = await fetch(logoutUrl, logoutOptions);
+      const data = await response.json();
+
+      if (data.message === "Logged out") {
+        navigate("/");
+      } else {
+        alert(`Logout failed: ${data.message || "Unknown error"}`);
+      }
+    } catch (error) {
+      alert(`Error occurred: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="min-h-screen w-full  transition-colors duration-300">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-7xl mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto space-y-6 flex flex-row justify-between items-center">
           <h1 className="text-3xl font-bold dark:text-white">Admin Portal</h1>
+          <div className="border-t border-neutral-100 dark:border-neutral-700">
+            <button
+              role="menuitem"
+              onClick={onLogout}
+              disabled={loading}
+              className={classNames(
+                "flex w-full items-center gap-2 px-3 py-2 text-rose-600 bg-rose-100 dark:bg-rose-700/20 hover:bg-rose-50 dark:hover:bg-rose-700/30 transition duration-150 rounded-md text-sm font-medium",
+                loading && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              {loading ? (
+                <svg
+                  className="animate-spin h-4 w-4 text-rose-600"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+              ) : (
+                <LogOut className="h-4 w-4" />
+              )}
+              <span>{loading ? "Logging out..." : "Sign out"}</span>
+            </button>
+          </div>
         </div>
         <Stats />
         <RegionChapterManager />
