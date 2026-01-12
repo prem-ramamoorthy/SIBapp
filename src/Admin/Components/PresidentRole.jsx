@@ -155,7 +155,7 @@ export default function PresidentRoleManagement({ chapterId = null }) {
       await Promise.all(
         selected.map(async (id) => {
           const res = await fetch(
-            `${import.meta.env.VITE_BACKEND_SERVER}/admin/user/${id}`,
+            `${import.meta.env.VITE_BACKEND_SERVER}/admin/user?userId=${id}`,
             {
               method: "DELETE",
               credentials: "include"
