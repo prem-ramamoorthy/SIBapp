@@ -34,14 +34,14 @@ const ChapterDetails = () => {
             <ChapterStat chapterid={id}/>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="w-full">
-                    <CreatePresidentForm />
+                    <CreatePresidentForm chapterName={chapter ? chapter.chapter_name : ""} />
                 </div>
                 <div className="w-full">
-                    <PresidentRoleManagement />
+                    <PresidentRoleManagement chapterId={chapter ? chapter._id : null} />
                 </div>
             </div>
             <div className="mt-10">
-                <MemberDetailes />
+                <MemberDetailes chapterId={chapter ? chapter._id : null}/>
             </div>
         </div>
     );
