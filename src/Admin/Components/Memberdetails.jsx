@@ -83,7 +83,7 @@ const getSortValue = (value, columnKey) => {
     return value;
 };
 
-const MemberDetails= () => {
+const MemberDetails= ({chapterId = null}) => {
     const [members, setMembers] = useState([]);
     const [dateRange, setDateRange] = useState({ from: '', to: '' });
     const [searchTerm, setSearchTerm] = useState('');
@@ -104,13 +104,13 @@ const MemberDetails= () => {
         setError(null);
         try {
             // Construct URL with date query parameters if they exist
-            let url = `${import.meta.env.VITE_BACKEND_SERVER}/activity/getactivityofusers`;
+            let url = `${import.meta.env.VITE_BACKEND_SERVER}/activity/getactivityofusers?chapterid=${chapterId}`;
             const params = new URLSearchParams();
             if (dateRange.from) params.append('fromDate', dateRange.from);
             if (dateRange.to) params.append('toDate', dateRange.to);
             
             if (params.toString()) {
-                url += `?${params.toString()}`;
+                url += `&${params.toString()}`;
             }
 
             const response = await fetch(url, {
@@ -135,8 +135,10 @@ const MemberDetails= () => {
 
     // Refetch when dates change (you might want to debounce this or use a button if changes are frequent)
     useEffect(() => {
-        fetchData();
-    }, [dateRange]);
+        if (chapterId) {
+            fetchData();
+        }
+    }, [dateRange, chapterId]);
 
     const filteredAndSortedData = useMemo(() => {
         let result = members.filter(row =>

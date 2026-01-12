@@ -11,7 +11,7 @@ function toISODate(date) {
     return date.toISOString();
 }
 
-export default function CreatePresidentForm() {
+export default function CreatePresidentForm({chapterName = null}) {
     const [form, setForm] = useState({
         username: "",
         password: "",
@@ -105,7 +105,7 @@ export default function CreatePresidentForm() {
             const renewal = addMonths(now, 6);
 
             const membershipRes = await fetch(
-                `${import.meta.env.VITE_BACKEND_SERVER}/chapter/membership/createmembership`,
+                `${import.meta.env.VITE_BACKEND_SERVER}/chapter/membership/createpresident`,
                 {
                     method: "POST",
                     credentials: "include",
@@ -115,6 +115,7 @@ export default function CreatePresidentForm() {
                         username: form.username,
                         role: form.role,
                         membership_status: true,
+                        chapter_name: chapterName ? chapterName : "",
                         join_date: toISODate(now),
                         renewal_date: toISODate(renewal)
                     })
@@ -260,7 +261,7 @@ export default function CreatePresidentForm() {
                 <button
                     type="submit"
                     className="w-full rounded-lg py-2.5 bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold text-lg transition-colors border border-amber-300 dark:bg-amber-300 dark:hover:bg-amber-400 dark:text-gray-900 dark:border-amber-500 shadow-sm disabled:bg-gray-200 disabled:text-gray-400"
-                    disabled={loading}
+                    disabled={loading || !chapterName}
                 >
                     {loading ? "Creating..." : "Create Member"}
                 </button>

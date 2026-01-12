@@ -17,7 +17,7 @@ const capitalize = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-export default function PresidentRoleManagement() {
+export default function PresidentRoleManagement({ chapterId = null }) {
   const [members, setMembers] = useState([]);
   const [selected, setSelected] = useState([]);
   const [search, setSearch] = useState("");
@@ -31,7 +31,7 @@ export default function PresidentRoleManagement() {
     setLoading(true);
     setMessage(null);
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/chapter/membership/getallmemberships`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/chapter/membership/getallmemberships?chapter_id=${chapterId}`, {
         credentials: "include"
       });
       const data = await res.json();
@@ -49,7 +49,7 @@ export default function PresidentRoleManagement() {
         : [];
         
       setMembers(formattedData);
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "Could not fetch members. Please try again." });
     } finally {
       setLoading(false);
@@ -58,7 +58,8 @@ export default function PresidentRoleManagement() {
 
   useEffect(() => {
     fetchMembers();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chapterId]);
 
   // Selection Logic
   const handleSelect = (id) => {
@@ -128,7 +129,7 @@ export default function PresidentRoleManagement() {
       });
       setSelected([]);
 
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "Failed to update some roles. Please try again." });
     } finally {
       setSaving(false);
@@ -154,7 +155,7 @@ export default function PresidentRoleManagement() {
       await Promise.all(
         selected.map(async (id) => {
           const res = await fetch(
-            `${import.meta.env.VITE_BACKEND_SERVER}/chapter/membership/deletemembership/${id}`,
+            `${import.meta.env.VITE_BACKEND_SERVER}/admin/user/${id}`,
             {
               method: "DELETE",
               credentials: "include"
@@ -167,7 +168,7 @@ export default function PresidentRoleManagement() {
       setMembers(prev => prev.filter(m => !selected.includes(m.id)));
       setMessage({ type: "success", text: "Member(s) deleted successfully." });
       setSelected([]);
-    } catch (err) {
+    } catch {
       setMessage({ type: "error", text: "Failed to delete member(s). Please try again." });
     } finally {
       setSaving(false);

@@ -14,7 +14,6 @@ import FunctionalPage from './ButtonPages/FunctionalPage'
 import SignInPage from './SigninPage/SignInPage';
 import ProtectedRoute from './hooks/protectedRoute';
 import ResetPassword from './ResetPassword/ResetPassword';
-import AnimatedRoute from './hooks/AnimatedRoutes';
 import NotificationsPage from './NotificationPanel/NotificationsPage';
 import PresidentPortal from './PresidentPortal/PresidentPortal';
 import MembersAnalytics from './MembersAnalytics/MembersAnalytics';
@@ -38,46 +37,46 @@ const router = createBrowserRouter([
   {
     path: '/sib', element: <ExistingSession />, errorElement: <ErrorDisplay />
   },
-  { path: '/signin', element: <AnimatedRoute><SignInPage /></AnimatedRoute> },
-  { path: '/public-members', element:<PublicMembers /> },
-  {path:'/chapterdetails', element:<ChapterDetails />},
+  { path: '/signin', element: <SignInPage /> },
+  { path: '/public-members', element: <PublicMembers /> },
   {
     element: <ProtectedRoute />,
     errorElement: <ErrorDisplay />,
     children: [
-      { path: '/dashboard', element: <AnimatedRoute><Dashboard /></AnimatedRoute> },
-      { path: '/members', element: <AnimatedRoute><Members /></AnimatedRoute> },
-      { path: '/myactivity', element: <AnimatedRoute><Myactivity /></AnimatedRoute> },
-      { path: '/meetings', element: <AnimatedRoute><Meetings /></AnimatedRoute> },
-      { path: '/mychapter', element: <AnimatedRoute><Mychapter /></AnimatedRoute> },
-      { path: '/settings', element: <AnimatedRoute><Settings /></AnimatedRoute> },
-      { path: '/slips', element: <AnimatedRoute><FunctionalPage /></AnimatedRoute> },
-      { path: '/profile', element: <AnimatedRoute><Profile /></AnimatedRoute> },
-      { path: '/allnotifications', element: <AnimatedRoute><NotificationsPage /></AnimatedRoute> },
+      { path: '/dashboard', element: <Dashboard /> },
+      { path: '/members', element: <Members /> },
+      { path: '/myactivity', element: <Myactivity /> },
+      { path: '/meetings', element: <Meetings /> },
+      { path: '/mychapter', element: <Mychapter /> },
+      { path: '/settings', element: <Settings /> },
+      { path: '/slips', element: <FunctionalPage /> },
+      { path: '/profile', element: <Profile /> },
+      { path: '/allnotifications', element: <NotificationsPage /> },
     ]
   },
   {
     element: <AdminRoute />,
     children: [
-      { path: '/admin', element: <AnimatedRoute><Admin /></AnimatedRoute> },
+      { path: '/admin', element: <Admin /> },
+      { path: '/chapterdetails/:id', element: <ChapterDetails /> },
     ]
   },
   {
     element: <PresidentRoute />,
     children: [
-      { path: '/presidentportal', element: <AnimatedRoute><PresidentPortal /></AnimatedRoute> },
+      { path: '/presidentportal', element: <PresidentPortal /> },
     ]
   }, {
     element: <CoordinatorRoute />,
     children: [
-      { path: '/memberdetailedanalytics', element: <AnimatedRoute><MembersAnalytics /></AnimatedRoute> },
-      { path: '/coordinatorsportal', element: <AnimatedRoute><Coordinatorsportal /></AnimatedRoute> },
+      { path: '/memberdetailedanalytics', element: <MembersAnalytics /> },
+      { path: '/coordinatorsportal', element: <Coordinatorsportal /> },
     ]
   },
-  { path: '/profile/:id', element: <AnimatedRoute><Profile /></AnimatedRoute> },
-  { path: '/reset-password', element: <AnimatedRoute><ResetPassword /></AnimatedRoute> },
-  { path: '/noteligible', element: <AnimatedRoute><NotEligibleRole /></AnimatedRoute> },
-  { path: '/child-safety-standards', element: <AnimatedRoute><CSAEPolicy /></AnimatedRoute> },
+  { path: '/profile/:id', element: <Profile /> },
+  { path: '/reset-password', element: <ResetPassword /> },
+  { path: '/noteligible', element: <NotEligibleRole /> },
+  { path: '/child-safety-standards', element: <CSAEPolicy /> },
   { path: '/', element: <MainPage /> },
   { path: '/album', element: <Album /> },
   { path: '*', element: <NotFound404 /> },

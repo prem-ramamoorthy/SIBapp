@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Plus,
   MapPin,
@@ -49,6 +50,8 @@ export default function RegionChapterManager() {
   });
 
   const [expandedRegions, setExpandedRegions] = useState({});
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -121,10 +124,6 @@ export default function RegionChapterManager() {
     setExpandedRegions(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
-
   // --- REGION HANDLERS ---
 
   const openRegionModal = (region = null) => {
@@ -162,7 +161,7 @@ export default function RegionChapterManager() {
           }
         );
         setRegions(regions.map(r => r.id === editingId ? { ...r, ...regionForm } : r));
-      } catch (err) {
+      } catch {
         // Optionally handle error
       }
     } else {
@@ -191,7 +190,7 @@ export default function RegionChapterManager() {
           chapters: []
         };
         setRegions([...regions, newRegion]);
-      } catch (err) {
+      } catch {
         // Optionally handle error
       }
     }
@@ -268,7 +267,7 @@ export default function RegionChapterManager() {
           }
           return region;
         }));
-      } catch (err) {
+      } catch {
         // Optionally handle error
       }
     } else {
@@ -315,7 +314,7 @@ export default function RegionChapterManager() {
           }
           return region;
         }));
-      } catch (err) {
+      } catch {
         // Optionally handle error
       }
     }
@@ -328,6 +327,11 @@ export default function RegionChapterManager() {
 
   const totalRegions = regions.length;
   const totalChapters = regions.reduce((acc, curr) => acc + curr.chapters.length, 0);
+
+  // --- Chapter Card Click Handler ---
+  const handleChapterCardClick = (chapterId) => {
+    navigate(`/chapterdetails/${chapterId}`);
+  };
 
   return (
     <div className={`${isDarkMode ? 'dark' : ''}`}>
@@ -455,7 +459,11 @@ export default function RegionChapterManager() {
                         ) : (
                           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                             {region.chapters.map(chapter => (
-                              <div key={chapter.id} className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-5 rounded-lg hover:border-gray-400 dark:hover:border-gray-400 transition-colors flex flex-col sm:flex-row justify-between group/chapter relative overflow-hidden shadow-sm">
+                              <div
+                                key={chapter.id}
+                                className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 p-5 rounded-lg hover:border-gray-400 dark:hover:border-gray-400 transition-colors flex flex-col sm:flex-row justify-between group/chapter relative overflow-hidden shadow-sm cursor-pointer"
+                                onClick={() => handleChapterCardClick(chapter.id)}
+                              >
                                 {/* Subtle Yellow Side strip on hover */}
                                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-yellow-400 transform -translate-x-full group-hover/chapter:translate-x-0 transition-transform"></div>
                                 <div className="pl-2 flex-1">
@@ -479,6 +487,7 @@ export default function RegionChapterManager() {
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline mt-1"
+                                          onClick={e => e.stopPropagation()}
                                         >
                                           View on Map <ExternalLink size={10} />
                                         </a>
@@ -488,7 +497,10 @@ export default function RegionChapterManager() {
                                 </div>
                                 <div className="flex sm:flex-col items-center sm:items-end gap-2 mt-5 sm:mt-0 sm:pl-5 sm:border-l border-gray-100 dark:border-gray-600">
                                   <button
-                                    onClick={() => openChapterModal(region.id, chapter)}
+                                    onClick={e => {
+                                      e.stopPropagation();
+                                      openChapterModal(region.id, chapter);
+                                    }}
                                     className="flex-1 sm:flex-none w-full sm:w-auto px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-md transition-colors flex items-center justify-center gap-1.5"
                                   >
                                     <Edit2 size={12} /> Edit

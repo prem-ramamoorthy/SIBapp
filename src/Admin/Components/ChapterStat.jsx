@@ -31,7 +31,7 @@ const timeRangeToQuery = {
     last_week: 'week'
 };
 
-const ChapterStat = () => {
+const ChapterStat = ({ chapterid = null }) => {
     const [timeRange, setTimeRange] = useState('ytd');
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -40,10 +40,12 @@ const ChapterStat = () => {
         const fetchStats = async () => {
             setLoading(true);
             let query = timeRangeToQuery[timeRange];
-            let url = `${import.meta.env.VITE_BACKEND_SERVER}/public/stats`;
+            let url = chapterid
+                ? `${import.meta.env.VITE_BACKEND_SERVER}/admin/chapter-performance/${chapterid}`
+                : `${import.meta.env.VITE_BACKEND_SERVER}/public/stats`;
             if (query) url += `?time=${query}`;
             try {
-                const res = await fetch(url);
+                const res = await fetch(url, { credentials: 'include' });
                 const data = await res.json();
                 setStats(data);
             } catch {
@@ -52,13 +54,13 @@ const ChapterStat = () => {
             setLoading(false);
         };
         fetchStats();
-    }, [timeRange]);
+    }, [timeRange, chapterid]);
 
     const statsConfig = [
         {
             id: 1,
             label: "Referrals Passed",
-            value: stats?.referralcount ?? 0,
+            value: stats?.referrals ?? 0,
             isCurrency: false,
             icon: FileCheck,
             color: "text-blue-600",
@@ -67,7 +69,7 @@ const ChapterStat = () => {
         {
             id: 2,
             label: "Total Members",
-            value: stats?.membershipcount ?? 0,
+            value: stats?.members ?? 0,
             isCurrency: false,
             icon: Users,
             color: "text-violet-600",
@@ -75,9 +77,9 @@ const ChapterStat = () => {
         },
         {
             id: 3,
-            label: "Total Revenue",
-            value: stats?.bussinessamount ?? 0,
-            isCurrency: true,
+            label: "TYFTBs",
+            value: stats?.tyftbs ?? 0,
+            isCurrency: false,
             icon: IndianRupee,
             color: "text-emerald-600",
             bg: "bg-emerald-50 dark:bg-emerald-900/20"
@@ -85,7 +87,7 @@ const ChapterStat = () => {
         {
             id: 4,
             label: "M to M functions",
-            value: stats?.onetooner ?? 0,
+            value: stats?.m2ms ?? 0,
             isCurrency: false,
             icon: Handshake,
             color: "text-orange-600",
@@ -98,8 +100,12 @@ const ChapterStat = () => {
             {/* Header Area with Dropdown */}
             <div className="w-full max-w-7xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Overview</h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Track your community growth and revenue.</p>
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
+                        {stats?.chapter?.name ? `${stats.chapter.name} Overview` : "Overview"}
+                    </h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Track your community growth and engagement.
+                    </p>
                 </div>
                 <div className="relative w-full sm:w-auto">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
