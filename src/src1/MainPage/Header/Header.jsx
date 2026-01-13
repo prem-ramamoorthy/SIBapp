@@ -6,7 +6,6 @@ function Header({ isMembers = false, style = { background: "rgba(242, 240, 234, 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showSocials, setShowSocials] = useState(false);
 
-    // PASTE YOUR SOCIAL MEDIA LINKS HERE
     const socialLinks = {
         youtube: "https://www.youtube.com/",
         instagram: "https://www.instagram.com/sengunthar_in_business/",
@@ -21,10 +20,9 @@ function Header({ isMembers = false, style = { background: "rgba(242, 240, 234, 
         setShowSocials(!showSocials);
     };
 
-    // Styles for the popup to keep JSX clean
     const popupStyle = {
         position: 'absolute',
-        top: '125%', // Spacing below logo
+        top: '125%', 
         left: '50%',
         transform: 'translateX(-50%)',
         backgroundColor: '#ffffff',
@@ -71,7 +69,7 @@ function Header({ isMembers = false, style = { background: "rgba(242, 240, 234, 
                 <nav className="navbar">
                     <div className="container">
                         <div className="nav-brand">
-                            {/* Modified Logo Container */}
+                           
                             <div 
                                 className="logo-container" 
                                 onClick={toggleSocials} 
@@ -84,12 +82,9 @@ function Header({ isMembers = false, style = { background: "rgba(242, 240, 234, 
                                     className="logo-image"
                                 />
                                 
-                                {/* Professional Social Media Dropdown */}
                                 <div className="social-popup" style={popupStyle}>
-                                    {/* Tooltip Arrow */}
                                     <div style={arrowStyle}></div>
 
-                                    {/* YouTube */}
                                     <a 
                                         href={socialLinks.youtube} 
                                         target="_blank" 
@@ -101,7 +96,6 @@ function Header({ isMembers = false, style = { background: "rgba(242, 240, 234, 
                                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                                     </a>
 
-                                    {/* Instagram */}
                                     <a 
                                         href={socialLinks.instagram} 
                                         target="_blank" 
@@ -113,7 +107,6 @@ function Header({ isMembers = false, style = { background: "rgba(242, 240, 234, 
                                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
                                     </a>
 
-                                    {/* Facebook */}
                                     <a 
                                         href={socialLinks.facebook} 
                                         target="_blank" 

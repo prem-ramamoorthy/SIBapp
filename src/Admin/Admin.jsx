@@ -127,8 +127,27 @@ export default function Admin() {
             dark:bg-emerald-600 dark:hover:bg-emerald-500"
               >
                 <Image size={28} />
-                Open Gallery
+                Open Gallery 
               </button>
+              <div className="w-full flex flex-col items-center gap-6">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                Community & Members
+              </h3>
+              <p className="text-base text-gray-500 dark:text-gray-400 leading-relaxed">
+Connect with the people who make our events special and discover the members behind every powerful referral              </p>
+            </div>
+
+            <button
+              onClick={() => window.location.href = '/public-members'}
+              className="flex items-center gap-3 px-6 py-3 rounded-xl text-base font-bold text-white shadow-md transition-all hover:-translate-y-1 hover:shadow-lg active:scale-95
+              /* Button Colors - Blue to distinguish from Gallery */
+              bg-blue-600 hover:bg-blue-700 
+              dark:bg-blue-600 dark:hover:bg-blue-500"
+            >
+              View Members
+            </button>
+          </div>
 
             </div>
           </div>

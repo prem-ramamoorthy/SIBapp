@@ -12,7 +12,9 @@ const GALLERY_CREATE_URL = `${BACKEND_SERVER_URL}/gallery/upload`;
 const GALLERY_ADD_PHOTOS_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/add-photos/${eventId}`;
 const GALLERY_DELETE_PHOTO_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/delete-photo/${eventId}`;
 const GALLERY_DELETE_ALBUM_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/${eventId}`;
-const GALLERY_UPDATE_COVER_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/updatecoverimage/${eventId}`;
+
+// Updated Route for updating cover image
+const GALLERY_UPDATE_COVER_URL = (id) => `${BACKEND_SERVER_URL}/gallery/updatecoverimage/${id}`;
 
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
@@ -59,7 +61,7 @@ const ConfirmationModal = ({ isOpen, title, message, onConfirm, onCancel, isDest
   );
 };
 
-// --- NEW COMPONENT: UPLOAD PROGRESS BAR ---
+// --- UPLOAD PROGRESS BAR ---
 const UploadProgress = ({ progress, currentFile, totalFiles }) => {
   if (progress === 0 && !currentFile) return null;
   
@@ -388,7 +390,7 @@ export default function PhotoGallery({ onBack }) {
     );
   };
 
-  // --- SET COVER IMAGE ---
+  // --- SET COVER IMAGE (UPDATED) ---
   const handleSetCoverImage = async (photoUrl) => {
     if (!selectedAlbumId) return;
 
@@ -476,10 +478,10 @@ export default function PhotoGallery({ onBack }) {
           }
         } else {
            try {
-              const errorData = JSON.parse(xhr.responseText);
-              reject(new Error(errorData.error || 'Upload failed'));
+             const errorData = JSON.parse(xhr.responseText);
+             reject(new Error(errorData.error || 'Upload failed'));
            } catch(e) {
-              reject(new Error(xhr.statusText));
+             reject(new Error(xhr.statusText));
            }
         }
       };
@@ -660,9 +662,9 @@ export default function PhotoGallery({ onBack }) {
       {/* Upload Progress Bar (Displays when isUploading is true) */}
       {isUploading && (
          <UploadProgress 
-            progress={uploadProgress} 
-            currentFile={uploadCurrentFile} 
-            totalFiles={uploadTotalFilesCount} 
+           progress={uploadProgress} 
+           currentFile={uploadCurrentFile} 
+           totalFiles={uploadTotalFilesCount} 
          />
       )}
 
@@ -723,50 +725,50 @@ export default function PhotoGallery({ onBack }) {
         {/* VIEW: ALBUM LIST */}
         {!selectedAlbumId && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="mb-8 flex justify-between items-end">
-               <div>
-                 <h2 className="text-3xl font-bold text-white mb-2">Albums & Collections</h2>
-                 <p className="text-neutral-400">
-                   {isReordering 
-                     ? "Drag albums to change their order." 
-                     : "Select an album to view or long-press to reorder."}
-                 </p>
-               </div>
-               {isReordering && (
-                  <span className="text-emerald-400 text-sm font-medium bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                    Reorder Mode Active
-                  </span>
-               )}
-             </div>
+              <div className="mb-8 flex justify-between items-end">
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-2">Albums & Collections</h2>
+                  <p className="text-neutral-400">
+                    {isReordering 
+                      ? "Drag albums to change their order." 
+                      : "Select an album to view or long-press to reorder."}
+                  </p>
+                </div>
+                {isReordering && (
+                   <span className="text-emerald-400 text-sm font-medium bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                     Reorder Mode Active
+                   </span>
+                )}
+              </div>
 
-             {loading ? (
-               <div className="flex justify-center items-center py-20">
-                 <Loader2 className="animate-spin text-neutral-500" size={32} />
-               </div>
-             ) : albums.length === 0 ? (
-               <div className="text-center py-20 border-2 border-dashed border-neutral-800 rounded-xl">
-                 <FolderPlus className="mx-auto h-12 w-12 text-neutral-600 mb-4" />
-                 <h3 className="text-lg font-medium text-white">No albums yet</h3>
-                 <p className="text-neutral-500 mt-1">Create your first album to start uploading photos.</p>
-               </div>
-             ) : (
-               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                 {albums.map((album, index) => (
-                   <AlbumCard 
-                     key={album.id} 
-                     index={index}
-                     album={album} 
-                     onClick={() => !isReordering && setSelectedAlbumId(album.id)}
-                     onDelete={handleDeleteAlbum}
-                     onLongPress={handleLongPress}
-                     isReordering={isReordering}
-                     onDragStart={handleDragStart}
-                     onDragEnter={handleDragEnter}
-                     onDragEnd={handleDragEnd}
-                   />
-                 ))}
-               </div>
-             )}
+              {loading ? (
+                <div className="flex justify-center items-center py-20">
+                  <Loader2 className="animate-spin text-neutral-500" size={32} />
+                </div>
+              ) : albums.length === 0 ? (
+                <div className="text-center py-20 border-2 border-dashed border-neutral-800 rounded-xl">
+                  <FolderPlus className="mx-auto h-12 w-12 text-neutral-600 mb-4" />
+                  <h3 className="text-lg font-medium text-white">No albums yet</h3>
+                  <p className="text-neutral-500 mt-1">Create your first album to start uploading photos.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {albums.map((album, index) => (
+                    <AlbumCard 
+                      key={album.id} 
+                      index={index}
+                      album={album} 
+                      onClick={() => !isReordering && setSelectedAlbumId(album.id)}
+                      onDelete={handleDeleteAlbum}
+                      onLongPress={handleLongPress}
+                      isReordering={isReordering}
+                      onDragStart={handleDragStart}
+                      onDragEnter={handleDragEnter}
+                      onDragEnd={handleDragEnd}
+                    />
+                  ))}
+                </div>
+              )}
           </div>
         )}
 
