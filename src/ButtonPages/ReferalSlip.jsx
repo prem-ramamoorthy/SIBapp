@@ -32,10 +32,10 @@ function ButtonPage({ onClose = () => { } }) {
   const [userData, setUserData] = useState(null);
   useEffect(() => {
     if (userData) {
-      if(userData?.email) setEmail(userData.email || "");
-      if(userData?.phone_number) setPhone(userData.phone_number || "");
+      if(userData?.email) setEmail(referralType !== 'tier2' ? userData.email || "" : "");
+      if(userData?.phone_number) setPhone(referralType !== 'tier2' ?userData.phone_number || "" : "");
     }
-  }, [userData]);
+  }, [userData , referralType]);
 
   useEffect(() => {
     let cancelled = false;

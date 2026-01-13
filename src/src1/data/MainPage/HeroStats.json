@@ -17,7 +17,7 @@
     { "name": "Chapters", "value": 2 },
     { "name": "Members", "value": 100 },
     { "name": "Verticals", "value": 50 },
-    { "name": "Referrals", "value": 150 },
-    { "name": "Business Value", "value": 999999 }
+    { "name": "Referrals", "value": 1500 },
+    { "name": "Business Value", "value":300000000 }
   ]
 }

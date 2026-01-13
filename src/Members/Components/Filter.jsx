@@ -8,7 +8,7 @@ function Filter({ name, state, update, content = [] }) {
         className="py-2 px-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm text-gray-700 dark:text-gray-200 shadow-sm"
       >
         {content.map((c, i) => (
-          <option key={i} value={c}>{c}</option>
+          <option key={c._id || i} value={c._id || c}>{c.region_name || c}</option>
         ))}
       </select>
     </label>
