@@ -292,7 +292,7 @@ textarea.form-input {
   
   .sib-card.info-card {
     flex: 1;
-    min-width: 250px;
+    max-width: 350px;
   }
 }
 

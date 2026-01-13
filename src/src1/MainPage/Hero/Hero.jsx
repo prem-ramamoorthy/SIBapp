@@ -2,207 +2,204 @@ import React, { useEffect, useRef, useState } from 'react'
 import './HeroStyle.css'
 import data from '../../data/MainPage/HeroStats.json'
 
-// REPLACE THIS with your actual Backend URL or import it
-const Backend_Server_URL = import.meta.env.VITE_BACKEND_SERVER; 
+const Backend_Server_URL = import.meta.env.VITE_BACKEND_SERVER;
+
+// 1. CONFIGURATION: Define the values you want to ADD to the backend data here.
+// Example: If backend sends 2 chapters and you put 5 here, total will be 7.
+const ADDITIONAL_VALUES = {
+    chapters: 0,
+    members: 0,
+    verticals: 0,
+    referrals: 2828,
+    businessValue: 319495833 // e.g. adding 1 Lakh to business value
+};
 
 function Hero() {
     const statsRef = useRef(null);
     const typewriterRef = useRef(null);
     const isAnimatedRef = useRef(false);
-    
-    // Initialize with local data to prevent layout shift before fetch
-    const [stats, setStats] = useState(data.stats);
+    const animationFrameIds = useRef([]);
 
-    // --- Helper Function: Format Numbers to Indian System (k, Lakh, Crore) ---
+    // 2. OPTIMIZATION: Initialize state merging local JSON + Additional Values immediately
+    // This prevents the numbers from looking "empty" before the API loads.
+    const [stats, setStats] = useState(() => {
+        return data.stats.map(stat => {
+            // Map JSON keys to our config keys safely if needed, or just use initial values
+            return stat; 
+        });
+    });
+
+    // --- Helper: Format Indian Numbers ---
     const formatIndianNumber = (num) => {
         if (!num) return 0;
-        
-        // Convert string to number if needed
         const value = Number(num);
-
-        if (value >= 10000000) {
-            // Crores (e.g., 1.5 Cr)
-            return (value / 10000000).toFixed(1).replace(/\.0$/, '') + ' Crore+';
-        } else if (value >= 100000) {
-            // Lakhs (e.g., 1.5 Lakh)
-            return (value / 100000).toFixed(1).replace(/\.0$/, '') + ' Lakh+';
-        } else if (value >= 1000) {
-            // Thousands (e.g., 10 Thousand)
-            return (value / 1000).toFixed(1).replace(/\.0$/, '') + ' Thousand+';
-        }
-        
+        if (value >= 10000000) return (value / 10000000).toFixed(1).replace(/\.0$/, '') + ' Cr+';
+        if (value >= 100000) return (value / 100000).toFixed(1).replace(/\.0$/, '') + ' Lakh+';
+        if (value >= 1000) return (value / 1000).toFixed(1).replace(/\.0$/, '') + ' K+';
         return value;
     };
 
-    // --- Helper Function: Button Redirection ---
     const handleRedirect = (link) => {
-        if (link) {
-            // Use window.open(link, '_blank') for new tab, or window.location.href = link for same tab
-            window.location.href = link; 
-        }
+        if (link) window.location.href = link;
     };
 
-    // Fetch Dynamic Stats
+    const clearRunningAnimations = () => {
+        animationFrameIds.current.forEach(id => cancelAnimationFrame(id));
+        animationFrameIds.current = [];
+    };
+
+    // --- Fetch & Calculation Logic ---
     useEffect(() => {
         const fetchStats = async () => {
             try {
                 const response = await fetch(`${Backend_Server_URL}/public/stats`);
                 if (!response.ok) throw new Error('Network response was not ok');
-                
+
                 const apiData = await response.json();
-                
+
+                // 3. LOGIC: Calculate Total (API Value + Additional Value)
+                // We use Number() to ensure we don't accidentally concatenate strings (e.g. "5"+"2" = "52")
                 const dynamicStats = [
-                    { name: "Chapters", value: apiData.chaptercount },
-                    { name: "Members", value: apiData.membershipcount },
-                    { name: "Verticals", value: apiData.verticalcount },
-                    { name: "Referrals", value: apiData.referralcount },
-                    { name: "Business Value", value: apiData.bussinessamount }
+                    { 
+                        name: "Chapters", 
+                        value: Number(apiData.chaptercount || 0) + ADDITIONAL_VALUES.chapters 
+                    },
+                    { 
+                        name: "Members", 
+                        value: Number(apiData.membershipcount || 0) + ADDITIONAL_VALUES.members 
+                    },
+                    { 
+                        name: "Verticals", 
+                        value: Number(apiData.verticalcount || 0) + ADDITIONAL_VALUES.verticals 
+                    },
+                    { 
+                        name: "Referrals", 
+                        value: Number(apiData.referralcount || 0) + ADDITIONAL_VALUES.referrals 
+                    },
+                    { 
+                        name: "Business Value", 
+                        value: Number(apiData.bussinessamount || 0) + ADDITIONAL_VALUES.businessValue 
+                    }
                 ];
-                
-                setStats(dynamicStats);
+
+                setStats(prevStats => {
+                    const isDifferent = JSON.stringify(prevStats) !== JSON.stringify(dynamicStats);
+                    return isDifferent ? dynamicStats : prevStats;
+                });
+
             } catch (error) {
-                console.error("Failed to fetch dynamic stats, using fallback:", error);
+                console.error("Failed to fetch stats, falling back to local data:", error);
+                // Optional: If fetch fails, you could setStats using just the ADDITIONAL_VALUES here
             }
         };
 
         fetchStats();
     }, []);
 
-    // Observer and Animation Logic
+    // --- Animation Logic ---
     useEffect(() => {
+        // Typewriter Effect
         const setupTypewriterEffect = () => {
             const typewriterElements = document.querySelectorAll('.hero .animate-typewriter');
-
             typewriterElements.forEach((element, index) => {
                 const text = element.getAttribute('data-text') || element.textContent;
                 const delay = parseInt(element.getAttribute('data-delay')) || index * 1000;
-
+                
                 element.textContent = '';
                 element.style.width = '0';
-                element.style.borderRight = '2px solid var(--warm-gold)';
+                element.style.borderRight = '2px solid var(--warm-gold)'; // Ensure this var exists in CSS
 
-                setTimeout(() => {
-                    typeWriter(element, text, 30);
-                }, delay);
+                setTimeout(() => typeWriter(element, text), delay);
             });
         };
 
-        const typeWriter = (element, text, speed = 30) => {
+        const typeWriter = (element, text) => {
             let i = 0;
             element.style.width = 'auto';
             element.style.display = 'inline-block';
+            
+            // Optimization: Clear existing interval if any (safety check)
+            if(element.typewriterTimer) clearInterval(element.typewriterTimer);
 
-            const timer = setInterval(() => {
+            element.typewriterTimer = setInterval(() => {
                 if (i < text.length) {
                     element.textContent += text.charAt(i);
                     i++;
                 } else {
-                    clearInterval(timer);
-                    setTimeout(() => {
-                        element.style.borderRight = 'none';
-                    }, 100);
+                    clearInterval(element.typewriterTimer);
+                    setTimeout(() => { element.style.borderRight = 'none'; }, 100);
                 }
-            }, speed);
+            }, 30);
         };
 
+        // Counter Animation
         const animateCounters = (selector) => {
             const counters = document.querySelectorAll(selector);
+            
             counters.forEach(counter => {
-                // Get the raw numeric value from data attribute
                 const target = parseInt(counter.getAttribute('data-count'));
                 if (isNaN(target)) return;
 
-                const duration = 2500;
+                const startValue = parseFloat(counter.getAttribute('data-current-value')) || 0;
+                if (startValue === target) {
+                    counter.textContent = formatIndianNumber(target); // Ensure formatting is correct even if no animation needed
+                    return;
+                }
+
+                const duration = 2000;
                 const startTime = performance.now();
 
                 const animate = (currentTime) => {
                     const elapsed = currentTime - startTime;
                     const progress = Math.min(elapsed / duration, 1);
-
                     const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-                    const current = Math.floor(target * easeOutQuart);
+                    
+                    const current = Math.floor(startValue + (target - startValue) * easeOutQuart);
 
-                    // Apply the formatting logic during animation
+                    counter.setAttribute('data-current-value', current);
                     counter.textContent = formatIndianNumber(current);
 
                     if (progress < 1) {
-                        requestAnimationFrame(animate);
+                        const id = requestAnimationFrame(animate);
+                        animationFrameIds.current.push(id);
                     } else {
-                        // Ensure final value is formatted correctly
                         counter.textContent = formatIndianNumber(target);
+                        counter.setAttribute('data-current-value', target);
                     }
                 };
 
-                requestAnimationFrame(animate);
+                const id = requestAnimationFrame(animate);
+                animationFrameIds.current.push(id);
             });
         };
 
-        // Re-run logic if stats update while already visible
-        // FIX: Directly update the text instead of restarting the animation from 0
+        // Update Animation if already visible and data changes
         if (isAnimatedRef.current) {
-            const counters = document.querySelectorAll('.hero .stat-number');
-            counters.forEach(counter => {
-                const target = parseInt(counter.getAttribute('data-count'));
-                if (!isNaN(target)) {
-                    counter.textContent = formatIndianNumber(target);
-                }
-            });
+            clearRunningAnimations();
+            requestAnimationFrame(() => animateCounters('.hero .stat-number'));
         }
 
+        // Intersection Observer
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting && !isAnimatedRef.current) {
                     isAnimatedRef.current = true;
-
-                    setTimeout(() => {
-                        setupTypewriterEffect();
-                    }, 500);
-
-                    setTimeout(() => {
-                        animateCounters('.hero .stat-number');
-                    }, 20);
+                    
+                    // Trigger animations
+                    setTimeout(setupTypewriterEffect, 500);
+                    clearRunningAnimations();
+                    setTimeout(() => animateCounters('.hero .stat-number'), 20);
                 }
             });
-        }, {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-        if (statsRef.current) {
-            observer.observe(statsRef.current);
-        }
+        if (statsRef.current) observer.observe(statsRef.current);
 
         return () => {
-            if (statsRef.current) {
-                observer.unobserve(statsRef.current);
-            }
+            if (statsRef.current) observer.unobserve(statsRef.current);
+            clearRunningAnimations();
         };
     }, [stats]); 
-
-    const renderButtons = () => {
-        return data.buttons.map((button, index) => (
-            <button 
-                key={index} 
-                className={`btn btn-${button.type}`}
-                onClick={() => handleRedirect(button.link)}
-            >
-                <span>{button.name}</span>
-                <div className="btn-glow">{button.content}</div>
-            </button>
-        ));
-    };
-
-    const renderStats = () => {
-        return stats.map((stat, index) => (
-            <div key={index} className="stat-item"> 
-                {/* data-count stores the raw number for calculation.
-                    The text content starts at 0 and is updated by JS.
-                */}
-                <span className="stat-number" data-count={stat.value}>0</span>
-                <span className="stat-label">{stat.name}</span>
-            </div>
-        ));
-    };
 
     return (
         <section id="home" className="hero" style={{ marginTop: '-40px' }}>
@@ -233,14 +230,29 @@ function Hero() {
                         </a>
                     </div>
                     <div className="hero-actions animate-fade-up" data-delay="3000">
-                        {renderButtons()}
+                        {data.buttons.map((button, index) => (
+                            <button key={index} className={`btn btn-${button.type}`} onClick={() => handleRedirect(button.link)}>
+                                <span>{button.name}</span>
+                                <div className="btn-glow">{button.content}</div>
+                            </button>
+                        ))}
                     </div>
                     <div className="hero-stats animate-fade-up" data-delay="3500" ref={statsRef}>
-                        {renderStats()}
+                        {stats.map((stat, index) => (
+                            <div key={index} className="stat-item"> 
+                                <span 
+                                    className="stat-number" 
+                                    data-count={stat.value} 
+                                    data-current-value="0"
+                                >
+                                    0
+                                </span>
+                                <span className="stat-label">{stat.name}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
-            
         </section>
     )
 }
