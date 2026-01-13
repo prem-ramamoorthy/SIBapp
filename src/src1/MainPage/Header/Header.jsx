@@ -8,9 +8,9 @@ function Header({ isMembers = false, style = { background: "rgba(242, 240, 234, 
 
     // PASTE YOUR SOCIAL MEDIA LINKS HERE
     const socialLinks = {
-        youtube: "https://www.youtube.com/your-channel",
-        instagram: "https://www.instagram.com/your-profile",
-        facebook: "https://www.facebook.com/your-page"
+        youtube: "https://www.youtube.com/",
+        instagram: "https://www.instagram.com/sengunthar_in_business/",
+        facebook: "https://www.facebook.com/people/Sengunthar-In-Business/61580019027353/#"
     };
 
     const toggleMenu = () => {

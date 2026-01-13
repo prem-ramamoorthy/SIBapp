@@ -25,14 +25,18 @@ const Album = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper: Get Base URL
+  const getBaseUrl = () => {
+    return BACKEND_SERVER_URL.endsWith('/') 
+      ? BACKEND_SERVER_URL.slice(0, -1) 
+      : BACKEND_SERVER_URL;
+  };
+
   // Fetch Albums on Mount
   useEffect(() => {
     const fetchAlbums = async () => {
       try {
-        // Construct URL: Ensure we handle potential trailing slashes in env var
-        const baseUrl = BACKEND_SERVER_URL.endsWith('/') 
-          ? BACKEND_SERVER_URL.slice(0, -1) 
-          : BACKEND_SERVER_URL;
+        const baseUrl = getBaseUrl();
         
         const response = await fetch(`${baseUrl}/gallery/all`);
 
@@ -82,6 +86,25 @@ const Album = () => {
     } catch (e) {
       return dateString;
     }
+  };
+
+  // Helper: Get Cover Image URL
+  // Ensures relative paths from the backend (e.g. "uploads/image.jpg") 
+  // are converted to full URLs (e.g. "http://server/uploads/image.jpg")
+  const getCoverImageUrl = (album) => {
+    if (!album.coverImg) {
+        return "https://via.placeholder.com/400x300?text=No+Cover";
+    }
+    // If it is already a full URL (e.g. Cloudinary), return it
+    if (album.coverImg.startsWith('http')) {
+        return album.coverImg;
+    }
+    
+    // Otherwise, prepend the backend URL
+    const baseUrl = getBaseUrl();
+    // Remove leading slash from path if it exists to avoid double slashes
+    const cleanPath = album.coverImg.startsWith('/') ? album.coverImg.slice(1) : album.coverImg;
+    return `${baseUrl}/${cleanPath}`;
   };
 
   // Helper: Normalize photos to ensure they have a 'src' property
@@ -156,20 +179,20 @@ const Album = () => {
             ) : (
                 albums.map((album) => (
                 <div 
-                    key={album.id} 
+                    key={album.id || album._id} 
                     className="album-card-modern" 
                     onClick={() => handleFolderClick(album)}
                 >
                     <div className="image-container">
+                        {/* USE THE HELPER FUNCTION HERE */}
                         <img 
-                            src={album.coverImg || "https://via.placeholder.com/400x300?text=No+Cover"} 
+                            src={getCoverImageUrl(album)} 
                             alt={album.title} 
                             loading="lazy" 
                         />
                         <div className="overlay-gradient"></div>
                     </div>
                     <div className="card-content">
-                        {/* Updated Date Formatting */}
                         <span className="date-badge">{formatDate(album.date)}</span>
                         <h3>{album.title}</h3>
                         <p className="photo-count">

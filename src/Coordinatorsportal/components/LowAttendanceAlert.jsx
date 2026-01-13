@@ -35,6 +35,7 @@ const LowAttendanceAlert = () => {
         const data = await res.json();
         processAttendanceData(data);
       } catch (err) {
+        console.log(err);
         setError(err.message);
       } finally {
         setFetchLoading(false);
@@ -161,6 +162,7 @@ const LowAttendanceAlert = () => {
       setSuccess(`Alert sent to ${targetMembers.length} member(s)`);
       setTimeout(() => setSuccess(null), 2000);
     } catch (err) {
+        console.log(err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -183,6 +185,7 @@ const LowAttendanceAlert = () => {
       setModalData(Array.isArray(data) ? data : []);
       setShowModal(true);
     } catch (err) {
+        console.log(err);
       setError(err.message);
     } finally {
       setLoading(false);
