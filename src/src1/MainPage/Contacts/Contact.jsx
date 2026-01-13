@@ -394,8 +394,8 @@ function Contact() {
                 <div className="info-text">
                   <h4>Visit Office</h4>
                   <address>
-                    H96 Shop No5, Periyar Nagar Main Road,<br />
-                    Erode - 638001, Tamil Nadu
+                    {/* H96 Shop No5, Periyar Nagar Main Road,<br />
+                    Erode - 638001, Tamil Nadu */}
                   </address>
                 </div>
               </a>

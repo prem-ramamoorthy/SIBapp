@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   X, ChevronLeft, ChevronRight, ZoomIn, Image as ImageIcon, 
   Plus, Trash2, Upload, FolderPlus, ArrowLeft, Loader2, AlertCircle, CheckCircle2,
-   Calendar,
-  ArrowLeftIcon
+  Calendar, ArrowLeftIcon, Star, GripHorizontal, Save
 } from 'lucide-react';
 
 const BACKEND_SERVER_URL = import.meta.env.VITE_BACKEND_SERVER; 
@@ -13,6 +12,7 @@ const GALLERY_CREATE_URL = `${BACKEND_SERVER_URL}/gallery/upload`;
 const GALLERY_ADD_PHOTOS_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/add-photos/${eventId}`;
 const GALLERY_DELETE_PHOTO_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/delete-photo/${eventId}`;
 const GALLERY_DELETE_ALBUM_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/${eventId}`;
+const GALLERY_UPDATE_COVER_URL = (eventId) => `${BACKEND_SERVER_URL}/gallery/updatecoverimage/${eventId}`;
 
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
@@ -53,6 +53,40 @@ const ConfirmationModal = ({ isOpen, title, message, onConfirm, onCancel, isDest
           >
             Confirm
           </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// --- NEW COMPONENT: UPLOAD PROGRESS BAR ---
+const UploadProgress = ({ progress, currentFile, totalFiles }) => {
+  if (progress === 0 && !currentFile) return null;
+  
+  return (
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[80] w-full max-w-md px-4 animate-in slide-in-from-bottom-4 duration-300">
+      <div className="bg-neutral-900 border border-neutral-700 rounded-xl shadow-2xl p-4">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium text-white flex items-center">
+            <Loader2 className="animate-spin mr-2 h-4 w-4 text-emerald-500" />
+            Uploading...
+          </span>
+          <span className="text-xs text-neutral-400 font-mono">
+            {Math.round(progress)}%
+          </span>
+        </div>
+        
+        {/* Progress Track */}
+        <div className="w-full bg-neutral-800 rounded-full h-2 mb-2 overflow-hidden">
+          <div 
+            className="bg-emerald-500 h-2 rounded-full transition-all duration-300 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        <div className="flex justify-between text-xs text-neutral-500">
+           <span>{currentFile}</span>
+           <span>{totalFiles} files total</span>
         </div>
       </div>
     </div>
@@ -116,45 +150,94 @@ const Lightbox = ({ isOpen, image, onClose, onNext, onPrev, hasNext, hasPrev }) 
   );
 };
 
-const AlbumCard = ({ album, onClick, onDelete }) => (
-  <div 
-    onClick={onClick}
-    className="group relative aspect-square bg-neutral-800 rounded-lg overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-neutral-700"
-  >
-    {album.coverImg ? (
-      <img 
-        src={album.coverImg} 
-        alt={album.title}
-        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
-      />
-    ) : (
-      <div className="w-full h-full flex items-center justify-center text-neutral-600 bg-neutral-800">
-        <ImageIcon size={48} />
-      </div>
-    )}
-    
-    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
-      <h3 className="text-white font-bold text-xl mb-1">{album.title}</h3>
-      <div className="flex items-center text-neutral-300 text-sm mb-2">
-        <Calendar size={14} className="mr-1.5 opacity-75" />
-        {album.date && (new Date(album.date)).toLocaleDateString()}
-      </div>
-      <div className="flex items-center text-xs text-neutral-400">
-        <span className="bg-neutral-700/50 px-2 py-1 rounded backdrop-blur-sm">
-          {album.photos ? album.photos.length : 0} Photos
-        </span>
-      </div>
-    </div>
+const AlbumCard = ({ 
+  album, 
+  onClick, 
+  onDelete, 
+  onLongPress, 
+  isReordering,
+  onDragStart,
+  onDragEnter,
+  onDragEnd,
+  index
+}) => {
+  const longPressTimer = useRef(null);
 
-    <button
-      onClick={(e) => { e.stopPropagation(); onDelete(album); }}
-      className="absolute top-2 right-2 p-2 bg-red-500/80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-      title="Delete Album"
+  const handleTouchStart = () => {
+    longPressTimer.current = setTimeout(() => {
+      onLongPress(album.id);
+    }, 800); // 800ms long press
+  };
+
+  const handleTouchEnd = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+    }
+  };
+
+  return (
+    <div 
+      draggable={isReordering}
+      onDragStart={(e) => onDragStart(e, index)}
+      onDragEnter={(e) => onDragEnter(e, index)}
+      onDragEnd={onDragEnd}
+      onDragOver={(e) => e.preventDefault()}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleTouchStart}
+      onMouseUp={handleTouchEnd}
+      onMouseLeave={handleTouchEnd}
+      onClick={isReordering ? undefined : onClick}
+      className={`group relative aspect-square bg-neutral-800 rounded-lg overflow-hidden shadow-lg border border-neutral-700 transition-all duration-300 
+        ${isReordering ? 'cursor-move ring-2 ring-emerald-500 animate-pulse scale-95' : 'cursor-pointer hover:shadow-xl hover:-translate-y-1'}
+      `}
     >
-      <Trash2 size={16} />
-    </button>
-  </div>
-);
+      {album.coverImg ? (
+        <img 
+          src={album.coverImg} 
+          alt={album.title}
+          className={`w-full h-full object-cover transition-transform duration-700 ${isReordering ? 'opacity-60' : 'group-hover:scale-110 opacity-80 group-hover:opacity-100'}`}
+        />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center text-neutral-600 bg-neutral-800">
+          <ImageIcon size={48} />
+        </div>
+      )}
+      
+      {/* Overlay Content */}
+      <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6 ${isReordering ? 'pointer-events-none' : ''}`}>
+        <h3 className="text-white font-bold text-xl mb-1 truncate">{album.title}</h3>
+        <div className="flex items-center text-neutral-300 text-sm mb-2">
+          <Calendar size={14} className="mr-1.5 opacity-75" />
+          {album.date && (new Date(album.date)).toLocaleDateString()}
+        </div>
+        <div className="flex items-center text-xs text-neutral-400">
+          <span className="bg-neutral-700/50 px-2 py-1 rounded backdrop-blur-sm">
+            {album.photos ? album.photos.length : 0} Photos
+          </span>
+        </div>
+      </div>
+
+      {/* Delete Button (Hidden during reorder) */}
+      {!isReordering && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onDelete(album); }}
+          className="absolute top-2 right-2 p-2 bg-red-500/80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10"
+          title="Delete Album"
+        >
+          <Trash2 size={16} />
+        </button>
+      )}
+
+      {/* Reorder Indicator */}
+      {isReordering && (
+        <div className="absolute top-2 right-2 p-2 bg-emerald-500/80 text-white rounded-full">
+          <GripHorizontal size={20} />
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function PhotoGallery({ onBack }) {
   const [albums, setAlbums] = useState([]);
@@ -166,10 +249,20 @@ export default function PhotoGallery({ onBack }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isCreatingAlbum, setIsCreatingAlbum] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  // Upload Progress State
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadCurrentFile, setUploadCurrentFile] = useState("");
+  const [uploadTotalFilesCount, setUploadTotalFilesCount] = useState(0);
+
   const [newAlbumDate, setNewAlbumDate] = useState("");
   
   const [toasts, setToasts] = useState([]);
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, title: "", message: "", onConfirm: () => {} });
+
+  // Reordering States
+  const [isReordering, setIsReordering] = useState(false);
+  const dragItem = useRef();
+  const dragOverItem = useRef();
 
   const [newAlbumTitle, setNewAlbumTitle] = useState("");
   const fileInputRef = useRef(null);
@@ -271,7 +364,6 @@ export default function PhotoGallery({ onBack }) {
     }
   };
 
-  // --- UPDATED DELETE ALBUM LOGIC ---
   const handleDeleteAlbum = (albumToDelete) => {
     openConfirm(
       "Delete Album",
@@ -296,47 +388,160 @@ export default function PhotoGallery({ onBack }) {
     );
   };
 
-  // --- MODIFIED UPLOAD LOGIC ---
+  // --- SET COVER IMAGE ---
+  const handleSetCoverImage = async (photoUrl) => {
+    if (!selectedAlbumId) return;
+
+    try {
+      const res = await fetch(GALLERY_UPDATE_COVER_URL(selectedAlbumId), {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ coverImg: photoUrl })
+      });
+
+      if (!res.ok) throw new Error("Failed to set cover image");
+      
+      setAlbums(prev => prev.map(album => {
+        if (album.id === selectedAlbumId) {
+          return { ...album, coverImg: photoUrl };
+        }
+        return album;
+      }));
+      
+      addToast("Cover image updated successfully");
+    } catch (err) {
+      console.error("Set cover error:", err);
+      addToast("Failed to set cover image", "error");
+    }
+  };
+
+  // --- REARRANGE ALBUMS ---
+  const handleDragStart = (e, position) => {
+    dragItem.current = position;
+  };
+
+  const handleDragEnter = (e, position) => {
+    dragOverItem.current = position;
+    
+    // Live Swap Logic
+    const copyListItems = [...albums];
+    const dragItemContent = copyListItems[dragItem.current];
+    copyListItems.splice(dragItem.current, 1);
+    copyListItems.splice(dragOverItem.current, 0, dragItemContent);
+    dragItem.current = position;
+    dragOverItem.current = null;
+    setAlbums(copyListItems);
+  };
+
+  const handleDragEnd = () => {
+    dragItem.current = null;
+    dragOverItem.current = null;
+  };
+
+  const handleLongPress = () => {
+    if (!isReordering) {
+      setIsReordering(true);
+      addToast("Reorder mode enabled. Drag albums to rearrange.");
+    }
+  };
+
+  const saveReorder = () => {
+    setIsReordering(false);
+    addToast("Album order saved");
+  };
+
+  // --- UPDATED UPLOAD LOGIC WITH PROGRESS ---
+  
+  // Helper to upload single file using XHR for progress events
+  const uploadFileWithProgress = (file, onProgress) => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', UPLOAD_API_URL);
+      xhr.withCredentials = true;
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          onProgress(event.loaded);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            resolve(data);
+          } catch (e) {
+            reject(new Error("Invalid JSON response"));
+          }
+        } else {
+           try {
+              const errorData = JSON.parse(xhr.responseText);
+              reject(new Error(errorData.error || 'Upload failed'));
+           } catch(e) {
+              reject(new Error(xhr.statusText));
+           }
+        }
+      };
+
+      xhr.onerror = () => reject(new Error('Network Error'));
+
+      const formData = new FormData();
+      formData.append('photo', file);
+      xhr.send(formData);
+    });
+  };
+
   const handleFileUpload = async (e) => {
     const files = e.target.files;
     if (!files || files.length === 0 || !selectedAlbumId) return;
 
     setIsUploading(true);
+    setUploadProgress(0);
+    setUploadTotalFilesCount(files.length);
 
     try {
       const uploadedUrls = [];
       let successCount = 0;
+      
+      // Calculate total size for global progress
+      let totalBytes = 0;
+      for (let i = 0; i < files.length; i++) totalBytes += files[i].size;
+
+      let accumulatedBytes = 0;
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const formData = new FormData();
-        formData.append('photo', file);
+        setUploadCurrentFile(`${file.name}`);
 
         try {
-          const response = await fetch(UPLOAD_API_URL, {
-            method: 'POST',
-            body: formData,
+          const data = await uploadFileWithProgress(file, (loaded) => {
+             const currentTotal = accumulatedBytes + loaded;
+             const percentage = Math.min((currentTotal / totalBytes) * 100, 99); // Cap at 99 until finished
+             setUploadProgress(percentage);
           });
 
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Upload failed');
-          }
-
-          const data = await response.json();
           const imageUrl = data.url; 
-
           if (!imageUrl) throw new Error("No URL returned from backend");
 
           uploadedUrls.push(imageUrl);
           successCount++;
+          
+          // Add this file's full size to accumulated for next loop
+          accumulatedBytes += file.size;
+
         } catch (innerErr) {
           console.error(`Failed to upload ${file.name}:`, innerErr);
+          // Even if failed, add size to keep progress bar moving roughly correctly or skip
+          accumulatedBytes += file.size; 
         }
       }
+      
+      setUploadProgress(100);
 
       if (uploadedUrls.length > 0) {
-        // Now POST to /gallery/add-photos/:eventid
+        setUploadCurrentFile("Saving to album...");
+        
         const addPhotosRes = await fetch(GALLERY_ADD_PHOTOS_URL(selectedAlbumId), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -373,11 +578,13 @@ export default function PhotoGallery({ onBack }) {
       addToast("Upload process failed", "error");
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
+      setUploadCurrentFile("");
+      setUploadTotalFilesCount(0);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
-  // --- MODIFIED DELETE PHOTO LOGIC ---
   const handleDeletePhoto = async (photoToDelete) => {
     openConfirm(
       "Delete Photo",
@@ -450,6 +657,15 @@ export default function PhotoGallery({ onBack }) {
         isDestructive={confirmModal.isDestructive}
       />
 
+      {/* Upload Progress Bar (Displays when isUploading is true) */}
+      {isUploading && (
+         <UploadProgress 
+            progress={uploadProgress} 
+            currentFile={uploadCurrentFile} 
+            totalFiles={uploadTotalFilesCount} 
+         />
+      )}
+
       {/* HEADER */}
       <header className="border-b border-neutral-800 bg-neutral-900/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -472,16 +688,24 @@ export default function PhotoGallery({ onBack }) {
           </div>
           
           <div className="flex items-center space-x-4">
-             {selectedAlbumId ? (
+              {selectedAlbumId ? (
                 <button 
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
                   className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isUploading ? <Loader2 className="animate-spin" size={16}/> : <Upload size={16} />}
-                  <span>Upload Photos</span>
+                  <span>{isUploading ? 'Uploading...' : 'Upload Photos'}</span>
                 </button>
-             ) : (
+              ) : isReordering ? (
+                <button 
+                  onClick={saveReorder}
+                  className="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors animate-pulse"
+                >
+                  <Save size={16} />
+                  <span>Done Reordering</span>
+                </button>
+              ) : (
                 <button 
                   onClick={() => setIsCreatingAlbum(true)}
                   className="flex items-center space-x-2 bg-neutral-100 hover:bg-white text-neutral-900 px-4 py-2 rounded-md text-sm font-medium transition-colors"
@@ -489,7 +713,7 @@ export default function PhotoGallery({ onBack }) {
                   <Plus size={16} />
                   <span>New Album</span>
                 </button>
-             )}
+              )}
           </div>
         </div>
       </header>
@@ -499,9 +723,20 @@ export default function PhotoGallery({ onBack }) {
         {/* VIEW: ALBUM LIST */}
         {!selectedAlbumId && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="mb-8">
-                <h2 className="text-3xl font-bold text-white mb-2">Albums & Collections</h2>
-                <p className="text-neutral-400">Select an album to view or manage photos.</p>
+             <div className="mb-8 flex justify-between items-end">
+               <div>
+                 <h2 className="text-3xl font-bold text-white mb-2">Albums & Collections</h2>
+                 <p className="text-neutral-400">
+                   {isReordering 
+                     ? "Drag albums to change their order." 
+                     : "Select an album to view or long-press to reorder."}
+                 </p>
+               </div>
+               {isReordering && (
+                  <span className="text-emerald-400 text-sm font-medium bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                    Reorder Mode Active
+                  </span>
+               )}
              </div>
 
              {loading ? (
@@ -516,12 +751,18 @@ export default function PhotoGallery({ onBack }) {
                </div>
              ) : (
                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                 {albums.map(album => (
+                 {albums.map((album, index) => (
                    <AlbumCard 
                      key={album.id} 
+                     index={index}
                      album={album} 
-                     onClick={() => setSelectedAlbumId(album.id)}
+                     onClick={() => !isReordering && setSelectedAlbumId(album.id)}
                      onDelete={handleDeleteAlbum}
+                     onLongPress={handleLongPress}
+                     isReordering={isReordering}
+                     onDragStart={handleDragStart}
+                     onDragEnter={handleDragEnter}
+                     onDragEnd={handleDragEnd}
                    />
                  ))}
                </div>
@@ -544,8 +785,8 @@ export default function PhotoGallery({ onBack }) {
                 <div>
                   <h2 className="text-3xl font-bold text-white">{selectedAlbum.title}</h2>
                   <div className="flex items-center text-neutral-400 mt-1 text-sm">
-                     <Calendar size={14} className="mr-1.5" />
-                     {selectedAlbum.date && (new Date(selectedAlbum.date)).toLocaleDateString()}
+                      <Calendar size={14} className="mr-1.5" />
+                      {selectedAlbum.date && (new Date(selectedAlbum.date)).toLocaleDateString()}
                   </div>
                 </div>
               </div>
@@ -593,14 +834,33 @@ export default function PhotoGallery({ onBack }) {
                         <ZoomIn className="text-white drop-shadow-lg" size={24} />
                     </div>
 
-                    {/* Delete Image Button */}
-                    <button
-                      onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo); }}
-                      className="absolute top-0 right-1 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-md group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0"
-                      title="Delete Image"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    {/* Actions Overlay (Always visible on hover) */}
+                    <div className="absolute top-0 w-full p-2 flex justify-between items-start opacity-0 group-hover:opacity-100 transition-opacity">
+                        {/* Set Cover Button */}
+                        <button
+                          onClick={(e) => { 
+                            e.stopPropagation(); 
+                            handleSetCoverImage(photo.src); 
+                          }}
+                          className={`p-1.5 rounded-md backdrop-blur-md transition-colors ${
+                             selectedAlbum.coverImg === photo.src 
+                             ? 'bg-yellow-500/80 text-white' 
+                             : 'bg-black/50 text-white hover:bg-yellow-500/80'
+                          }`}
+                          title="Set as Album Cover"
+                        >
+                           <Star size={14} fill={selectedAlbum.coverImg === photo.src ? "currentColor" : "none"} />
+                        </button>
+
+                        {/* Delete Image Button */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photo); }}
+                          className="p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-md transition-colors"
+                          title="Delete Image"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -651,7 +911,6 @@ export default function PhotoGallery({ onBack }) {
                   onChange={(e) => setNewAlbumDate(e.target.value)}
                   className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                   placeholder="e.g., Summer Vacation 2024"
-                  autoFocus
                 />
               </div>
               

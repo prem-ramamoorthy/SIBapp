@@ -8,8 +8,8 @@ const Backend_Server_URL = import.meta.env.VITE_BACKEND_SERVER;
 
 // --- MOCK DATA (Replace with your actual imports) ---
 const socialData = [
-    { name: "Facebook", link: "#", icon: <Facebook size={20} /> },
-    { name: "Instagram", link: "#", icon: <Instagram size={20} /> },
+    { name: "Facebook", link: "https://www.facebook.com/people/Sengunthar-In-Business/61580019027353/#", icon: <Facebook size={20} /> },
+    { name: "Instagram", link: "https://www.instagram.com/sengunthar_in_business/", icon: <Instagram size={20} /> },
     { name: "YouTube", link: "#", icon: <Youtube size={20} /> }
 ];
 
@@ -167,7 +167,7 @@ function Footer({ margin = "auto", ismember = false }) {
                                 <div className="contact-info">
                                     <div className="contact-item">
                                         <MapPin size={18} className="contact-icon" />
-                                        <p>H96 Shop No5, Periyar Nagar Main Road,<br/>Erode, Tamil Nadu - 638009</p>
+                                        {/* <p>H96 Shop No5, Periyar Nagar Main Road,<br/>Erode, Tamil Nadu - 638009</p> */}
                                     </div>
                                     <div className="contact-item">
                                         <Phone size={18} className="contact-icon" />
@@ -175,7 +175,7 @@ function Footer({ margin = "auto", ismember = false }) {
                                     </div>
                                     <div className="contact-item">
                                         <Mail size={18} className="contact-icon" />
-                                        <p>members@segentharinbusiness.in</p>
+                                        <p>members@senguntharinbusiness.in</p>
                                     </div>
                                 </div>
                                 
