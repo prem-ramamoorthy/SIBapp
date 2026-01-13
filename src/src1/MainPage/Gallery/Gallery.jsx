@@ -1,3 +1,4 @@
+import { Scale } from 'lucide-react';
 import './GalleryStyle.css'
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom';
@@ -62,10 +63,10 @@ function Gallery() {
                         <img src="/Prosperity-focusedmovement(1).png" alt="Gallery Image 1"  />
                     </div>
                     <div className="slide">
-                        <img src="/Prosperity-focusedmovement.png" alt="Gallery Image 2" style={{ height: '670px' }} />
+                        <img src="/Prosperity-focusedmovement.png" alt="Gallery Image 2" />
                     </div>
                     <div className="slide">
-                        <img src="/Prosperity-focusedmovement(2).png" alt="Gallery Image 3" style={{ maxWidth: '100%' ,height: '670px' }} />
+                        <img src="/Prosperity-focusedmovement(2).png" alt="Gallery Image 3" />
                     </div>
                     <div className="slide">
                         <img src="/Prosperity-focusedmovement(3).png" alt="Gallery Image 4" />
