@@ -23,15 +23,15 @@ function MemberCard({
     <div className="flex flex-col justify-end pt-12 w-full max-w-[300px] mx-auto">
       
       {/* Card Body */}
-      <div className="relative bg-white dark:bg-gray-800 w-full rounded-t-2xl rounded-b-xl flex flex-col items-center shadow-md hover:shadow-xl transition-all duration-300 pb-5 -z-1">
+      <div className="relative bg-white dark:bg-gray-800 w-full rounded-t-2xl rounded-b-xl flex flex-col items-center shadow-md hover:shadow-xl transition-all duration-300 pb-5 ">
         
         {/* --- Profile Image (Floating) --- */}
-        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="h-[110px] w-[110px] bg-gray-300 dark:bg-gray-700 rounded-full shadow-lg border-2 border-gray-400 dark:border-gray-600 relative">
+        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 z-1">
+          <div className="h-[110px] w-[110px] bg-gray-300 dark:bg-gray-700 rounded-full shadow-lg border-2 border-gray-400 dark:border-gray-600 relative ">
             <img
               src={member.profile_image_url || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
               alt={member.username}
-              className="h-full w-full rounded-full object-cover object-top z-15"
+              className="h-full w-full rounded-full object-cover object-top "
 
             />
             {/* Blood Group Badge */}
