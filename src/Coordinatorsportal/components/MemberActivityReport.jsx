@@ -157,27 +157,38 @@ function MemberActivityReport() {
                 meeting_id: selectedMeeting,
                 date: formattedDate,
             };
-            await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/attendance/createbulkattendances`, {
+            const attendanceRes = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/attendance/createbulkattendances`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data),
             });
-            setSubmittedAttendances((prev) => new Set([...prev, filteredAndSortedData.id]));
+            if (!attendanceRes.ok) {
+                const errMsg = await attendanceRes.text();
+                throw new Error(`Attendance submission failed: ${errMsg}`);
+            }
+            setSubmittedAttendances((prev) => {
+                const newIds = filteredAndSortedData.map((m) => m.id);
+                return new Set([...prev, ...newIds]);
+            });
             const confirm_data = {
                 _id: selectedMeeting,
                 attendance_status: true,
             };
-            await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/updatemeeting`, {
+            const updateMeetingRes = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/meeting/updatemeeting`, {
                 method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(confirm_data),
             });
+            if (!updateMeetingRes.ok) {
+                const errMsg = await updateMeetingRes.text();
+                throw new Error(`Meeting update failed: ${errMsg}`);
+            }
             setSuccess('Attendance submitted successfully');
             setTimeout(() => setSuccess(null), 2000);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || 'An error occurred during attendance submission');
         } finally {
             setLoading(false);
         }
@@ -202,32 +213,40 @@ function MemberActivityReport() {
                 header: "Approval Notification",
                 content: `Your meeting/business activity data has been approved by the coordinator in the meeting "${selectedMeeting}".`
             };
-            await Promise.all([
+            const [
+                referralRes,
+                tyftbRes,
+                m2mRes,
+                notificationRes
+            ] = await Promise.all([
                 fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/referral/updatebulkreferralstatusbyreferrer`, {
                     method: 'PUT',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({"list" : selectedMembers}),
+                    body: JSON.stringify({ "list": selectedMembers }),
                 }),
-                await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/tyftb/updatebulktyftbstatusbypayer`, {
+                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/tyftb/updatebulktyftbstatusbypayer`, {
                     method: 'PUT',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ "list": selectedMembers }),
                 }),
-                await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/one2one/updatebulkm2mstatusbyuserid`, {
+                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/one2one/updatebulkm2mstatusbyuserid`, {
                     method: 'PUT',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ "list": selectedMembers }),
                 }),
-                await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/notification/createbulknotificationwithoutsenderbyid`, {
+                fetch(`${import.meta.env.VITE_BACKEND_SERVER}/notification/createbulknotificationwithoutsenderbyid`, {
                     method: 'POST',
                     credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(notificationData),
                 }),
             ]);
+            if (!referralRes.ok || !tyftbRes.ok || !m2mRes.ok || !notificationRes.ok) {
+                throw new Error('One or more approval requests failed');
+            }
             setApprovedMembers((prev) => new Set([...prev, ...selectedMembers]));
 
             const updated = memberData.map((m) =>
@@ -252,7 +271,11 @@ function MemberActivityReport() {
         }
         setLoading(true);
         try {
-            await Promise.all([
+            const [
+                referralRes,
+                tyftbRes,
+                m2mRes
+            ] = await Promise.all([
                 fetch(`${import.meta.env.VITE_BACKEND_SERVER}/slips/referral/updatereferralstatusbyreferrer/${memberId}`, {
                     method: 'PUT',
                     credentials: 'include',
@@ -272,6 +295,9 @@ function MemberActivityReport() {
                     body: JSON.stringify({ status: true }),
                 }),
             ]);
+            if (!referralRes.ok || !tyftbRes.ok || !m2mRes.ok) {
+                throw new Error('One or more approval requests failed');
+            }
 
             const updated = memberData.map((m) =>
                 m.id === memberId ? { ...m, approvalStatus: 'APPROVED' } : m
@@ -282,7 +308,7 @@ function MemberActivityReport() {
             setSuccess('Member approved successfully');
             setTimeout(() => setSuccess(null), 2000);
         } catch (err) {
-            setError(err.message);
+            setError(err.message || 'An error occurred during member approval');
         } finally {
             setLoading(false);
         }

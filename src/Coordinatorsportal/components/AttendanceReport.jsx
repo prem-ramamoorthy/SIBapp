@@ -46,23 +46,23 @@ const AttendanceOverview = () => {
   function processAttendanceData(data) {
     const userMap = {};
     data.forEach(record => {
-      const userId = record.user._id;
+      const userId = record?.user?._id || "unknown";
       if (!userMap[userId]) {
         userMap[userId] = {
           id: userId,
-          name: record.user.username,
-          contact: record.user.phone_number,
+          name: record?.user?.username || 'Unknown',
+          contact: record?.user?.phone_number || 'N/A',
           totalMeetings: 0,
           presentCount: 0,
           lastPresentDate: null,
         };
       }
       userMap[userId].totalMeetings++;
-      if (record.attendance_status === 'present') {
+      if (record?.attendance_status === 'present') {
         userMap[userId].presentCount++;
-        const recordDate = new Date(record.date);
+        const recordDate = new Date(record?.date);
         if (!userMap[userId].lastPresentDate || recordDate > new Date(userMap[userId].lastPresentDate)) {
-          userMap[userId].lastPresentDate = record.date;
+          userMap[userId].lastPresentDate = record?.date;
         }
       }
     });
@@ -79,17 +79,19 @@ const AttendanceOverview = () => {
   const filteredAndSortedData = useMemo(() => {
     let result = members.filter(
       row =>
-        row.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        row.contact.includes(searchTerm)
+        (row.name && row.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (row.contact && row.contact.toString().includes(searchTerm))
     );
     result.sort((a, b) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
       let comparison = 0;
-      if (typeof aValue === 'string') {
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
         comparison = aValue.toLowerCase().localeCompare(bValue.toLowerCase());
-      } else {
+      } else if (typeof aValue === 'number' && typeof bValue === 'number') {
         comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        comparison = 0;
       }
       return sortConfig.direction === 'asc' ? comparison : -comparison;
     });
@@ -135,11 +137,20 @@ const AttendanceOverview = () => {
 
   const handleExport = () => {
     setLoading(true);
+    setError(null);
+    setSuccess(null);
     try {
       const csv = [
         ['MEMBER NAME', 'ATTENDANCE %', 'PRESENT', 'TOTAL MEETINGS', 'LAST PRESENT DATE', 'CONTACT'].join(','),
         ...filteredAndSortedData.map(row =>
-          [row.name, row.attendance, row.presentCount, row.totalMeetings, row.lastPresent, row.contact]
+          [
+            row.name ?? '',
+            row.attendance ?? '',
+            row.presentCount ?? '',
+            row.totalMeetings ?? '',
+            row.lastPresent ?? '',
+            row.contact ?? ''
+          ]
             .map(v => `"${v}"`)
             .join(',')
         )
@@ -155,6 +166,8 @@ const AttendanceOverview = () => {
       document.body.removeChild(link);
       setSuccess('Attendance data exported successfully');
       setTimeout(() => setSuccess(null), 2000);
+    } catch (err) {
+      setError('Failed to export data');
     } finally {
       setLoading(false);
     }
@@ -167,7 +180,7 @@ const AttendanceOverview = () => {
   };
 
   if (loading && members.length === 0) return <div className="w-full min-h-screen flex items-center justify-center">Loading...</div>;
-  if (error && members.length === 0) return <div className="w-full min-h-screen flex items-center justify-center text-red-600">{error}</div>;
+  if (error && members.length === 0) return <div className="w-full min-h-screen flex items-center justify-center text-red-600">{error || 'An error occurred.'}</div>;
 
   return (
     <div className="w-full min-h-screen p-4 sm:p-6 lg:p-8">
@@ -247,9 +260,8 @@ const AttendanceOverview = () => {
                     <th
                       key={col.key}
                       onClick={() => col.sortable && handleSort(col.key)}
-                      className={`px-4 py-4 text-left text-xs font-bold text-white uppercase tracking-wide ${col.width} ${
-                        col.sortable ? 'cursor-pointer hover:bg-gray-800' : ''
-                      } transition-colors`}
+                      className={`px-4 py-4 text-left text-xs font-bold text-white uppercase tracking-wide ${col.width} ${col.sortable ? 'cursor-pointer hover:bg-gray-800' : ''
+                        } transition-colors`}
                     >
                       {col.label}
                     </th>
@@ -261,9 +273,8 @@ const AttendanceOverview = () => {
                   paginatedData.map((row, idx) => (
                     <tr
                       key={row.id}
-                      className={`border-b border-gray-200 dark:border-gray-700 ${
-                        idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'
-                      } hover:bg-gray-100 dark:hover:bg-gray-900/50 transition-colors`}
+                      className={`border-b border-gray-200 dark:border-gray-700 ${idx % 2 === 0 ? 'bg-white dark:bg-gray-800' : 'bg-gray-50 dark:bg-gray-700'
+                        } hover:bg-gray-100 dark:hover:bg-gray-900/50 transition-colors`}
                     >
                       <td className="px-4 py-4 text-sm font-semibold text-gray-900 dark:text-gray-50">{row.name}</td>
                       <td className="px-4 py-4 text-sm font-bold">
@@ -338,11 +349,10 @@ const AttendanceOverview = () => {
                     <button
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
-                      className={`px-3 py-2 rounded text-sm font-medium transition-colors duration-200 ${
-                        currentPage === pageNum
+                      className={`px-3 py-2 rounded text-sm font-medium transition-colors duration-200 ${currentPage === pageNum
                           ? 'bg-red-500 text-white'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'
-                      }`}
+                        }`}
                     >
                       {pageNum}
                     </button>
@@ -361,7 +371,7 @@ const AttendanceOverview = () => {
         </div>
       </div>
 
-      {showModal && modalData && (
+      {showModal && Array.isArray(modalData) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
@@ -371,26 +381,29 @@ const AttendanceOverview = () => {
               </button>
             </div>
             <div className="p-6 space-y-3">
-              {modalData.map((record, idx) => (
-                <div key={idx} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Meeting: {record.meeting?.title}</p>
-                      <p className="text-sm text-gray-900 dark:text-gray-50">Date: {new Date(record.date).toLocaleDateString()}</p>
-                      <p className="text-sm text-gray-900 dark:text-gray-50">Location: {record.meeting?.location}</p>
+              {modalData.length > 0 ? (
+                modalData.map((record, idx) => (
+                  <div key={idx} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Meeting: {record?.meeting?.title ?? 'N/A'}</p>
+                        <p className="text-sm text-gray-900 dark:text-gray-50">Date: {record?.date ? new Date(record.date).toLocaleDateString() : 'N/A'}</p>
+                        <p className="text-sm text-gray-900 dark:text-gray-50">Location: {record?.meeting?.location ?? 'N/A'}</p>
+                      </div>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold ${record?.attendance_status === 'present'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                          }`}
+                      >
+                        {record?.attendance_status === 'present' ? 'Present' : 'Absent'}
+                      </span>
                     </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold ${
-                        record.attendance_status === 'present'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}
-                    >
-                      {record.attendance_status === 'present' ? 'Present' : 'Absent'}
-                    </span>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <div className="text-center text-gray-600 dark:text-gray-400">No attendance records found.</div>
+              )}
             </div>
             <div className="flex gap-2 justify-end p-6 border-t border-gray-200 dark:border-gray-700">
               <button

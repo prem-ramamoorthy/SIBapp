@@ -95,10 +95,15 @@ export default function CreatePresidentForm({chapterName = null}) {
                     })
                 }
             );
-            const signupJson = await signupRes.json();
+            let signupJson;
+            try {
+                signupJson = await signupRes.json();
+            } catch (jsonErr) {
+                throw new Error("Failed to parse signup response");
+            }
 
-            if (!signupRes.ok || !signupJson.uid) {
-                throw new Error(signupJson.message || signupJson.error || "Registration failed");
+            if (!signupRes.ok || !signupJson || !signupJson.uid) {
+                throw new Error((signupJson && (signupJson.message || signupJson.error)) || "Registration failed");
             }
 
             const now = new Date();
@@ -121,26 +126,36 @@ export default function CreatePresidentForm({chapterName = null}) {
                     })
                 }
             );
-            const membershipJson = await membershipRes.json();
+            let membershipJson;
+            try {
+                membershipJson = await membershipRes.json();
+            } catch (jsonErr) {
+                throw new Error("Failed to parse membership response");
+            }
+
+            if (!membershipRes.ok) {
+                throw new Error((membershipJson && (membershipJson.message || membershipJson.error)) || "Membership creation failed");
+            }
 
             const payload = {
                 receiver: form.username,
-                header: "Welcome to SIB Platform!r",
+                header: "Welcome to SIB Platform!",
                 content: `Hello and welcome to the Sengunthar In Business family! Your account has been created successfully. You can now log in to access all features and participate in chapter activities. If you have any questions or need assistance, feel free to reach out to support.`
             };
 
-            await fetch(
-                `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`,
-                {
-                    method: "POST",
-                    credentials: "include",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                }
-            );
-
-            if (!membershipRes.ok) {
-                throw new Error(membershipJson.message || membershipJson.error || "Membership creation failed");
+            try {
+                await fetch(
+                    `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`,
+                    {
+                        method: "POST",
+                        credentials: "include",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    }
+                );
+            } catch (notifyErr) {
+                // Optionally log notification error, but do not block user creation
+                console.error("Notification error:", notifyErr);
             }
             setShowSuccess(true);
             setTimeout(() => setShowSuccess(false), 2500);
