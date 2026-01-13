@@ -33,7 +33,7 @@ const StatusBadge = ({ status }) => {
 
 export default function RegionChapterManager() {
   const [regions, setRegions] = useState([]);
-  const [chapters, setChapters] = useState([]);
+  // const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [isRegionModalOpen, setIsRegionModalOpen] = useState(false);
@@ -42,7 +42,7 @@ export default function RegionChapterManager() {
   const [editingId, setEditingId] = useState(null);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode] = useState(false);
 
   const [regionForm, setRegionForm] = useState({ name: '', code: '', country: '', status: 'Active' });
   const [chapterForm, setChapterForm] = useState({
@@ -50,12 +50,14 @@ export default function RegionChapterManager() {
   });
 
   const [expandedRegions, setExpandedRegions] = useState({});
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+      setError(null);
       try {
         const [regionsRes, chaptersRes] = await Promise.all([
           fetch(`${import.meta.env.VITE_BACKEND_SERVER}/admin/region/getallregions`, {
@@ -67,6 +69,9 @@ export default function RegionChapterManager() {
             credentials: "include",
           }),
         ]);
+        if (!regionsRes.ok || !chaptersRes.ok) {
+          throw new Error("Failed to fetch regions or chapters.");
+        }
         const regionsData = await regionsRes.json();
         const chaptersData = await chaptersRes.json();
 
@@ -99,11 +104,11 @@ export default function RegionChapterManager() {
         });
 
         setRegions(Object.values(regionMap));
-        setChapters(chaptersData);
+        // setChapters(chaptersData);
       } catch (err) {
-        console.error('Error fetching data:', err);
+        setError(err.message || 'Error fetching data');
         setRegions([]);
-        setChapters([]);
+        // setChapters([]);
       }
       setLoading(false);
     }
@@ -144,10 +149,11 @@ export default function RegionChapterManager() {
 
   const handleRegionSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     if (editingId) {
       // Update region via API
       try {
-        await fetch(
+        const res = await fetch(
           `${import.meta.env.VITE_BACKEND_SERVER}/admin/region/updateregionbyid/${editingId}`,
           {
             method: "PUT",
@@ -160,9 +166,11 @@ export default function RegionChapterManager() {
             }),
           }
         );
+        if (!res.ok) throw new Error("Failed to update region.");
         setRegions(regions.map(r => r.id === editingId ? { ...r, ...regionForm } : r));
-      } catch {
-        // Optionally handle error
+        setIsRegionModalOpen(false);
+      } catch (err) {
+        setError(err.message || "Error updating region.");
       }
     } else {
       // CREATE region via API
@@ -180,6 +188,7 @@ export default function RegionChapterManager() {
             }),
           }
         );
+        if (!res.ok) throw new Error("Failed to create region.");
         const data = await res.json();
         const newRegion = {
           id: data._id,
@@ -190,11 +199,11 @@ export default function RegionChapterManager() {
           chapters: []
         };
         setRegions([...regions, newRegion]);
-      } catch {
-        // Optionally handle error
+        setIsRegionModalOpen(false);
+      } catch (err) {
+        setError(err.message || "Error creating region.");
       }
     }
-    setIsRegionModalOpen(false);
   };
 
   // --- CHAPTER HANDLERS ---
@@ -223,6 +232,7 @@ export default function RegionChapterManager() {
 
   const handleChapterSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     const regionObj = regions.find(r => r.id === activeRegionId);
     const newChapterData = {
       id: editingId || Date.now().toString(),
@@ -238,7 +248,7 @@ export default function RegionChapterManager() {
     if (editingId) {
       // Update chapter via API
       try {
-        await fetch(
+        const res = await fetch(
           `${import.meta.env.VITE_BACKEND_SERVER}/chapter/main/updatechapterbyid/${editingId}`,
           {
             method: "PUT",
@@ -258,6 +268,7 @@ export default function RegionChapterManager() {
             }),
           }
         );
+        if (!res.ok) throw new Error("Failed to update chapter.");
         setRegions(regions.map(region => {
           if (region.id === activeRegionId) {
             return {
@@ -267,12 +278,14 @@ export default function RegionChapterManager() {
           }
           return region;
         }));
-      } catch {
-        // Optionally handle error
+        setIsChapterModalOpen(false);
+      } catch (err) {
+        setError(err.message || "Error updating chapter.");
       }
     } else {
       // CREATE chapter via API
       try {
+        setLoading(true);
         const res = await fetch(
           `${import.meta.env.VITE_BACKEND_SERVER}/chapter/main/createchapter`,
           {
@@ -294,6 +307,42 @@ export default function RegionChapterManager() {
             }),
           }
         );
+        if (!res.ok) throw new Error("Failed to create chapter.");
+        // Membership creation
+        const presidentRes = await fetch(
+          `${import.meta.env.VITE_BACKEND_SERVER}/chapter/membership/createpresident`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: "SIBSangam",
+              role: "member",
+              membership_status: true,
+              chapter_name: chapterForm.name,
+              join_date: new Date().toISOString().split('T')[0],
+              renewal_date: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0]
+            })
+          }
+        );
+        if (!presidentRes.ok) throw new Error("Failed to create SIBSangam member.");
+        const visitorRes = await fetch(
+          `${import.meta.env.VITE_BACKEND_SERVER}/chapter/membership/createpresident`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: "Visitors",
+              role: "member",
+              membership_status: true,
+              chapter_name: chapterForm.name,
+              join_date: new Date().toISOString().split('T')[0],
+              renewal_date: new Date(new Date().setMonth(new Date().getMonth() + 6)).toISOString().split('T')[0]
+            })
+          }
+        );
+        if (!visitorRes.ok) throw new Error("Failed to create Visitors member.");
         const data = await res.json();
         const createdChapter = {
           id: data._id,
@@ -314,14 +363,14 @@ export default function RegionChapterManager() {
           }
           return region;
         }));
-      } catch {
-        // Optionally handle error
+        setIsChapterModalOpen(false);
+        if (!editingId) {
+          setExpandedRegions(prev => ({ ...prev, [activeRegionId]: true }));
+        }
+        setLoading(false);
+      } catch (err) {
+        setError(err.message || "Error creating chapter.");
       }
-    }
-
-    setIsChapterModalOpen(false);
-    if (!editingId) {
-      setExpandedRegions(prev => ({ ...prev, [activeRegionId]: true }));
     }
   };
 
@@ -365,6 +414,7 @@ export default function RegionChapterManager() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 focus:border-yellow-400 dark:focus:border-yellow-500 focus:outline-none transition-all shadow-sm"
+                  disabled={loading}
                 />
                 <Search className="absolute left-3.5 top-3.5 text-gray-400 dark:text-gray-500 w-5 h-5 group-focus-within:text-yellow-500 transition-colors" />
               </div>
@@ -372,6 +422,8 @@ export default function RegionChapterManager() {
                 <button
                   onClick={() => openRegionModal()}
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-bold transition-all shadow-lg shadow-red-600/20 whitespace-nowrap active:transform active:scale-95"
+                  disabled={loading}
+                  style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
                 >
                   <Plus size={20} />
                   Create Region
@@ -387,6 +439,11 @@ export default function RegionChapterManager() {
                 <span className="text-sm font-bold uppercase tracking-wider">Network Structure</span>
               </div>
             </div>
+            {error && (
+              <div className="text-center py-4 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 rounded-xl text-red-700 dark:text-red-300 font-semibold mb-4">
+                {error}
+              </div>
+            )}
             {loading ? (
               <div className="text-center py-20 bg-white dark:bg-gray-800 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
                 <Globe className="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600 mb-4 animate-spin" />
@@ -429,6 +486,8 @@ export default function RegionChapterManager() {
                         <button
                           onClick={() => openChapterModal(region.id)}
                           className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-900 bg-yellow-400 hover:bg-yellow-500 rounded-lg transition-colors shadow-sm"
+                          disabled={loading}
+                          style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
                         >
                           <Plus size={16} />
                           Add Chapter
@@ -438,12 +497,16 @@ export default function RegionChapterManager() {
                           onClick={() => openRegionModal(region)}
                           className="p-2.5 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                           title="Edit Region"
+                          disabled={loading}
+                          style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
                         >
                           <Edit2 size={18} />
                         </button>
                         <button
                           onClick={() => toggleRegion(region.id)}
                           className={`p-2.5 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors ${expandedRegions[region.id] ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                          disabled={loading}
+                          style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
                         >
                           {expandedRegions[region.id] ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                         </button>
@@ -502,6 +565,8 @@ export default function RegionChapterManager() {
                                       openChapterModal(region.id, chapter);
                                     }}
                                     className="flex-1 sm:flex-none w-full sm:w-auto px-3 py-2 text-xs font-bold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-md transition-colors flex items-center justify-center gap-1.5"
+                                    disabled={loading}
+                                    style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}
                                   >
                                     <Edit2 size={12} /> Edit
                                   </button>
@@ -528,7 +593,7 @@ export default function RegionChapterManager() {
                   {editingId ? <Edit2 size={18} /> : <Plus size={18} />}
                   {editingId ? 'Edit Region' : 'New Region Setup'}
                 </h2>
-                <button onClick={() => setIsRegionModalOpen(false)} className="text-gray-500 hover:text-white transition-colors">&times;</button>
+                <button onClick={() => setIsRegionModalOpen(false)} className="text-gray-500 hover:text-white transition-colors" disabled={loading} style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}>&times;</button>
               </div>
               <form onSubmit={handleRegionSubmit} className="p-8 space-y-6">
                 <div>
@@ -540,6 +605,7 @@ export default function RegionChapterManager() {
                     onChange={(e) => setRegionForm({ ...regionForm, name: e.target.value })}
                     className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-yellow-400 dark:focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-400 transition-all placeholder-gray-400"
                     placeholder="e.g. London South"
+                    disabled={loading}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-5">
@@ -552,6 +618,7 @@ export default function RegionChapterManager() {
                       onChange={(e) => setRegionForm({ ...regionForm, code: e.target.value })}
                       className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-yellow-400 dark:focus:border-yellow-500 focus:outline-none transition-all placeholder-gray-400"
                       placeholder="e.g. LON-S"
+                      disabled={loading}
                     />
                   </div>
                   <div>
@@ -563,12 +630,13 @@ export default function RegionChapterManager() {
                       onChange={(e) => setRegionForm({ ...regionForm, country: e.target.value })}
                       className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-yellow-400 dark:focus:border-yellow-500 focus:outline-none transition-all placeholder-gray-400"
                       placeholder="e.g. United Kingdom"
+                      disabled={loading}
                     />
                   </div>
                 </div>
                 <div className="pt-6 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700">
-                  <button type="button" onClick={() => setIsRegionModalOpen(false)} className="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancel</button>
-                  <button type="submit" className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black font-bold rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 border-b-4 border-yellow-500 active:border-b-0 active:mt-1 transition-all">
+                  <button type="button" onClick={() => setIsRegionModalOpen(false)} className="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" disabled={loading} style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}>Cancel</button>
+                  <button type="submit" className="px-6 py-2.5 bg-black dark:bg-white text-white dark:text-black font-bold rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 border-b-4 border-yellow-500 active:border-b-0 active:mt-1 transition-all" disabled={loading} style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}>
                     {editingId ? 'Save Changes' : 'Create Region'}
                   </button>
                 </div>
@@ -585,7 +653,7 @@ export default function RegionChapterManager() {
                   {editingId ? <Edit2 size={18} /> : <Plus size={18} />}
                   {editingId ? 'Edit Chapter Details' : 'Launch New Chapter'}
                 </h2>
-                <button onClick={() => setIsChapterModalOpen(false)} className="text-black/60 hover:text-black hover:bg-black/10 rounded-full p-1 transition-colors">&times;</button>
+                <button onClick={() => setIsChapterModalOpen(false)} className="text-black/60 hover:text-black hover:bg-black/10 rounded-full p-1 transition-colors" disabled={loading} style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}>&times;</button>
               </div>
               <form onSubmit={handleChapterSubmit} className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Left Column: Identity */}
@@ -600,6 +668,7 @@ export default function RegionChapterManager() {
                       onChange={(e) => setChapterForm({ ...chapterForm, name: e.target.value })}
                       className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none transition-all placeholder-gray-400"
                       placeholder="e.g. Prosperity Creators"
+                      disabled={loading}
                     />
                   </div>
                   <div>
@@ -611,6 +680,7 @@ export default function RegionChapterManager() {
                       onChange={(e) => setChapterForm({ ...chapterForm, code: e.target.value })}
                       className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none transition-all"
                       placeholder="e.g. PC-01"
+                      disabled={loading}
                     />
                   </div>
                 </div>
@@ -626,6 +696,7 @@ export default function RegionChapterManager() {
                           value={chapterForm.day}
                           onChange={(e) => setChapterForm({ ...chapterForm, day: e.target.value })}
                           className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg appearance-none focus:border-black dark:focus:border-white focus:outline-none cursor-pointer"
+                          disabled={loading}
                         >
                           {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
                             <option key={d} value={d}>{d}</option>
@@ -642,6 +713,7 @@ export default function RegionChapterManager() {
                         value={chapterForm.time}
                         onChange={(e) => setChapterForm({ ...chapterForm, time: e.target.value })}
                         className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none"
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -654,6 +726,7 @@ export default function RegionChapterManager() {
                       onChange={(e) => setChapterForm({ ...chapterForm, location: e.target.value })}
                       className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none placeholder-gray-400"
                       placeholder="e.g. Grand Hotel"
+                      disabled={loading}
                     />
                   </div>
                   <div>
@@ -665,12 +738,13 @@ export default function RegionChapterManager() {
                       onChange={(e) => setChapterForm({ ...chapterForm, address: e.target.value })}
                       className="w-full p-3 border-2 border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:border-black dark:focus:border-white focus:outline-none text-sm placeholder-gray-400"
                       placeholder="Street, City, Zip"
+                      disabled={loading}
                     />
                   </div>
                 </div>
                 <div className="md:col-span-2 pt-6 flex justify-end gap-3 border-t border-gray-100 dark:border-gray-700 mt-2">
-                  <button type="button" onClick={() => setIsChapterModalOpen(false)} className="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">Cancel</button>
-                  <button type="submit" className="px-6 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 shadow-lg shadow-red-600/30 transition-all">
+                  <button type="button" onClick={() => setIsChapterModalOpen(false)} className="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-semibold hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors" disabled={loading} style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}>Cancel</button>
+                  <button type="submit" className="px-6 py-2.5 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 shadow-lg shadow-red-600/30 transition-all" disabled={loading} style={loading ? { opacity: 0.6, cursor: 'not-allowed' } : {}}>
                     {editingId ? 'Update Chapter' : 'Launch Chapter'}
                   </button>
                 </div>
@@ -679,7 +753,7 @@ export default function RegionChapterManager() {
           </div>
         )}
       </div>
-      <br className=''/>
+      <br className='' />
     </div>
   );
 }

@@ -13,7 +13,6 @@ const TABLE_COLUMNS = [
 const ATTENDANCE_THRESHOLD = 75;
 
 const LowAttendanceAlert = () => {
-  const [rawData, setRawData] = useState([]);
   const [members, setMembers] = useState([]);
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [sortConfig, setSortConfig] = useState({ key: 'attendance', direction: 'asc' });
@@ -34,7 +33,6 @@ const LowAttendanceAlert = () => {
         });
         if (!res.ok) throw new Error('Failed to fetch attendance');
         const data = await res.json();
-        setRawData(data);
         processAttendanceData(data);
       } catch (err) {
         setError(err.message);
@@ -46,37 +44,43 @@ const LowAttendanceAlert = () => {
   }, []);
 
   function processAttendanceData(data) {
-    const userMap = {};
-    data.forEach(record => {
-      const userId = record.user._id;
-      if (!userMap[userId]) {
-        userMap[userId] = {
-          id: userId,
-          name: record.user.username,
-          contact: record.user.phone_number,
-          totalMeetings: 0,
-          presentCount: 0,
-          lastPresentDate: null,
-        };
-      }
-      userMap[userId].totalMeetings++;
-      if (record.attendance_status === 'present') {
-        userMap[userId].presentCount++;
-        const recordDate = new Date(record.date);
-        if (!userMap[userId].lastPresentDate || recordDate > new Date(userMap[userId].lastPresentDate)) {
-          userMap[userId].lastPresentDate = record.date;
+    try {
+      if (!Array.isArray(data)) throw new Error('Attendance data is not an array');
+      const userMap = {};
+      data.forEach(record => {
+        if (!record || !record.user || !record.user._id) return;
+        const userId = record.user._id;
+        if (!userMap[userId]) {
+          userMap[userId] = {
+            id: userId,
+            name: record.user.username || 'Unknown',
+            contact: record.user.phone_number || '',
+            totalMeetings: 0,
+            presentCount: 0,
+            lastPresentDate: null,
+          };
         }
-      }
-    });
-    const processedMembers = Object.values(userMap).map(user => ({
-      ...user,
-      attendance: user.totalMeetings > 0 ? Math.round((user.presentCount / user.totalMeetings) * 100) : 0,
-      trend: user.attendance < 75 ? 'down' : 'up',
-      lastPresent: user.lastPresentDate
-        ? new Date(user.lastPresentDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-        : 'N/A'
-    }));
-    setMembers(processedMembers);
+        userMap[userId].totalMeetings++;
+        if (record.attendance_status === 'present') {
+          userMap[userId].presentCount++;
+          const recordDate = new Date(record.date);
+          if (!userMap[userId].lastPresentDate || recordDate > new Date(userMap[userId].lastPresentDate)) {
+            userMap[userId].lastPresentDate = record.date;
+          }
+        }
+      });
+      const processedMembers = Object.values(userMap).map(user => ({
+        ...user,
+        attendance: user.totalMeetings > 0 ? Math.round((user.presentCount / user.totalMeetings) * 100) : 0,
+        trend: user.attendance < 75 ? 'down' : 'up',
+        lastPresent: user.lastPresentDate
+          ? new Date(user.lastPresentDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+          : 'N/A'
+      }));
+      setMembers(processedMembers);
+    } catch (err) {
+      setError(err.message || 'Error processing attendance data');
+    }
   }
 
   const lowAttendanceMembers = useMemo(() => {
@@ -136,16 +140,23 @@ const LowAttendanceAlert = () => {
       const targetIds = ids || Array.from(selectedRows);
       const targetMembers = members.filter(m => targetIds.includes(m.id));
       for (const member of targetMembers) {
-        await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            receiver: member.name,
-            header: 'Low Attendance Alert',
-            content: `Hello ${member.name}, your attendance is ${member.attendance}%. Please improve your participation.`
-          })
-        });
+        try {
+          const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              receiver: member.name,
+              header: 'Low Attendance Alert',
+              content: `Hello ${member.name}, your attendance is ${member.attendance}%. Please improve your participation.`
+            })
+          });
+          if (!res.ok) {
+            throw new Error(`Failed to send alert to ${member.name}`);
+          }
+        } catch (err) {
+          setError(err.message);
+        }
       }
       setSuccess(`Alert sent to ${targetMembers.length} member(s)`);
       setTimeout(() => setSuccess(null), 2000);
@@ -163,8 +174,13 @@ const LowAttendanceAlert = () => {
         credentials: 'include'
       });
       if (!res.ok) throw new Error('Failed to fetch user attendance');
-      const data = await res.json();
-      setModalData(data);
+      let data = [];
+      try {
+        data = await res.json();
+      } catch (err) {
+        throw new Error('Failed to parse user attendance data');
+      }
+      setModalData(Array.isArray(data) ? data : []);
       setShowModal(true);
     } catch (err) {
       setError(err.message);
@@ -384,14 +400,16 @@ const LowAttendanceAlert = () => {
               </button>
             </div>
             <div className="p-6 space-y-4">
-              {modalData.map((record, idx) => (
+              {Array.isArray(modalData) && modalData.length > 0 ? modalData.map((record, idx) => (
                 <div key={idx} className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Meeting: {record.meeting?.title}</p>
-                  <p className="text-sm text-gray-900 dark:text-gray-50">Date: {new Date(record.date).toLocaleDateString()}</p>
-                  <p className="text-sm text-gray-900 dark:text-gray-50">Status: {record.attendance_status}</p>
-                  <p className="text-sm text-gray-900 dark:text-gray-50">Location: {record.meeting?.location}</p>
+                  <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">Meeting: {record.meeting?.title || 'N/A'}</p>
+                  <p className="text-sm text-gray-900 dark:text-gray-50">Date: {record.date ? new Date(record.date).toLocaleDateString() : 'N/A'}</p>
+                  <p className="text-sm text-gray-900 dark:text-gray-50">Status: {record.attendance_status || 'N/A'}</p>
+                  <p className="text-sm text-gray-900 dark:text-gray-50">Location: {record.meeting?.location || 'N/A'}</p>
                 </div>
-              ))}
+              )) : (
+                <div className="text-gray-600 dark:text-gray-400">No attendance history found.</div>
+              )}
             </div>
             <div className="flex gap-2 justify-end p-6 border-t border-gray-200 dark:border-gray-700">
               <button
