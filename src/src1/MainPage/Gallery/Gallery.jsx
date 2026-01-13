@@ -59,19 +59,19 @@ function Gallery() {
                 <div className="slideshow-container">
                     <Link to="/album">
                     <div className="slide active">
-                        <img src="/assets/IMG-20260110-WA0015.jpg" alt="Gallery Image 1" />
+                        <img src="/Prosperity-focusedmovement(1).png" alt="Gallery Image 1"  />
                     </div>
                     <div className="slide">
-                        <img src="/assets/IMG-20260110-WA0016.jpg" alt="Gallery Image 2" />
+                        <img src="/Prosperity-focusedmovement.png" alt="Gallery Image 2" style={{ height: '670px' }} />
                     </div>
                     <div className="slide">
-                        <img src="/assets/IMG-20260110-WA0017.jpg" alt="Gallery Image 3" />
+                        <img src="/Prosperity-focusedmovement(2).png" alt="Gallery Image 3" style={{ maxWidth: '100%' ,height: '670px' }} />
                     </div>
                     <div className="slide">
-                        <img src="/assets/IMG-20260110-WA0018.jpg" alt="Gallery Image 4" />
+                        <img src="/Prosperity-focusedmovement(3).png" alt="Gallery Image 4" />
                     </div>
                     <div className="slide">
-                        <img src="/assets/IMG-20260110-WA0019.jpg" alt="Gallery Image 5" />
+                        <img src="/Prosperity-focusedmovement(4).png" alt="Gallery Image 5" />
                     </div>
                     </Link>
 

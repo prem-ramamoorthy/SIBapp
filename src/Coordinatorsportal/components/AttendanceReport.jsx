@@ -34,6 +34,7 @@ const AttendanceOverview = () => {
         const data = await res.json();
         processAttendanceData(data);
       } catch (err) {
+        console.log(err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -125,6 +126,7 @@ const AttendanceOverview = () => {
       setModalData(data);
       setShowModal(true);
     } catch (err) {
+        console.log(err);
       setError(err.message);
     } finally {
       setLoading(false);

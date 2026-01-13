@@ -37,6 +37,7 @@ const LowAttendanceAlert = () => {
         setRawData(data);
         processAttendanceData(data);
       } catch (err) {
+        console.log(err);
         setError(err.message);
       } finally {
         setFetchLoading(false);
@@ -150,6 +151,7 @@ const LowAttendanceAlert = () => {
       setSuccess(`Alert sent to ${targetMembers.length} member(s)`);
       setTimeout(() => setSuccess(null), 2000);
     } catch (err) {
+        console.log(err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -167,6 +169,7 @@ const LowAttendanceAlert = () => {
       setModalData(data);
       setShowModal(true);
     } catch (err) {
+        console.log(err);
       setError(err.message);
     } finally {
       setLoading(false);
