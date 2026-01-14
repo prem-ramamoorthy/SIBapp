@@ -68,11 +68,9 @@ export function ModalViewer({ content = {} }) {
 
     const getHotLabel = (hot) => {
         const hotLabels = {
-            'burning': '🔥 Burning',
-            'very-hot': '🌋 Very Hot',
             'hot': '🌶️ Hot',
             'warm': '☀️ Warm',
-            'tepid': '🌤️ Tepid'
+            'cold': '🌤️ cold'
         };
         return hotLabels[hot?.toLowerCase()] || hot;
     };

@@ -1,11 +1,10 @@
 import { useId, useState, useEffect } from "react";
 
 const PRESETS = [
-  { label: "Tepid",    value: "tepid",    bar: "bg-cyan-500" },
+  { label: "Cold",    value: "cold",    bar: "bg-cyan-500" },
   { label: "Warm",     value: "warm",     bar: "bg-green-500" },
   { label: "Hot",      value: "hot",      bar: "bg-amber-400" },
-  { label: "Very Hot", value: "very-hot", bar: "bg-orange-500" },
-  { label: "Burning",  value: "burning",  bar: "bg-red-500" },
+
 ];
 
 export default function HeatScale({
@@ -13,7 +12,7 @@ export default function HeatScale({
   options = PRESETS,
   value,
   onChange,
-  defaultValue = "tepid",
+  defaultValue = "cold",
 }) {
   const name = useId();
   const [internal, setInternal] = useState(value ?? defaultValue);

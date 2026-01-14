@@ -5,7 +5,7 @@ import RadioButtons from "../Components/RadioButtons";
 import TextArea from "../Components/TextArea";
 import FilterButton from "../Members/Components/FilterButton";
 import { getDate } from "../utils/getDate.mjs";
-import { X } from "lucide-react";
+import { X, IndianRupee, Calendar, Briefcase, FileText, User, Layers } from "lucide-react";
 
 function ButtonPage({ onClose = () => { } }) {
   const todaysDate = getDate();
@@ -138,109 +138,163 @@ function ButtonPage({ onClose = () => { } }) {
   };
 
   return (
-    <div className="flex flex-1 items-center justify-around min-h-screen p-4">
-      <div className="max-w-full border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-5 rounded-2xl flex flex-col gap-3 shadow-lg">
-        <div className="header border-b-2 border-gray-300 dark:border-gray-600 pb-2 flex justify-between">
-          <p className="font-bold text-gray-900 dark:text-gray-100">SIB TYB Slip</p>
+    <div className="flex flex-1 items-center justify-center p-2 sm:p-4 min-h-screen bg-stone-50/50 dark:bg-black/20">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-stone-100 dark:border-gray-800 flex flex-col h-full max-h-[95vh] sm:max-h-[90vh]">
+        
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50/50 dark:from-gray-800 dark:to-gray-900 p-5 sm:p-8 flex justify-between items-center border-b border-amber-100 dark:border-gray-800 shrink-0">
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+            <span className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-xl text-amber-600 dark:text-amber-400">
+              <IndianRupee size={24} className="sm:w-7 sm:h-7" />
+            </span>
+            SIB TYB Slip
+          </h2>
           <button
-            className="font-bold text-gray-900 dark:text-gray-100 hover:text-red-500 dark:hover:text-red-400"
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
             onClick={onClose}
           >
-            <X />
+            <X size={24} />
           </button>
         </div>
 
-        <div className="flex w-full gap-4">
-          <EntryField
-            type="text"
-            placeholder={chapterName || "Chapter"}
-            label="Chapter"
-            value={chapterName}
-            readOnly={true}
-            className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-          />
-          <EntryField
-            type="date"
-            placeholder={todaysDate}
-            label="Date"
-            value={date}
-            onChange={setDate}
-            className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-          />
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8 custom-scrollbar">
+          
+          {/* Section 1: Who & When */}
+          <section className="space-y-4">
+             <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2 mb-2 sm:mb-4">
+              <Calendar size={16} className="text-amber-500" />
+              Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+               <EntryField
+                type="text"
+                placeholder={chapterName || "Chapter"}
+                label="Chapter"
+                value={chapterName}
+                readOnly={true}
+                className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+              />
+              <EntryField
+                type="date"
+                placeholder={todaysDate}
+                label="Date"
+                value={date}
+                onChange={setDate}
+                className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+              />
+            </div>
+          </section>
+
+          {/* Section 2: Transaction */}
+          <section className="bg-stone-50 dark:bg-gray-800/30 p-4 sm:p-6 rounded-2xl border border-stone-100 dark:border-gray-800 space-y-5">
+             <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+              <User size={16} className="text-amber-500" />
+              Transaction Information
+            </h3>
+            
+            <CrossChapterSearch
+              label="Thank you to *"
+              placeholder="Select a member"
+              value={to}
+              onChange={setTo}
+              className="dark:bg-gray-700 dark:text-gray-100 dark:border-yellow-400"
+            />
+
+            <EntryField
+              type="number"
+              placeholder="Enter Amount in INR"
+              label="Amount (₹) *"
+              value={amount}
+              onChange={setAmount}
+              className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 text-lg font-medium"
+            />
+          </section>
+
+          {/* Section 3: Classifications & Notes */}
+          <section className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+              <div className="space-y-2">
+                 <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+                  <Briefcase size={16} className="text-amber-500" />
+                  Business Type
+                </h3>
+                <RadioButtons
+                  label=""
+                  buttons={[
+                    { name: "New", value: "new" },
+                    { name: "Repeat", value: "repeat" },
+                  ]}
+                  value={businessType}
+                  onChange={setBusinessType}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+                  <Layers size={16} className="text-amber-500" />
+                  Referral Type
+                </h3>
+                <RadioButtons
+                  label=""
+                  buttons={[
+                    { name: "Tier 1", value: "tier1" },
+                    { name: "Tier 2", value: "tier2" },
+                    { name: "Tier 3+", value: "tier3" },
+                  ]}
+                  value={referralType}
+                  onChange={setReferralType}
+                />
+              </div>
+            </div>
+
+            <div className="pt-2">
+               <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+                  <FileText size={16} className="text-amber-500" />
+                  Description
+                </h3>
+              <TextArea
+                label="Business Description *"
+                placeholder="Details about the business transacted..."
+                value={comments}
+                onChange={setComments}
+                className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+              />
+            </div>
+          </section>
         </div>
 
-        <CrossChapterSearch
-          label="Thank you to"
-          placeholder="Select a member"
-          value={to}
-          onChange={setTo}
-          className="dark:bg-gray-700 dark:text-gray-100 dark:border-yellow-400"
-        />
+        {/* Footer Actions */}
+        <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shrink-0">
+          {error && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400 text-center animate-pulse">
+              {String(error)}
+            </div>
+          )}
 
-        <EntryField
-          type="number"
-          placeholder="Enter Amount in INR"
-          label="Amount"
-          value={amount}
-          onChange={setAmount}
-          className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-        />
+          {response && (
+            <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-600 dark:border-green-900/50 dark:bg-green-900/20 dark:text-green-400 text-center">
+              {String(response)}
+            </div>
+          )}
 
-        <RadioButtons
-          label="Business Type"
-          buttons={[
-            { name: "New", value: "new" },
-            { name: "Repeat", value: "repeat" },
-          ]}
-          value={businessType}
-          onChange={setBusinessType}
-        />
-
-        <RadioButtons
-          label="Referral Type"
-          buttons={[
-            { name: "Tier 1 (Inside)", value: "tier1" },
-            { name: "Tier 2 (Outside)", value: "tier2" },
-            { name: "Tier 3+", value: "tier3" },
-          ]}
-          value={referralType}
-          onChange={setReferralType}
-        />
-
-        <TextArea
-          label="Business Description"
-          placeholder="Additional Comments..."
-          value={comments}
-          onChange={setComments}
-          className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
-        />
-
-        {error && (
-          <p className="rounded-md border px-3 py-2 text-sm border-red-300 bg-red-100 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
-            {String(error)}
-          </p>
-        )}
-
-        {response && (
-          <p className="rounded-md border px-3 py-2 text-sm border-green-300 bg-green-100 text-green-700 dark:border-green-700 dark:bg-green-900 dark:text-green-300">
-            {String(response)}
-          </p>
-        )}
-
-        <div className="mt-2 flex w-full justify-end gap-4 border-t-2 border-gray-300 dark:border-gray-600 pt-3">
-          <FilterButton
-            content="Close"
-            bg="bg-white dark:bg-gray-700"
-            hover="hover:bg-gray-200 dark:hover:bg-gray-600"
-            onClick={onClose}
-          />
-          <FilterButton
-            content="Submit"
-            bg="bg-yellow-300 dark:bg-yellow-500"
-            hover="hover:bg-yellow-400 dark:hover:bg-yellow-600"
-            loading={loading}
-            onClick={handleSubmit}
-          />
+          <div className="flex w-full justify-end gap-3 sm:gap-4">
+            <FilterButton
+              content="Cancel"
+              bg="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+              hover="hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={onClose}
+              className="flex-1 sm:flex-none px-4 sm:px-8 py-3 text-gray-600 dark:text-gray-300 shadow-sm"
+            />
+            <FilterButton
+              content={loading ? "Submitting..." : "Submit TYB"}
+              bg="bg-gradient-to-r from-amber-400 to-yellow-500 dark:from-amber-600 dark:to-yellow-600"
+              hover="hover:from-amber-500 hover:to-yellow-600 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30"
+              loading={loading}
+              onClick={handleSubmit}
+              className="flex-1 sm:flex-none px-4 sm:px-8 py-3 text-white font-semibold transform transition hover:-translate-y-0.5"
+            />
+          </div>
         </div>
       </div>
     </div>

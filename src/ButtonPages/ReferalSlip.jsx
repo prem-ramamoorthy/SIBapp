@@ -7,7 +7,7 @@ import HeatScale from "../Components/HeatScale";
 import FilterButton from "../Members/Components/FilterButton";
 import { useEffect, useState } from "react";
 import { getDate } from "../utils/getDate.mjs";
-import { X } from "lucide-react";
+import { Handshake, X, User, FileText, Phone } from "lucide-react";
 import { sanitizeReferralData } from "../utils/slipsSanitization.mjs";
 
 function ButtonPage({ onClose = () => { } }) {
@@ -23,19 +23,20 @@ function ButtonPage({ onClose = () => { } }) {
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [comments, setComments] = useState("");
-  const [heatScale, setHeatScale] = useState("tepid");
+  const [heatScale, setHeatScale] = useState("cold");
   const [contactName, setContactName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [response, setResponse] = useState(null);
   const [username, setUsername] = useState("loading...");
   const [userData, setUserData] = useState(null);
+
   useEffect(() => {
     if (userData) {
-      if(userData?.email) setEmail(referralType !== 'tier2' ? userData.email || "" : "");
-      if(userData?.phone_number) setPhone(referralType !== 'tier2' ?userData.phone_number || "" : "");
+      if (userData?.email) setEmail(referralType !== 'tier2' ? userData.email || "" : "");
+      if (userData?.phone_number) setPhone(referralType !== 'tier2' ? userData.phone_number || "" : "");
     }
-  }, [userData , referralType]);
+  }, [userData, referralType]);
 
   useEffect(() => {
     let cancelled = false;
@@ -151,137 +152,189 @@ function ButtonPage({ onClose = () => { } }) {
   };
 
   return (
-    <div className="flex flex-1 items-center justify-center">
-      <div className="max-w-full border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-5 rounded-2xl flex flex-col gap-4 shadow-lg">
-        <div className="header border-b-2 border-gray-300 dark:border-gray-700 pb-2 flex justify-between items-center">
-          <p className="font-bold text-lg">SIB Referral Slip</p>
+    <div className="flex flex-1 items-center justify-center p-2 sm:p-4 min-h-screen bg-stone-50/50 dark:bg-black/20">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-stone-100 dark:border-gray-800 flex flex-col h-full max-h-[95vh] sm:max-h-[90vh]">
+        
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50/50 dark:from-gray-800 dark:to-gray-900 p-5 sm:p-8 flex justify-between items-center border-b border-amber-100 dark:border-gray-800 shrink-0">
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+            <span className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-xl text-amber-600 dark:text-amber-400">
+              <Handshake size={24} className="sm:w-7 sm:h-7" />
+            </span>
+            SIB Referral Slip
+          </h2>
           <button
-            className="font-bold text-gray-900 dark:text-gray-100"
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
             onClick={onClose}
           >
-            <X />
+            <X size={24} />
           </button>
         </div>
 
-        <div className="flex flex-col md:flex-row w-full gap-4">
-          <EntryField
-            type="date"
-            placeholder={todaysDate}
-            label="Date *"
-            value={date}
-            onChange={setDate}
-          />
-          <EntryField
-            type="text"
-            placeholder={username || "Loading..."}
-            label="From *"
-            value={from}
-            readOnly={true}
-            onChange={() => { }}
-          />
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8 custom-scrollbar">
+          
+          {/* Section 1: The Basics */}
+          <section className="space-y-4">
+            <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2 mb-2 sm:mb-4">
+              <User size={16} className="text-amber-500" />
+              Who & When
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div className="space-y-1">
+                 <EntryField
+                  type="date"
+                  placeholder={todaysDate}
+                  label="Date *"
+                  value={date}
+                  onChange={setDate}
+                />
+              </div>
+              <div className="space-y-1">
+                 <EntryField
+                  type="text"
+                  placeholder={username || "Loading..."}
+                  label="From *"
+                  value={from}
+                  readOnly={true}
+                  onChange={() => { }}
+                />
+              </div>
+            </div>
+            <div className="pt-2">
+               <CrossChapterSearch
+                label="To *"
+                placeholder="Search Member Username..."
+                onChange={setTo}
+                userstate={setUserData}
+              />
+            </div>
+          </section>
+
+          {/* Section 2: The Referral */}
+          <section className="bg-stone-50 dark:bg-gray-800/30 p-4 sm:p-6 rounded-2xl border border-stone-100 dark:border-gray-800 space-y-5">
+             <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+              <FileText size={16} className="text-amber-500" />
+              Referral Details
+            </h3>
+            
+            <TextArea
+              label="Description *"
+              placeholder="What is this referral about?"
+              onChange={setReferralDetails}
+              className="bg-white dark:bg-gray-900"
+            />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <RadioButtons
+                label="Referral Type *"
+                buttons={[
+                  { name: "Tier 1 (Inside)", value: "tier1" },
+                  { name: "Tier 2 (Outside)", value: "tier2" },
+                ]}
+                value={referralType}
+                onChange={setReferralType}
+              />
+              <div className="flex flex-col justify-end">
+                {referralType === "tier2" && (
+                  <EntryField
+                    type="text"
+                    placeholder="Enter Contact Name"
+                    label="Contact Name *"
+                    value={contactName}
+                    onChange={setContactName}
+                  />
+                )}
+              </div>
+            </div>
+
+            <SelectButtons
+              label="Status"
+              items={[
+                { name: "Given Your Card", value: "given_card" },
+                { name: "Told Them You Would Call", value: "told_to_call" },
+              ]}
+              value={referralStatus}
+              onChange={setReferralStatus}
+            />
+          </section>
+
+          {/* Section 3: Contact Info */}
+          <section className="space-y-4">
+             <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2 mb-2 sm:mb-4">
+              <Phone size={16} className="text-amber-500" />
+              Contact Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <EntryField
+                type="text"
+                placeholder="Phone Number"
+                label="Telephone *"
+                value={phone}
+                onChange={setPhone}
+              />
+              <EntryField
+                type="email"
+                placeholder="Email Address"
+                label="Email"
+                value={email}
+                onChange={setEmail}
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+               <TextArea
+                label="Address"
+                placeholder="Physical address..."
+                value={address}
+                onChange={setAddress}
+              />
+               <TextArea
+                label="Comments"
+                placeholder="Any additional notes..."
+                value={comments}
+                onChange={setComments}
+              />
+            </div>
+          </section>
+
+          {/* Heat Scale - Centerpiece */}
+          <div className="flex flex-col items-center justify-center pt-2 pb-4 border-t border-gray-100 dark:border-gray-800">
+             <span className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 mb-4">How hot is this lead?</span>
+             <HeatScale value={heatScale} onChange={setHeatScale} />
+          </div>
         </div>
 
-        <CrossChapterSearch
-          label="To *"
-          placeholder="Search Username..."
-          onChange={setTo}
-          userstate={setUserData}
-        />
+        {/* Footer Actions */}
+        <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shrink-0">
+          {error && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400 text-center animate-pulse">
+              {String(error)}
+            </div>
+          )}
 
-        <TextArea
-          label="Referral *"
-          placeholder="Enter the referral details..."
-          onChange={setReferralDetails}
-        />
+          {response && (
+            <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-600 dark:border-green-900/50 dark:bg-green-900/20 dark:text-green-400 text-center">
+              {String(response)}
+            </div>
+          )}
 
-        <RadioButtons
-          label="Referral Type *"
-          buttons={[
-            { name: "Tier 1 (Inside)", value: "tier1" },
-            { name: "Tier 2 (Outside)", value: "tier2" },
-          ]}
-          value={referralType}
-          onChange={setReferralType}
-        />
-
-        {referralType === "tier2" && (
-          <EntryField
-            type="text"
-            placeholder="Enter Contact Name"
-            label="Contact Name *"
-            value={contactName}
-            onChange={setContactName}
-          />
-        )}
-
-        <SelectButtons
-          label="Referral Status"
-          items={[
-            { name: "Given Your Card", value: "given_card" },
-            { name: "Told Them You Would Call", value: "told_to_call" },
-          ]}
-          value={referralStatus}
-          onChange={setReferralStatus}
-        />
-
-        <div className="flex flex-col md:flex-row w-full gap-4">
-          <EntryField
-            type="text"
-            placeholder="Phone Number"
-            label="Telephone *"
-            value={phone}
-            onChange={setPhone}
-          />
-          <EntryField
-            type="email"
-            placeholder="Email Address"
-            label="Email"
-            value={email}
-            onChange={setEmail}
-          />
-        </div>
-
-        <TextArea
-          label="Address"
-          placeholder="Address Details..."
-          value={address}
-          onChange={setAddress}
-        />
-        <TextArea
-          label="Comments"
-          placeholder="Additional comments..."
-          value={comments}
-          onChange={setComments}
-        />
-
-        <HeatScale value={heatScale} onChange={setHeatScale} />
-
-        {error && (
-          <p className="rounded-md border px-3 py-2 text-sm border-red-300 bg-red-100 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
-            {String(error)}
-          </p>
-        )}
-
-        {response && (
-          <p className="rounded-md border px-3 py-2 text-sm border-green-300 bg-green-100 text-green-700 dark:border-green-700 dark:bg-green-900 dark:text-green-300">
-            {String(response)}
-          </p>
-        )}
-
-        <div className="mt-2 flex w-full justify-end gap-4 border-t-2 border-gray-300 dark:border-gray-700 pt-3">
-          <FilterButton
-            content="Close"
-            bg="bg-white dark:bg-gray-700"
-            hover="hover:bg-gray-200 dark:hover:bg-gray-600"
-            onClick={onClose}
-          />
-          <FilterButton
-            content="Submit"
-            bg="bg-yellow-300 dark:bg-yellow-500"
-            hover="hover:bg-yellow-400 dark:hover:bg-yellow-600"
-            onClick={handler}
-            loading={loading}
-          />
+          <div className="flex w-full justify-end gap-3 sm:gap-4">
+            <FilterButton
+              content="Cancel"
+              bg="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+              hover="hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={onClose}
+              className="flex-1 sm:flex-none px-4 sm:px-8 py-3 text-gray-600 dark:text-gray-300 shadow-sm"
+            />
+            <FilterButton
+              content={loading ? "Sending..." : "Submit Referral"}
+              bg="bg-gradient-to-r from-amber-400 to-yellow-500 dark:from-amber-600 dark:to-yellow-600"
+              hover="hover:from-amber-500 hover:to-yellow-600 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30"
+              onClick={handler}
+              loading={loading}
+              className="flex-1 sm:flex-none px-4 sm:px-8 py-3 text-white font-semibold transform transition hover:-translate-y-0.5"
+            />
+          </div>
         </div>
       </div>
     </div>

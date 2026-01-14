@@ -4,7 +4,7 @@ import EntryField from "../Components/EntryField";
 import TextArea from "../Components/TextArea";
 import FilterButton from "../Members/Components/FilterButton";
 import { getDate } from '../utils/getDate.mjs';
-import { X } from "lucide-react";
+import { X, Users, MapPin, Camera, MessageSquare, Calendar } from "lucide-react";
 
 function ButtonPage({ onClose = () => {} }) {
   const todaysDate = getDate();
@@ -158,124 +158,169 @@ function ButtonPage({ onClose = () => {} }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center backdrop-blur-sm p-4">
-      <div className="w-fit max-w-full bg-white dark:bg-gray-900 rounded-2xl p-6 flex flex-col gap-4 shadow-lg border border-gray-200 dark:border-gray-700 overflow-auto max-h-[90vh]">
-        <div className="flex justify-between items-center border-b-2 border-gray-300 dark:border-gray-600 pb-2">
-          <p className="font-bold text-lg dark:text-gray-100">SIB M to M Slip</p>
+    <div className="flex flex-1 items-center justify-center p-2 sm:p-4 min-h-screen bg-stone-50/50 dark:bg-black/20">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-gray-900 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden border border-stone-100 dark:border-gray-800 flex flex-col h-full max-h-[95vh] sm:max-h-[90vh]">
+        
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50/50 dark:from-gray-800 dark:to-gray-900 p-5 sm:p-8 flex justify-between items-center border-b border-amber-100 dark:border-gray-800 shrink-0">
+          <h2 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-white flex items-center gap-3">
+            <span className="p-2 bg-amber-100 dark:bg-amber-900/30 rounded-xl text-amber-600 dark:text-amber-400">
+              <Users size={24} className="sm:w-7 sm:h-7" />
+            </span>
+            SIB M to M Slip
+          </h2>
           <button
-            className="font-bold text-gray-700 dark:text-gray-200 hover:text-red-500 dark:hover:text-red-400 transition"
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
             onClick={onClose}
             aria-label="Close"
           >
-            <X />
+            <X size={24} />
           </button>
         </div>
 
-        <EntryField
-          placeholder={username}
-          label="Member - 1"
-          readOnly={true}
-          type="text"
-          value={username}
-        />
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8 custom-scrollbar">
+          
+          {/* Section 1: Meeting Details */}
+          <section className="space-y-4">
+             <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2 mb-2 sm:mb-4">
+              <Calendar size={16} className="text-amber-500" />
+              Meeting Logistics
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <EntryField
+                placeholder={username}
+                label="Member 1 (You)"
+                readOnly={true}
+                type="text"
+                value={username}
+                className="bg-gray-50 dark:bg-gray-800"
+              />
+              <CrossChapterSearch
+                label="Member 2 (Partner)"
+                placeholder="Search a member"
+                onChange={setMember2Name}
+              />
+            </div>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+               <CrossChapterSearch
+                label="Chapter"
+                placeholder="Chapter Name of the member met"
+                onChange={setChapterName}
+                offsubmit={true}
+                searchdomain="searchchapter"
+              />
+              <EntryField
+                type="date"
+                placeholder="Date"
+                label="Date"
+                value={date}
+                onChange={setDate}
+              />
+             </div>
+             <div className="pt-2">
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+                  <MapPin size={16} className="text-amber-500" />
+                  Location
+                </h3>
+               <EntryField
+                type="text"
+                placeholder="Where did you meet?"
+                label=""
+                value={location}
+                onChange={setLocation}
+              />
+             </div>
+          </section>
 
-        <CrossChapterSearch
-          label="Member - 2"
-          placeholder="Search a member"
-          onChange={setMember2Name}
-        />
+          {/* Section 2: Discussion */}
+          <section className="bg-stone-50 dark:bg-gray-800/30 p-4 sm:p-6 rounded-2xl border border-stone-100 dark:border-gray-800 space-y-4">
+             <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+              <MessageSquare size={16} className="text-amber-500" />
+              Conversation
+            </h3>
+            <TextArea
+              label="Topic of conversation *"
+              placeholder="Briefly describe the topics discussed..."
+              value={conversationTopic}
+              onChange={setConversationTopic}
+              className="bg-white dark:bg-gray-900 min-h-[100px]"
+            />
+          </section>
 
-        <CrossChapterSearch
-          label="Chapter"
-          placeholder="Chapter Name of the member met"
-          onChange={setChapterName}
-          offsubmit={true}
-          searchdomain="searchchapter"
-        />
+          {/* Section 3: Proof of Meeting */}
+          <section className="space-y-4">
+             <h3 className="text-xs sm:text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+              <Camera size={16} className="text-amber-500" />
+              Proof of Meeting
+            </h3>
+            <div className="p-4 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-900/50 hover:bg-amber-50/50 dark:hover:bg-gray-800/50 transition-colors">
+              <label className="block w-full cursor-pointer">
+                <span className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                  Upload Photo *
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="block w-full text-sm text-gray-500 dark:text-gray-400
+                    file:mr-4 file:py-2.5 file:px-4
+                    file:rounded-xl file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-amber-100 file:text-amber-700
+                    hover:file:bg-amber-200
+                    dark:file:bg-amber-900/30 dark:file:text-amber-400
+                    cursor-pointer"
+                  disabled={loading}
+                  onChange={handleImageChange}
+                />
+              </label>
+              {imageUrl && (
+                <div className="mt-4 relative group w-fit">
+                  <img src={imageUrl} alt="Meeting Proof" className="h-32 w-auto object-cover rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm" />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors rounded-lg"></div>
+                </div>
+              )}
+              {imageError && (
+                <p className="mt-2 text-xs text-red-600 dark:text-red-400 font-medium flex items-center gap-1">
+                   <X size={12} /> {imageError}
+                </p>
+              )}
+            </div>
+          </section>
 
-        <div className="flex flex-row w-full gap-2">
-          <EntryField
-            type="date"
-            placeholder="Date"
-            label="Date"
-            value={date}
-            onChange={setDate}
-          />
-          <EntryField
-            type="text"
-            placeholder="Meeting Location"
-            label="Location"
-            value={location}
-            onChange={setLocation}
-          />
         </div>
 
-        <TextArea
-          label="Topic of conversation"
-          placeholder="Describe Topics discussed..."
-          value={conversationTopic}
-          onChange={setConversationTopic}
-        />
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-            Upload Image *
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            className="block w-full text-sm text-gray-700 dark:text-gray-200
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-full file:border-0
-              file:text-sm file:font-semibold
-              file:bg-yellow-50 file:text-yellow-700
-              hover:file:bg-yellow-100
-              dark:file:bg-gray-800 dark:file:text-yellow-300 dark:hover:file:bg-gray-700
-              "
-            disabled={loading}
-            onChange={handleImageChange}
-          />
-          {imageUrl && (
-            <div className="mt-2">
-              <img src={imageUrl} alt="Uploaded" className="max-h-32 rounded-md border" />
-              <p className="text-xs text-green-600 dark:text-green-400 break-all">{imageUrl}</p>
+        {/* Footer Actions */}
+        <div className="p-4 sm:p-6 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shrink-0">
+          {error && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400 text-center animate-pulse">
+              {String(error)}
             </div>
           )}
-          {imageError && (
-            <p className="text-xs text-red-600 dark:text-red-400">{imageError}</p>
+
+          {response && (
+            <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-600 dark:border-green-900/50 dark:bg-green-900/20 dark:text-green-400 text-center">
+              {String(response)}
+            </div>
           )}
-        </div>
 
-        {error && (
-          <p className="rounded-md border px-3 py-2 text-sm border-red-300 bg-red-100 text-red-700 dark:border-red-700 dark:bg-red-900 dark:text-red-300">
-            {error}
-          </p>
-        )}
-
-        {response && (
-          <p className="rounded-md border px-3 py-2 text-sm border-green-300 bg-green-100 text-green-700 dark:border-green-700 dark:bg-green-900 dark:text-green-300">
-            {response}
-          </p>
-        )}
-
-        {loading && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">Processing...</p>
-        )}
-
-        <div className="mt-2 flex w-full justify-end gap-4 border-t-2 border-gray-300 dark:border-gray-600 pt-3">
-          <FilterButton
-            content="Close"
-            bg="bg-white dark:bg-gray-800"
-            hover="hover:bg-gray-200 dark:hover:bg-gray-700"
-            onClick={onClose}
-          />
-          <FilterButton
-            content="Submit"
-            bg="bg-yellow-300 dark:bg-yellow-400"
-            hover="hover:bg-yellow-400 dark:hover:bg-yellow-500"
-            onClick={handleSubmit}
-            loading={loading}
-          />
+          <div className="flex w-full justify-end gap-3 sm:gap-4">
+            <FilterButton
+              content="Cancel"
+              bg="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+              hover="hover:bg-gray-100 dark:hover:bg-gray-700"
+              onClick={onClose}
+              className="flex-1 sm:flex-none px-4 sm:px-8 py-3 text-gray-600 dark:text-gray-300 shadow-sm"
+            />
+            <FilterButton
+              content={loading ? "Submitting..." : "Submit Slip"}
+              bg="bg-gradient-to-r from-amber-400 to-yellow-500 dark:from-amber-600 dark:to-yellow-600"
+              hover="hover:from-amber-500 hover:to-yellow-600 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30"
+              onClick={handleSubmit}
+              loading={loading}
+              className="flex-1 sm:flex-none px-4 sm:px-8 py-3 text-white font-semibold transform transition hover:-translate-y-0.5"
+            />
+          </div>
         </div>
       </div>
     </div>

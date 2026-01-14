@@ -40,23 +40,13 @@ function SubmitButtons() {
   return (
     <div
       className="
-        div7 
         bg-white dark:bg-gray-700/5
         rounded-lg sm:rounded-xl lg:rounded-2xl
-        [grid-area:20/1/21/2]
-        sm:[grid-area:8/1/9/5]  
-        md:[grid-area:9/1/10/7] 
-        lg:[grid-area:9/1/10/9] 
-        xl:[grid-area:10/1/11/11]
         grid 
         grid-cols-2 
-        grid-rows-2 
         md:grid-cols-4 
-        md:grid-rows-1
-        lg:grid-cols-4 
-        lg:grid-rows-1
-        gap-2 gap-y-0 p-2 place-items-center
-        lg:gap-4
+        gap-3 sm:gap-4
+        p-3 sm:p-4
         shadow-sm dark:shadow-gray-900/5
         transition-colors duration-300
       "

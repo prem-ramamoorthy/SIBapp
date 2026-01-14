@@ -20,24 +20,26 @@ function ButtonUI({ label, description, component }) {
   const Comp = componentMap[component] ?? null;
 
   return (
-    <div className="my-2">
+    <div className="w-full h-full min-h-[100px]">
       <button
         onClick={handleToggle}
         className="
           bg-yellow-300  dark:bg-yellow-400
           hover:bg-yellow-500 dark:hover:bg-yellow-400/80
           rounded-2xl
-          hover:scale-105 transition-transform duration-200 ease-in-out
+          hover:scale-[1.02] active:scale-95
+          transition-all duration-200 ease-in-out
           flex flex-col items-center justify-center
-          h-4/5 w-full p-2
-          lg:h-auto lg:w-60 md:h-auto md:w-40
+          w-full h-full
+          p-3 sm:p-4
           text-black
+          shadow-sm
         "
         type="button"
       >
         <div>
-          <h4 className="text-[0.9rem] font-semibold mt-1">{label}</h4>
-          <p className="text-[0.8rem] font-semibold mb-2 text-gray-600">{description}</p>
+          <h4 className="text-sm sm:text-base font-bold mt-1">{label}</h4>
+          <p className="text-xs sm:text-sm font-medium mt-1 text-gray-700 dark:text-black/70">{description}</p>
         </div>
       </button>
 
@@ -48,19 +50,20 @@ function ButtonUI({ label, description, component }) {
           role="dialog"
         >
           <div
-            className="absolute inset-0 backdrop-blur-sm"
+            className="absolute inset-0 backdrop-blur-sm bg-black/20"
             onClick={handleClose}
           />
 
           <div className="absolute inset-0 flex items-center justify-center p-4">
-            <div className="w-fit h-full max-w-[1600px] max-h-[100vh]">
+            <div className="w-full h-full max-w-[1600px] max-h-[90vh] sm:max-h-[95vh] bg-white dark:bg-gray-900 rounded-xl shadow-2xl overflow-hidden flex flex-col">
+               <div className="p-2 text-right">
+                  <button onClick={handleClose} className="p-2 text-gray-500 hover:text-red-500">Close</button>
+               </div>
               <div
                 className="
                   relative w-full h-full
-                  rounded-xl
-                  overflow-scroll
-                  p-5
-                  transition-colors duration-300
+                  overflow-y-auto
+                  p-2 sm:p-5
                 "
               >
                 <Comp onClose={handleClose} />
