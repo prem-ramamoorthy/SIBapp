@@ -3,9 +3,11 @@ import ProfileStrip from "./Components/ProfileStrip";
 import ProfileCard from "./Components/ProfileCard";
 import MyBioCard from "./Components/BioCard";
 import ProfessionalDetailsCard from "./Components/ProfessionalDetails";
+import IdCardModal from "./Components/IDcard";
 import useFetch from "../hooks/useFetch";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { CreditCard } from "lucide-react";
 
 const isFilled = (val) => {
   if (val === null || val === undefined) return false;
@@ -18,6 +20,7 @@ function Profile() {
   const [editable, setEditable] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [completionPercentage, setcompletionPercentage] = useState(0);
+  const [showIdCard, setShowIdCard] = useState(false);
   const { id } = useParams();
 
   const queryParams = new URLSearchParams(window.location.search);
@@ -142,9 +145,10 @@ function Profile() {
   }
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen bg-gray-1/50">
       <div className="container mx-auto px-4 py-4">
         {editable && <Header />}
+
         <div className="mt-3 flex flex-col items-center gap-2">
           <ProfileStrip
             name={profileData?.user?.username}
@@ -157,6 +161,18 @@ function Profile() {
             completionPercentage={completionPercentage}
           />
         </div>
+
+        {/* Action Bar for Profile */}
+        {!id && (<div className="mt-4 flex justify-end">
+          <button
+            onClick={() => setShowIdCard(true)}
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 font-medium text-sm"
+          >
+            <CreditCard size={18} />
+            View ID Card
+          </button>
+        </div>)}
+
         <section className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <div className="order-1">
             <ProfileCard
@@ -217,6 +233,15 @@ function Profile() {
           </div>
         </section>
       </div>
+
+      {!id && showIdCard && (
+        <IdCardModal
+          isOpen={showIdCard}
+          onClose={() => setShowIdCard(false)}
+          profileData={profileData}
+          idno={profileData?.membership?.idno}
+        />
+      )}
     </main>
   );
 }

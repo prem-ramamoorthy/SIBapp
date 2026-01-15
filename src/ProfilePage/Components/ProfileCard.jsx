@@ -35,7 +35,7 @@ const fieldConfig = [
   { key: "displayName", label: "Nickname", icon: <User />, type :"text" },
   { key: "phone", label: "Phone", icon: <Phone className="h-5 w-5" />, type :"text"  },
   { key: "email", label: "Email", icon: <MailCheck className="h-5 w-5" />, type :"text"  },
-  { key: "address", label: "Address", icon: <Pin className="h-5 w-5" />, colSpan: 2 , type :"text" },
+  { key: "address", label: "Address", icon: <Pin className="h-5 w-5" />, colSpan: 2, type :"text" },
   { key: "dob", label: "DOB", icon: <Calendar className="h-5 w-5" /> , type :"date" },
   { key: "wedding", label: "Wedding Date", icon: <Calendar className="h-5 w-5"/> , type :"date" },
   { key: "bloodGroup", label: "Blood Group", icon: <Heart className="h-5 w-5" /> , type :"text" },

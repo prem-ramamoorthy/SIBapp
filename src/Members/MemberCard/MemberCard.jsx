@@ -18,7 +18,7 @@ function MemberCard({
 }) {
   return (
     /* 1. Increased Max Width: max-w-[300px] allows more space for text.
-      2. mx-auto: Centers the card in its grid cell on mobile.
+       2. mx-auto: Centers the card in its grid cell on mobile.
     */
     <div className="flex flex-col justify-end pt-12 w-full max-w-[300px] mx-auto">
       
@@ -71,7 +71,10 @@ function MemberCard({
           <div className="w-full space-y-2">
             <div className="flex justify-between items-start w-full gap-2">
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Chapter</p>
-              <p className="text-xs font-bold text-gray-900 dark:text-gray-100 text-right">{member.chapter}</p>
+              {/* Modified to show only first letter of each word (Abbreviation) */}
+              <p className="text-xs font-bold text-gray-900 dark:text-gray-100 text-right">
+                {member.chapter?.split(' ').map(word => word[0]).join('').toUpperCase()}
+              </p>
             </div>
             <div className="flex justify-between items-start w-full gap-2">
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 shrink-0">Region</p>
