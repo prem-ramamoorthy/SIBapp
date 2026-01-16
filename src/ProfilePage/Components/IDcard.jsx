@@ -7,7 +7,7 @@ const IdCardModal = ({ isOpen, onClose, profileData }) => {
   const [libLoaded, setLibLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  // robustly handle whether profileData is the direct object or an array
+  // Robustly handle whether profileData is the direct object or an array
   const data = Array.isArray(profileData) ? profileData[0] : (profileData || {});
 
   // --- HTML2Canvas Loader ---
@@ -38,7 +38,7 @@ const IdCardModal = ({ isOpen, onClose, profileData }) => {
     setDownloading(true);
 
     try {
-      // Wait for images to render
+      // 1. Wait for images to load (logos etc)
       const images = cardRef.current.getElementsByTagName('img');
       await Promise.all(Array.from(images).map(img => {
         if (img.complete) return Promise.resolve();
@@ -48,41 +48,56 @@ const IdCardModal = ({ isOpen, onClose, profileData }) => {
         });
       }));
 
+      // 2. Generate Canvas
       const canvas = await window.html2canvas(cardRef.current, {
         useCORS: true,       
-        allowTaint: false,   
-        scale: 3, 
-        backgroundColor: '#f3f4f6', // Safe HEX color
-        logging: true,
+        allowTaint: true,   
+        scale: 4, // High resolution
+        backgroundColor: null, 
+        logging: false,
+        imageTimeout: 0,
+        onclone: (clonedDoc) => {
+            const clonedCard = clonedDoc.getElementById('capture-target');
+            if(clonedCard) {
+                clonedCard.style.fontFeatureSettings = '"liga" 0';
+                clonedCard.style.transform = 'none';
+            }
+        }
       });
 
       const dataUrl = canvas.toDataURL('image/png', 1.0);
       const link = document.createElement('a');
       link.href = dataUrl;
-      link.download = `${data?.display_name || data?.user?.username || 'Member'}_ID_Card.png`;
+      // Updated to use username for filename as well
+      link.download = `${data?.user?.username || 'Member'}_ID_Card.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (err) {
       console.error("Failed to download ID card:", err);
-      alert("Download failed. See console for details.");
+      alert("Download failed. Please check the console.");
     } finally {
       setDownloading(false);
     }
   };
 
   // --- Data Mapping ---
-  const displayName = data?.display_name || data?.user?.username || "Member Name";
+  // Updated: Prioritize username instead of display_name (nickname)
+  const displayName = data?.user?.username || "Member Name";
   const memberId = data?.membership?.idno || "SIB-MEM";
   
-  // Image Logic with CACHE BUSTER
+  // Image Logic
   let avatarUrl = "https://via.placeholder.com/200?text=No+Image";
+  const getBackendUrl = () => {
+    try { return import.meta.env.VITE_BACKEND_SERVER; } catch (e) { return ""; }
+  };
+
   if (data?.profile_image_url) {
     let rawUrl = "";
     if (data.profile_image_url.startsWith("http")) {
       rawUrl = data.profile_image_url;
     } else {
-      rawUrl = `${import.meta.env.VITE_BACKEND_SERVER}${data.profile_image_url}`;
+      rawUrl = `${getBackendUrl()}${data.profile_image_url}`;
     }
     const separator = rawUrl.includes('?') ? '&' : '?';
     avatarUrl = `${rawUrl}${separator}t=${new Date().getTime()}`;
@@ -107,10 +122,272 @@ const IdCardModal = ({ isOpen, onClose, profileData }) => {
   const chapterName = data?.chaptername || "SIB Chapter";
   const chapterCode = chapterName.split(' ').map(word => word.charAt(0)).join('').toUpperCase();
 
-  // --- SAFE STYLES (No OKLCH) ---
-  // We use inline styles for colors to prevent html2canvas crashing on modern Tailwind variables
-  const cardDimensions = "w-[320px] h-[520px]";
-  const bodyPattern = `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`;
+  // --- STRICT INLINE STYLES ---
+  const styles = {
+    wrapper: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      alignItems: 'flex-start',
+      gap: '2rem',
+      padding: '2rem',
+      backgroundColor: '#f3f4f6',
+      fontFamily: "'Inter', sans-serif"
+    },
+    card: {
+      position: 'relative',
+      display: 'flex',
+      flexDirection: 'column',
+      width: '320px',
+      height: '520px',
+      backgroundColor: '#ffffff',
+      borderRadius: '12px',
+      overflow: 'hidden',
+      border: '1px solid #e5e7eb',
+      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+      flexShrink: 0,
+      boxSizing: 'border-box'
+    },
+    frontHeader: {
+      height: '210px',
+      backgroundColor: '#171717',
+      position: 'relative',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      overflow: 'hidden',
+      zIndex: 1
+    },
+    headerDecoration1: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      width: '12rem',
+      height: '12rem',
+      borderRadius: '50%',
+      transform: 'translate(2.5rem, -2.5rem)',
+      backgroundColor: '#eab308', 
+      opacity: 0.1, 
+      filter: 'blur(40px)',
+      zIndex: 0
+    },
+    headerTitle: {
+      position: 'relative',
+      zIndex: 10,
+      fontWeight: 900,
+      fontSize: '10px',
+      letterSpacing: '0.3em',
+      textTransform: 'uppercase',
+      marginTop: '0.3rem', // Reduced margin top
+      color: 'rgba(255,255,255,0.9)',
+      
+    },
+    logoContainer: {
+      marginBottom: 'auto', // Pushes it away from the bottom (where profile overlaps)
+      position: 'relative',
+      zIndex: 10,
+      width: '4.5rem', // Slightly smaller to ensure fit
+      height: '4.5rem',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingTop: '8px'
+    },
+    goldLine: {
+      position: 'absolute',
+      bottom: 0,
+      width: '100%',
+      height: '7px',
+      backgroundColor: '#ca8a04',
+      zIndex: 5,
+    },
+    profileContainer: {
+      position: 'absolute',
+      marginTop: '6rem',
+      display: 'flex',
+      justifyContent: 'center',
+      zIndex: 20,
+      width: '100%',
+    },
+    profileImageWrapper: {
+      width: '128px',
+      height: '128px',
+      borderRadius: '16px',
+      border: '4px solid #ffffff',
+      overflow: 'hidden',
+      position: 'relative',
+      backgroundColor: '#e5e7eb',
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+      flexShrink: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      
+    },
+    profileImage: {
+      width: '100%',
+      height: '100%',
+      objectFit: 'cover',
+      display: 'block',
+    },
+    bloodGroup: {
+      position: 'absolute',
+      bottom: '-6px',
+      right: '-10px',
+      width: '28px',
+      height: '28px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: '50%',
+      border: '2px solid #ffffff',
+      backgroundColor: '#dc2626',
+      zIndex: 30,
+      color: '#ffffff',
+      fontSize: '10px',
+      fontWeight: 900,
+      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      paddingBottom: '12px'
+    },
+    body: {
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      paddingTop: '0.5rem',
+      paddingLeft: '1.25rem',
+      paddingRight: '1.25rem',
+      paddingBottom: '1rem',
+      textAlign: 'center',
+      position: 'relative',
+      backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+      zIndex: 5
+    },
+    memberId: {
+      fontFamily: 'monospace',
+      fontWeight: 'bold',
+      fontSize: '14px',
+      letterSpacing: '0.1em',
+      borderBottom: '2px solid #fee2e2',
+      paddingBottom: '0px',
+      color: '#b91c1c',
+      marginBottom: '-1px',
+      display: 'inline-block'
+    },
+    name: {
+      fontSize: '20px',
+      fontWeight: 900,
+      textTransform: 'uppercase',
+      lineHeight: 1.2,
+      letterSpacing: '-0.025em',
+      marginBottom: '8px',
+      color: '#111827',
+      width: '100%',
+      textAlign: 'center',
+      paddingBottom: '4px',
+    },
+    verticalPill: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      // FIX: Adjust padding to push text up visually (less padding top, more bottom)
+      // or keep balanced but force line-height
+      padding: '4px 16px 16px 16px', 
+      borderRadius: '9999px',
+      fontSize: '10px',
+      fontWeight: 'bold',
+      textTransform: 'uppercase',
+      letterSpacing: '0.05em',
+      marginBottom: '16px',
+      backgroundColor: '#171717',
+      color: '#ffffff',
+      maxWidth: '90%',
+      whiteSpace: 'nowrap',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      lineHeight: '1.1' // Strict line height
+    },
+    detailsBox: {
+      width: '100%',
+      backgroundColor: 'rgba(255,255,255,0.95)',
+      padding: '12px',
+      borderRadius: '12px',
+      border: '1px solid #f3f4f6',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px'
+    },
+    detailLabel: {
+      fontSize: '8px',
+      textTransform: 'uppercase',
+      fontWeight: 800,
+      letterSpacing: '0.1em',
+      marginBottom: '2px',
+      color: '#9ca3af',
+      display: 'block'
+    },
+    detailValue: {
+      fontWeight: 'bold',
+      fontSize: '12px',
+      lineHeight: 1.25,
+      color: '#1f2937',
+      margin: 0,
+
+      
+    },
+    footer: {
+      marginTop: 'auto',
+      width: '100%',
+      paddingTop: '8px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center'
+    },
+    chapterCode: {
+      fontSize: '30px',
+      fontWeight: 900,
+      lineHeight: 1,
+      color: '#d1d5db',
+      display: 'block'
+    },
+    backHeader: {
+        height: '64px', 
+        backgroundColor: '#171717', 
+        position: 'relative', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'space-between', 
+        paddingLeft: '24px', 
+        paddingRight: '24px', 
+        overflow: 'hidden' 
+    },
+    websiteFooter: {
+        padding: '12px 24px', 
+        backgroundColor: '#171717',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        boxSizing: 'border-box'
+    },
+    // Icon Wrapper Helper for consistent alignment
+    iconRow: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        marginBottom: '4px'
+        
+    },
+    // Helper for text next to icons to ensure it doesn't hang low
+    iconText: {
+        fontSize: '12px',
+        fontWeight: 'bold', 
+        color: '#1f2937',
+        lineHeight: '1', // FORCE line height to match icon center
+        display: 'block',
+        marginTop: '2px' // Visual tweak for fonts that render high
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200 overflow-y-auto">
@@ -125,219 +402,153 @@ const IdCardModal = ({ isOpen, onClose, profileData }) => {
 
         <div className="flex-1 p-8 bg-gray-100 flex justify-center items-start overflow-auto">
           
-          <div 
-            ref={cardRef}
-            className="flex flex-wrap justify-center gap-8 bg-gray-100 p-4" 
-            style={{ fontFamily: "'Inter', sans-serif" }}
-          >
+          {/* Main Capture Container */}
+          <div ref={cardRef} id="capture-target" style={styles.wrapper}>
             
             {/* ================= CARD FRONT ================= */}
-            <div 
-              className={`${cardDimensions} relative flex flex-col shadow-2xl overflow-hidden rounded-xl border border-gray-200 shrink-0`}
-              style={{ backgroundColor: '#ffffff' }} // SAFE HEX
-            >
+            <div style={styles.card}>
               
-              {/* Header */}
-              <div 
-                className="h-[40%] relative flex flex-col items-center overflow-hidden"
-                style={{ backgroundColor: '#171717' }} // SAFE HEX (neutral-900)
-              >
-                 {/* Decorative background elements (Replaced gradients with standard syntax) */}
-                 <div 
-                    className="absolute top-0 right-0 w-48 h-48 rounded-full blur-2xl transform translate-x-10 -translate-y-10"
-                    style={{ background: 'linear-gradient(to bottom right, rgba(234, 179, 8, 0.2), transparent)' }}
-                 ></div>
-                 <div 
-                    className="absolute top-0 left-0 w-full h-full"
-                    style={{ background: 'radial-gradient(ellipse at top, #262626, #171717)' }}
-                 ></div>
+              <div style={styles.frontHeader}>
+                 <div style={styles.headerDecoration1}></div>
                  
-                 <h1 className="relative z-10 font-black text-[10px] tracking-[0.3em] uppercase mt-3" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                   Sengunthar In Business
-                 </h1>
+                 <h1 style={styles.headerTitle}>Sengunthar In Business</h1>
 
-                 <div className="mb-60 relative z-10 w-18 h-18 flex items-center justify-center">
-                    <img src='../logo.webp' alt="SIB Logo" className="w-full h-full object-contain drop-shadow-2xl" />
+                 <div style={styles.logoContainer}>
+                    <img src='../logo.webp' alt="SIB Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 25px 25px rgb(0 0 0 / 0.15))' }} />
                  </div>
                  
-                 {/* Gold accent line */}
-                 <div 
-                    className="absolute bottom-0 w-full h-1.5"
-                    style={{ background: 'linear-gradient(to right, #ca8a04, #facc15, #ca8a04)' }}
-                 ></div>
+                 <div style={styles.goldLine}></div>
               </div>
 
-              {/* Profile Image Area */}
-              <div className="relative -mt-14 flex justify-center z-20">
-                 <div className="relative group">
-                   <div className="w-32 h-32 rounded-xl border-[4px] border-white shadow-2xl overflow-hidden relative" style={{ backgroundColor: '#e5e7eb' }}>
+              <div style={styles.profileContainer}>
+                 <div style={{ position: 'relative' }}>
+                   <div style={styles.profileImageWrapper}>
                       <img 
-                        src={avatarUrl} 
+                        src={imgError ? "https://via.placeholder.com/200?text=No+Image" : avatarUrl} 
                         alt="Profile" 
-                        className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
+                        style={styles.profileImage}
                         crossOrigin="anonymous"
                         onError={() => setImgError(true)}
                       />
-                      <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to top right, rgba(0,0,0,0.1), transparent)' }}></div>
                    </div>
-                   {/* Blood Group Badge */}
                    {bloodGroup && (
-                     <div 
-                        className="absolute -bottom-1 -right-3 text-white w-7 h-7 flex items-center justify-center rounded-full shadow-lg border-2 border-white transform rotate-0 z-30"
-                        style={{ background: 'linear-gradient(to bottom right, #dc2626, #991b1b)' }}
-                     >
-                       <span className="text-[10px] font-black">{bloodGroup}</span>
+                     <div style={styles.bloodGroup}>
+                       <span>{bloodGroup}</span>
                      </div>
                    )}
                  </div>
               </div>
 
-              {/* Main Content Body */}
-              <div 
-                className="flex-1 flex flex-col items-center pt-2 px-5 pb-4 text-center relative"
-                style={{ backgroundImage: bodyPattern }}
-              >
-                 {/* ID Number */}
-                 <div className="mb-1 mt-1">
-                    <span 
-                        className="font-mono font-bold text-sm tracking-widest border-b-2 pb-0.5"
-                        style={{ color: '#b91c1c', borderColor: '#fee2e2' }} // red-700, red-100
-                    >
-                      {memberId}
-                    </span>
+              <div style={styles.body}>
+                 <div style={{ marginTop: '4px', marginBottom: '4px' }}>
+                    <span style={styles.memberId}>{memberId}</span>
                  </div>
 
-                 {/* Display Name */}
-                 <h2 
-                    className="text-xl font-black uppercase leading-none tracking-tight mb-2 drop-shadow-sm line-clamp-2 min-h-[1.5em] flex items-center justify-center"
-                    style={{ color: '#111827' }} // gray-900
-                 >
-                   {displayName}
-                 </h2>
+                 <h2 style={styles.name}>{displayName}</h2>
 
-                 {/* Vertical Pill */}
-                 <span 
-                    className="inline-block px-4 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider mb-4 shadow-sm max-w-full truncate"
-                    style={{ backgroundColor: '#171717', color: '#ffffff' }}
-                 >
-                    {vertical}
-                 </span>
+                 <span style={styles.verticalPill}>{vertical}</span>
 
-                 {/* Details Block */}
-                 <div 
-                    className="w-full space-y-3 backdrop-blur-sm p-3 rounded-xl shadow-sm"
-                    style={{ backgroundColor: 'rgba(255,255,255,0.8)', borderColor: '#f3f4f6', borderWidth: '1px' }}
-                 >
-                    {/* Company */}
-                    <div className="flex flex-col items-center">
-                       <span className="text-[8px] uppercase font-extrabold tracking-widest mb-0.5" style={{ color: '#9ca3af' }}>Company</span>
-                       <p className="font-bold text-xs leading-tight line-clamp-2" style={{ color: '#1f2937' }}>{companyName}</p>
+                 <div style={styles.detailsBox}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                       <span style={styles.detailLabel}>Company</span>
+                       <p style={styles.detailValue}>{companyName}</p>
                     </div>
 
-                    <div className="w-1/2 h-px mx-auto" style={{ backgroundColor: '#e5e7eb' }}></div>
+                    <div style={{ width: '50%', height: '1px', backgroundColor: '#e5e7eb', margin: '0 auto' }}></div>
 
-                    {/* Contact */}
-                    <div className="flex flex-col items-center">
-                       <span className="text-[8px] uppercase font-extrabold tracking-widest mb-0.5" style={{ color: '#9ca3af' }}>Contact</span>
-                       <div className="flex items-center gap-2 font-bold px-3 py-1 rounded-md" style={{ backgroundColor: '#f9fafb', color: '#1f2937' }}>
-                          <Phone size={12} style={{ color: '#dc2626', fill: '#dc2626' }} />
-                          <span className="tracking-wide text-xs">{phone}</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                       <span style={styles.detailLabel}>Contact</span>
+                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 'bold', backgroundColor: '#f9fafb', padding: '6px 12px', borderRadius: '6px', color: '#1f2937' }}>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <Phone size={12} color="#dc2626" />
+                          </div>
+                          <span style={{ paddingBottom: '14px', fontSize: '12px', letterSpacing: '0.025em', lineHeight: '1' }}>{phone}</span>
                        </div>
                     </div>
                  </div>
 
-                 {/* Chapter Footer */}
-                 <div className="mt-auto w-full pt-2 flex justify-between items-end">
-                    <div className="text-left pl-1">
-                       <span className="block text-[8px] uppercase font-extrabold tracking-widest" style={{ color: '#9ca3af' }}>Chapter</span>
-                       <span className="text-3xl font-black leading-none select-none" style={{ color: '#d1d5db' }}>{chapterCode}</span>
+                 <div style={styles.footer}>
+                    <div style={{ textAlign: 'left', paddingLeft: '4px' }}>
+                       <span style={styles.detailLabel}>Chapter</span>
+                       <span style={styles.chapterCode}>{chapterCode}</span>
                     </div>
-                    <div className="opacity-10 w-10 h-10">
-                       <img src="../logo.webp" alt="" className="w-full h-full object-contain grayscale" />
+                    <div style={{ opacity: 0.1, width: '40px', height: '40px', display: 'flex', alignItems: 'center' }}>
+                       <img src="../logo.webp" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'grayscale(100%)' }} />
                     </div>
                  </div>
               </div>
             </div>
 
             {/* ================= CARD BACK ================= */}
-            <div 
-                className={`${cardDimensions} relative flex flex-col shadow-2xl overflow-hidden rounded-xl border border-gray-200 shrink-0`}
-                style={{ backgroundColor: '#ffffff' }}
-            >
+            <div style={styles.card}>
               
               {/* Back Header */}
-              <div 
-                className="h-16 relative flex items-center justify-between px-6 overflow-hidden"
-                style={{ backgroundColor: '#171717' }}
-              >
-                 <div className="absolute top-0 right-10 w-20 h-full skew-x-[-20deg]" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}></div>
+              <div style={styles.backHeader}>
+                 <div style={{ position: 'absolute', top: 0, right: '40px', width: '80px', height: '100%', backgroundColor: 'rgba(255,255,255,0.05)', transform: 'skewX(-20deg)' }}></div>
                  
-                 <div className="relative z-10">
-                    <h2 className="font-bold text-lg tracking-wide" style={{ color: '#ffffff' }}>Details</h2>
-                    <div className="h-0.5 w-8 mt-1" style={{ backgroundColor: '#eab308' }}></div>
+                 <div style={{ position: 'relative', zIndex: 10 }}>
+                    <h2 style={{ color: '#ffffff', fontWeight: 'bold', fontSize: '18px', letterSpacing: '0.025em', margin: 0 }}>Details</h2>
+                    <div style={{ height: '2px', width: '32px', backgroundColor: '#eab308', marginTop: '4px' }}></div>
                  </div>
                  
-                 <div className="relative z-10 w-8 h-8 rounded-full p-1 flex items-center justify-center" style={{ backgroundColor: '#ffffff' }}>
-                    <img src='../logo.webp' className="w-full h-full object-contain" />
+                 <div style={{ position: 'relative', zIndex: 10, width: '32px', height: '32px', backgroundColor: '#ffffff', borderRadius: '50%', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <img src='../logo.webp' style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                  </div>
               </div>
 
               {/* Back Content */}
-              <div className="flex-1 p-6 flex flex-col gap-4 relative" style={{ backgroundColor: '#ffffff' }}>
-                 <div className="absolute inset-0 opacity-30" style={{ backgroundImage: bodyPattern }}></div>
+              <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', position: 'relative', backgroundColor: '#ffffff' }}>
+                 <div style={{ position: 'absolute', inset: 0, opacity: 0.3, backgroundImage: styles.body.backgroundImage }}></div>
 
-                 <div className="relative z-10 space-y-4">
+                 <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     
                     {/* Vagaiyara */}
-                    <div className="p-2.5 rounded-lg border" style={{ backgroundColor: '#f9fafb', borderColor: '#f3f4f6' }}>
-                       <span className="text-[8px] font-bold uppercase tracking-widest block mb-1" style={{ color: '#9ca3af' }}>Vagaiyara</span>
-                       <span className="text-xs font-bold block tracking-wide" style={{ color: '#1f2937' }}>{vagaiyara}</span>
+                    <div style={{ padding: '10px', borderRadius: '8px', border: '1px solid #f3f4f6', backgroundColor: '#f9fafb' }}>
+                       <span style={styles.detailLabel}>Vagaiyara</span>
+                       <span style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', letterSpacing: '0.025em', color: '#1f2937' }}>{vagaiyara}</span>
                     </div>
 
                     {/* Kuladeivam */}
-                    <div className="pl-2 border-l-4" style={{ borderColor: '#eab308' }}>
-                       <span className="text-[8px] font-bold uppercase tracking-widest block mb-0.5" style={{ color: '#9ca3af' }}>Kuladeivam</span>
-                       <span className="text-xs font-bold block leading-relaxed" style={{ color: '#1f2937' }}>{kuladeivam}</span>
+                    <div style={{ paddingLeft: '8px', borderLeft: '4px solid #eab308' }}>
+                       <span style={styles.detailLabel}>Kuladeivam</span>
+                       <span style={{ fontSize: '12px', fontWeight: 'bold', display: 'block', lineHeight: 1.625, color: '#1f2937' }}>{kuladeivam}</span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 pt-2">
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '12px', paddingTop: '8px' }}>
                        {/* DOB */}
                        <div>
-                          <div className="flex items-center gap-1.5 mb-1" style={{ color: '#dc2626' }}>
-                             <Calendar size={12} />
-                             <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: '#000000' }}>DOB</span>
+                          <div style={styles.iconRow}>
+                             <Calendar size={12} color="#dc2626" />
+                             <span style={{ fontSize: '8px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#000000', lineHeight: 1, paddingBottom: '12px' }}>DOB</span>
                           </div>
-                          <span className="text-xs font-bold pl-1" style={{ color: '#1f2937' }}>{dob}</span>
+                          <span style={{ fontSize: '12px', fontWeight: 'bold', paddingLeft: '4px', color: '#1f2937', }}>{dob}</span>
                        </div>
                        {/* Wedding */}
                        <div>
-                          <div className="flex items-center gap-1.5 mb-1" style={{ color: '#dc2626' }}>
-                             <Calendar size={12} />
-                             <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: '#000000' }}>Wedding</span>
+                          <div style={styles.iconRow}>
+                             <Calendar size={12} color="#dc2626" />
+                             <span style={{ fontSize: '8px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#000000', lineHeight: 1, paddingBottom: '12px' }}>Wedding</span>
                           </div>
-                          <span className="text-xs font-bold pl-1" style={{ color: '#1f2937' }}>{weddingDate}</span>
+                          <span style={{ fontSize: '12px', fontWeight: 'bold', paddingLeft: '4px', color: '#1f2937' }}>{weddingDate}</span>
                        </div>
                     </div>
 
                     {/* Email */}
-                    <div className="pt-2 border-t border-dashed" style={{ borderColor: '#e5e7eb' }}>
-                       <div className="flex items-center gap-1.5 mb-1">
-                          <Mail size={12} style={{ color: '#9ca3af' }} />
-                          <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>Email</span>
+                    <div style={{ paddingTop: '8px', borderTop: '1px dashed #e5e7eb' }}>
+                       <div style={styles.iconRow}>
+                          <Mail size={12} color="#9ca3af"  />
+                          <span style={styles.detailLabel}>Email</span>
                        </div>
-                       <span className="text-xs font-bold break-all" style={{ color: '#1f2937' }}>{email}</span>
+                       <span style={{ fontSize: '12px', fontWeight: 'bold', wordBreak: 'break-all', color: '#1f2937' }}>{email}</span>
                     </div>
 
                     {/* Address */}
                     <div>
-                       <div className="flex items-center gap-1.5 mb-2">
-                          <MapPin size={12} style={{ color: '#dc2626' }} />
-                          <span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: '#9ca3af' }}>Address</span>
+                       <div style={{ ...styles.iconRow, marginBottom: '8px' }}>
+                          <MapPin size={12} color="#dc2626" />
+                          <span style={styles.detailLabel}>Address</span>
                        </div>
-                       <p 
-                          className="text-[10px] leading-relaxed font-medium p-2 rounded border line-clamp-3"
-                          style={{ color: '#4b5563', backgroundColor: '#f9fafb', borderColor: '#f3f4f6' }}
-                       >
+                       <p style={{ fontSize: '10px', lineHeight: 1.625, fontWeight: 500, padding: '8px', borderRadius: '4px', border: '1px solid #f3f4f6', backgroundColor: '#f9fafb', color: '#4b5563', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: 0 }}>
                           {address}
                        </p>
                     </div>
@@ -345,10 +556,12 @@ const IdCardModal = ({ isOpen, onClose, profileData }) => {
               </div>
 
               {/* Back Footer */}
-              <div className="py-2 px-6" style={{ backgroundColor: '#171717' }}>
-                 <div className="flex items-center justify-center gap-2" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                    <Globe size={10} />
-                    <span className="text-[8px] font-semibold tracking-wider uppercase">www.senguntharinbusiness.com</span>
+              <div style={styles.websiteFooter}>
+                 <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', color: 'rgba(255,255,255,0.6)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Globe size={10} color="rgba(255,255,255,0.6)" />
+                    </div>
+                    <span style={{ fontSize: '8px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', lineHeight: '1', marginTop: '1px' , paddingBottom: '12px'}}>www.senguntharinbusiness.com</span>
                  </div>
               </div>
 
