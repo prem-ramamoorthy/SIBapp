@@ -6,6 +6,29 @@ import { useEffect, useState, useMemo } from "react";
 import { BiErrorCircle } from "react-icons/bi";
 import { EventsModal } from "../PresidentPortal/components/EventModal";
 
+// --- Helper: Date Formatter ---
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
+
+  const day = date.getDate();
+  const year = date.getFullYear();
+  const month = date.toLocaleString('default', { month: 'short' }).toLowerCase();
+
+  const getSuffix = (d) => {
+    if (d > 3 && d < 21) return 'th';
+    switch (d % 10) {
+      case 1:  return "st";
+      case 2:  return "nd";
+      case 3:  return "rd";
+      default: return "th";
+    }
+  };
+
+  return `${day}${getSuffix(day)} ${month} ${year}`;
+};
+
 // --- Coordinator Bulk Edit Modal (UI Remains the same) ---
 function CoordinatorBulkEditModal({ open, onClose, onSave, initial, loading }) {
   const [coords, setCoords] = useState([]);
@@ -82,9 +105,9 @@ function UpcomingEvents() {
     { method: "GET", credentials: "include" }
   );
 
-  // 2. Fetch Latest Meeting
+  // 2. Fetch Meetings (Updated Route)
   const { data: meetingData, loading: meetingLoading, error: meetingError } = useFetch(
-    `${import.meta.env.VITE_BACKEND_SERVER}/meeting/getlatestmeeting`,
+    `${import.meta.env.VITE_BACKEND_SERVER}/meeting/getmeetings`,
     { method: "GET", credentials: "include" }
   );
 
@@ -110,9 +133,10 @@ function UpcomingEvents() {
       : null, 
   [eventsData, eventsLoading, eventsError]);
 
+  // Updated logic: Select first element from array
   const currentMeeting = useMemo(() => 
-    (!meetingLoading && !meetingError && meetingData && !meetingData.message)
-      ? meetingData
+    (!meetingLoading && !meetingError && Array.isArray(meetingData) && meetingData.length > 0)
+      ? meetingData[0]
       : null, 
   [meetingData, meetingLoading, meetingError]);
 
@@ -275,10 +299,10 @@ function UpcomingEvents() {
                         </span>
                       </div>
                       <div className="bg-white dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-sm active:scale-[0.98] active:bg-gray-50 dark:active:bg-gray-800 transition-all duration-200 overflow-hidden relative cursor-pointer group">
-                         <div className="p-0.5">
+                          <div className="p-0.5">
                           <Events
                             title={currentEvent.companyName}
-                            date={currentEvent.date}
+                            date={formatDate(currentEvent.date)}
                             time={currentEvent.time}
                             vatNumber={currentEvent.VATnumber}
                           />
@@ -300,7 +324,7 @@ function UpcomingEvents() {
                         <div className="p-0.5">
                            <Events
                             title={currentMeeting.title}
-                            date={currentMeeting.meeting_date}
+                            date={formatDate(currentMeeting.meeting_date)}
                             time={currentMeeting.meeting_time}
                             vatNumber={currentMeeting.location} 
                           />
