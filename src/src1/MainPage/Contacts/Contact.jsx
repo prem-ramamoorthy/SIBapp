@@ -157,6 +157,58 @@ const styles = `
 }
 
 /* -----------------------------------------------------------
+   CTA / JOIN CARD
+----------------------------------------------------------- */
+.cta-card {
+   /* Distinct border */
+  text-align: center;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sib-shadow-hover);
+}
+
+.cta-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--sib-navy);
+  margin-bottom: 0.75rem;
+}
+
+.cta-desc {
+  color: var(--sib-text-light);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.sib-cta-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--sib-navy);
+  color: var(--sib-white);
+  padding: 0.85rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.sib-cta-btn:hover {
+  background-color: var(--sib-navy-light);
+  transform: translateY(-1px);
+}
+
+/* -----------------------------------------------------------
    FORM STYLES
 ----------------------------------------------------------- */
 .contact-form {
@@ -294,6 +346,11 @@ textarea.form-input {
     flex: 1;
     max-width: 350px;
   }
+
+  .cta-card {
+    flex: 1;
+    min-width: 300px;
+  }
 }
 
 @media (max-width: 650px) {
@@ -423,6 +480,24 @@ function Contact() {
                   </a>
                 </div>
               </div>
+
+              {/* Join Now CTA Card (Added to fill gap) */}
+              <div className="sib-card cta-card">
+                <h4 className="cta-title">Become a Member</h4>
+                <p className="cta-desc">
+                  Join our growing network of Sengunthar business professionals. Connect, collaborate, and succeed together.
+                </p>
+                <a 
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSdol7x6QjDP-KsewX1hImi8sU3RqUR2dmn-arttsVt57h6yrA/viewform?usp=header"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="sib-cta-btn"
+                >
+                  <span>Join Now</span>
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                </a>
+              </div>
+
             </div>
 
             {/* Right Column: Contact Form */}

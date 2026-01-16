@@ -1,16 +1,16 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { X, Download, Phone, Calendar, Star, MapPin, Building2 } from 'lucide-react';
+import { X, Download, Phone, Calendar, MapPin, Mail, Globe } from 'lucide-react';
 
-const IdCardModal = ({ isOpen, onClose, profileData , idno }) => {
+const IdCardModal = ({ isOpen, onClose, profileData }) => {
   const cardRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
   const [libLoaded, setLibLoaded] = useState(false);
-  const [imgError, setImgError] = useState(false); 
+  const [imgError, setImgError] = useState(false);
 
-  
+  // robustly handle whether profileData is the direct object or an array
   const data = Array.isArray(profileData) ? profileData[0] : (profileData || {});
 
-
+  // --- HTML2Canvas Loader ---
   useEffect(() => {
     if (typeof window !== 'undefined' && window.html2canvas) {
       setLibLoaded(true);
@@ -36,80 +36,92 @@ const IdCardModal = ({ isOpen, onClose, profileData , idno }) => {
   const handleDownload = async () => {
     if (!cardRef.current || !window.html2canvas) return;
     setDownloading(true);
-    
+
     try {
       // Wait for images to render
       const images = cardRef.current.getElementsByTagName('img');
       await Promise.all(Array.from(images).map(img => {
         if (img.complete) return Promise.resolve();
         return new Promise(resolve => {
-            img.onload = resolve;
-            img.onerror = resolve; // Continue even if image fails
+          img.onload = resolve;
+          img.onerror = resolve; 
         });
       }));
 
       const canvas = await window.html2canvas(cardRef.current, {
-        useCORS: true, 
-        allowTaint: true, // Allow rendering even if tainted (might block download if strictly tainted)
+        useCORS: true, // This requires the Firebase CORS config we just set
+        allowTaint: true,
         scale: 3, 
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f3f4f6', 
         logging: false,
       });
 
       const dataUrl = canvas.toDataURL('image/png', 1.0);
       const link = document.createElement('a');
       link.href = dataUrl;
-      link.download = `${data?.user?.username || 'Member'}_ID.png`;
+      link.download = `${data?.display_name || data?.user?.username || 'Member'}_ID_Card.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } catch (err) {
       console.error("Failed to download ID card:", err);
-      // Fallback message if CORS completely blocks the canvas export
-      alert("Could not generate image due to browser security (CORS). Please take a screenshot manually.");
+      alert("Could not generate image. Please ensure Firebase CORS is configured.");
     } finally {
       setDownloading(false);
     }
   };
 
-  // --- Data Parsing & Formatting ---
-  const username = data?.user?.username || "Member Name";
-  const membershipId = data?.vagai_category ? `SIB-${data.vagai_category.substring(0,3).toUpperCase()}` : "SIB-MEM"; 
-
-  // Image URL Logic
+  // --- Data Mapping (Based on provided JSON) ---
+  
+  // 1. Basic Identity
+  const displayName = data?.display_name || data?.user?.username || "Member Name";
+  const memberId = data?.membership?.idno || "SIB-MEM";
+  
+  // 2. Image
   let avatarUrl = "https://via.placeholder.com/200?text=No+Image";
   if (data?.profile_image_url) {
     if (data.profile_image_url.startsWith("http")) {
       avatarUrl = data.profile_image_url;
     } else {
-      // Use env variable as requested without modification
       avatarUrl = `${import.meta.env.VITE_BACKEND_SERVER}${data.profile_image_url}`;
     }
   }
 
-  // Fallback for missing fields
-  const mobile = data?.company_phone || data?.user?.phone || "N/A";
-  const company = data?.company_name || "Company Name";
+  // 3. Contact Info
+  const phone = data?.company_phone || "N/A";
+  const email = data?.company_email || data?.user?.email || "N/A";
+  const address = data?.company_address || data?.personal_address || "Address not provided";
   
-  // Handle verticals array or string
-  let vertical = "Vertical";
-  if (Array.isArray(data?.verticals) && data.verticals.length > 0) {
-     vertical = data.verticals.map(v => v.vertical_name).join(", ");
-  } else if (Array.isArray(data?.vertical_names)) {
-     vertical = data.vertical_names.join(", ");
-  } else if (data?.vertical_names) {
-     vertical = data.vertical_names;
+  // 4. Details
+  const companyName = data?.company_name || "Company Name";
+  const bloodGroup = data?.blood_group || "";
+  const dob = data?.dob ? new Date(data.dob).toLocaleDateString() : "N/A";
+  const weddingDate = data?.wedding_date ? new Date(data.wedding_date).toLocaleDateString() : "N/A";
+  const vagaiyara = data?.vagai_category || "N/A";
+  const kuladeivam = data?.kuladeivam || "N/A";
+
+  // 5. Vertical
+  let vertical = "General";
+  if (data?.vertical_names && data.vertical_names.length > 0) {
+    vertical = data.vertical_names.join(", ");
   }
 
-  const dob = data?.dob ? data.dob.split('T')[0] : "N/A";
-  const bloodGroup = data?.blood_group || "";
-  const kuladeivam = data?.kuladeivam || "N/A";
-  const address = data?.company_address || "";
+  // 6. Chapter Code Logic
+  const chapterName = data?.chaptername || "SIB Chapter";
+  const chapterCode = chapterName
+    .split(' ')
+    .map(word => word.charAt(0))
+    .join('')
+    .toUpperCase();
+
+  // Styles
+  const cardDimensions = "w-[320px] h-[520px]";
+  const bodyPattern = `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm flex flex-col max-h-[90vh]">
-        
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200 overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl flex flex-col my-auto">
+
         {/* Modal Header */}
         <div className="flex justify-between items-center p-4 border-b">
           <h3 className="text-lg font-bold text-gray-800">Member ID Preview</h3>
@@ -119,131 +131,213 @@ const IdCardModal = ({ isOpen, onClose, profileData , idno }) => {
         </div>
 
         {/* Scrollable Preview Area */}
-        <div className="flex-1 p-6 bg-gray-100 flex justify-center items-center overflow-auto">
+        <div className="flex-1 p-8 bg-gray-100 flex justify-center items-start overflow-auto">
           
-          {/* ID CARD CONTAINER */}
           <div 
             ref={cardRef}
-            className="w-[320px] h-[540px] bg-white relative flex flex-col shadow-2xl overflow-hidden shrink-0 border border-gray-200"
+            className="flex flex-wrap justify-center gap-8 bg-gray-100 p-4" 
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
             
-            {/* 1. Header Section */}
-            <div className="relative h-[150px] bg-neutral-900 overflow-hidden flex flex-col items-center pt-5">
-               {/* Decorative Shapes */}
-               <div className="absolute top-0 left-0 w-24 h-24 bg-red-700 rounded-br-full opacity-90"></div>
-               <div className="absolute top-0 right-0 w-32 h-full bg-yellow-500 transform skew-x-[-25deg] translate-x-16 border-l-4 border-white/10"></div>
+            {/* ================= CARD FRONT ================= */}
+            <div className={`${cardDimensions} bg-white relative flex flex-col shadow-2xl overflow-hidden rounded-xl border border-gray-200 shrink-0`}>
+              
+              {/* Premium Header Background */}
+              <div className="h-[40%] bg-neutral-900 relative flex flex-col items-center overflow-hidden">
+                 {/* Decorative background elements */}
+                 <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-yellow-500/20 to-transparent rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
+                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-800 via-neutral-900 to-neutral-900"></div>
+                 
+                 {/* Org Name - Top */}
+                 <h1 className="relative z-10 text-white/90 font-black text-[10px] tracking-[0.3em] uppercase mt-3 ">
+                   Sengunthar In Business
+                 </h1>
 
-               {/* Logo Area */}
-               <div className="z-10 flex flex-col items-center">
-                  <div className="w-15 h-15 bg-white rounded-full flex items-center justify-center border-2 border-yellow-400 shadow-lg overflow-hidden">
-                      <img src='../logo.webp' className="text-neutral-900" size={24} />
-                  </div>
-                  <h1 className="text-white font-black text-xl tracking-wider z-10 drop-shadow-md">Sengunthar In Business</h1>
-               </div>
-            </div>
+                 {/* Logo - Large and Centered - Added padding bottom to ensure it clears the profile pic cut */}
+                 <div className="mb-60 relative z-10 w-18 h-18 flex items-center justify-center">
+                    <img src='../logo.webp' alt="SIB Logo" className="w-full h-full object-contain drop-shadow-2xl" />
+                 </div>
+                 
+                 {/* Gold accent line at bottom of header */}
+                 <div className="absolute bottom-0 w-full h-1.5 bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600"></div>
+              </div>
 
-            {/* 2. Profile Photo */}
-            <div className="relative -mt-10 flex justify-center z-20">
-               <div className="relative">
-                  <div className="w-32 h-32 rounded-full border-[5px] border-white shadow-xl bg-gray-200 overflow-hidden relative">
-                      {/* OPTIMIZED IMAGE LOADING:
-                         We try to load with 'anonymous' first (better for downloads).
-                         If that fails (CORS error), 'imgError' becomes true, and we remove the attribute so it displays visually.
-                      */}
+              {/* Profile Image Area - Overlapping */}
+              <div className="relative -mt-14 flex justify-center z-20">
+                 <div className="relative group">
+                   {/* Image Container */}
+                   <div className="  w-32 h-32 rounded-xl border-[4px] border-white shadow-2xl bg-gray-200 overflow-hidden relative">
                       <img 
                         src={avatarUrl} 
                         alt="Profile" 
-                        className="w-full h-full object-cover"
-                        crossOrigin={imgError ? undefined : "anonymous"}
+                        className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
+                        // REQUIRED for Solution 2: This requests the CORS headers from Firebase
+                        crossOrigin="anonymous"
                         onError={() => setImgError(true)}
                       />
-                  </div>
-                  {/* Blood Group Badge */}
-                  <div className="absolute bottom-1 right-1 bg-red-600 text-white w-9 h-9 flex items-center justify-center rounded-full border-[3px] border-white shadow-md z-30">
-                     <span className="text-xs font-bold">{bloodGroup}</span>
-                  </div>
-               </div>
-            </div>
-
-            {/* 3. Primary Info */}
-            <div className="text-center mt-3 px-4">
-               <div className="text-red-600 font-mono font-bold text-sm tracking-wide mb-1">
-                  {idno}
-               </div>
-
-               <h2 className="text-xl font-extrabold text-neutral-900 uppercase tracking-tight leading-none mb-2 line-clamp-1">
-                 {username}
-               </h2>
-
-               <div className="flex flex-col items-center gap-1">
-                 <span className="bg-yellow-400 text-neutral-900 text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider max-w-full truncate">
-                   {vertical}
-                 </span>
-                 <p className="text-xs text-gray-500 font-semibold truncate max-w-[90%]">{company}</p>
-               </div>
-            </div>
-
-            {/* 4. Details Section */}
-            <div className="px-5 mt-5 flex-1">
-               <div className="bg-gray-50 rounded-xl border border-gray-100 p-3 shadow-sm">
-                 
-                 {/* Row 1: Phone & DOB */}
-                 <div className="flex border-b border-gray-200 pb-2 mb-2">
-                    <div className="flex-1 border-r border-gray-200 pr-2">
-                      <div className="flex items-center gap-1.5 text-red-600 mb-0.5">
-                         <Phone size={11} strokeWidth={3} />
-                         <span className="text-[9px] font-bold uppercase text-gray-400">Phone</span>
-                      </div>
-                      <span className="text-xs font-bold text-gray-900 block truncate">{mobile}</span>
-                    </div>
-
-                    <div className="flex-1 pl-3">
-                      <div className="flex items-center gap-1.5 text-red-600 mb-0.5">
-                         <Calendar size={11} strokeWidth={3} />
-                         <span className="text-[9px] font-bold uppercase text-gray-400">DOB</span>
-                      </div>
-                      <span className="text-xs font-bold text-gray-900 block">{dob}</span>
-                    </div>
-                 </div>
-
-                 {/* Row 2: Kuladeivam */}
-                 <div className="w-full">
-                   <div className="flex items-center gap-1.5 text-red-600 mb-0.5">
-                      <Star size={11} strokeWidth={3} />
-                      <span className="text-[9px] font-bold uppercase text-gray-400">Kuladeivam</span>
+                      {/* Glossy overlay effect */}
+                      <div className="absolute inset-0 bg-gradient-to-tr from-black/10 to-transparent pointer-events-none"></div>
                    </div>
-                   <span className="text-xs font-bold text-gray-900 block break-words leading-snug line-clamp-2">
-                     {kuladeivam}
-                   </span>
+                   {/* Blood Group Badge - ROUNDED FULL as requested */}
+                   {bloodGroup && (
+                     <div className="absolute -bottom-1 -right-3 bg-gradient-to-br from-red-600 to-red-800 text-white w-7 h-7 flex items-center justify-center rounded-full shadow-lg border-2 border-white transform rotate-0 z-30">
+                       <span className="text-[10px] font-black">{bloodGroup}</span>
+                     </div>
+                   )}
+                 </div>
+              </div>
+
+              {/* Main Content Body */}
+              <div 
+                className="flex-1 flex flex-col items-center pt-2 px-5 pb-4 text-center relative"
+                style={{ backgroundImage: bodyPattern }}
+              >
+                 {/* ID Number */}
+                 <div className="mb-1 mt-1">
+                    <span className="font-mono font-bold text-red-700 text-sm tracking-widest border-b-2 border-red-100 pb-0.5">
+                      {memberId}
+                    </span>
                  </div>
 
-               </div>
+                 {/* Display Name */}
+                 <h2 className="text-xl font-black text-gray-900 uppercase leading-none tracking-tight mb-2 drop-shadow-sm line-clamp-2 min-h-[1.5em] flex items-center justify-center">
+                   {displayName}
+                 </h2>
+
+                 {/* Vertical Pill */}
+                 <span className="inline-block bg-neutral-900 text-white px-4 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider mb-4 shadow-sm max-w-full truncate">
+                    {vertical}
+                 </span>
+
+                 {/* Details Block */}
+                 <div className="w-full space-y-3 bg-white/80 backdrop-blur-sm p-3 rounded-xl border border-gray-100 shadow-sm">
+                    {/* Company */}
+                    <div className="flex flex-col items-center">
+                       <span className="text-[8px] uppercase text-gray-400 font-extrabold tracking-widest mb-0.5">Company</span>
+                       <p className="font-bold text-gray-800 text-xs leading-tight line-clamp-2">{companyName}</p>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="w-1/2 h-px bg-gray-200 mx-auto"></div>
+
+                    {/* Contact */}
+                    <div className="flex flex-col items-center">
+                       <span className="text-[8px] uppercase text-gray-400 font-extrabold tracking-widest mb-0.5">Contact</span>
+                       <div className="flex items-center gap-2 text-gray-800 font-bold bg-gray-50 px-3 py-1 rounded-md">
+                          <Phone size={12} className="text-red-600 fill-red-600" />
+                          <span className="tracking-wide text-xs">{phone}</span>
+                       </div>
+                    </div>
+                 </div>
+
+                 {/* Chapter Footer */}
+                 <div className="mt-auto w-full pt-2 flex justify-between items-end">
+                    <div className="text-left pl-1">
+                       <span className="block text-[8px] text-gray-400 uppercase font-extrabold tracking-widest">Chapter</span>
+                       <span className="text-3xl font-black text-gray-300 leading-none select-none">{chapterCode}</span>
+                    </div>
+                    {/* SIB Logo small watermark */}
+                    <div className="opacity-10 w-10 h-10">
+                       <img src="../logo.webp" alt="" className="w-full h-full object-contain grayscale" />
+                    </div>
+                 </div>
+              </div>
             </div>
 
-            {/* 5. Address Footer */}
-            {address && (
-               <div className="px-6 pb-3 pt-1">
-                  <div className="flex items-center gap-2 justify-center bg-neutral-900/5 py-1.5 px-3 rounded-lg">
-                     <MapPin size={10} className="text-red-600 shrink-0" />
-                     <p className="text-[9px] text-gray-600 text-center font-medium leading-tight line-clamp-2">
-                        {address}
-                     </p>
-                  </div>
-               </div>
-            )}
+            {/* ================= CARD BACK ================= */}
+            <div className={`${cardDimensions} bg-white relative flex flex-col shadow-2xl overflow-hidden rounded-xl border border-gray-200 shrink-0`}>
+              
+              {/* Back Header */}
+              <div className="bg-neutral-900 h-16 relative flex items-center justify-between px-6 overflow-hidden">
+                 {/* Diagonal stripe decoration */}
+                 <div className="absolute top-0 right-10 w-20 h-full bg-white/5 skew-x-[-20deg]"></div>
+                 
+                 <div className="relative z-10">
+                    <h2 className="text-white font-bold text-lg tracking-wide">Details</h2>
+                    <div className="h-0.5 w-8 bg-yellow-500 mt-1"></div>
+                 </div>
+                 
+                 <div className="relative z-10 w-8 h-8 bg-white rounded-full p-1 flex items-center justify-center">
+                    <img src='../logo.webp' className="w-full h-full object-contain" />
+                 </div>
+              </div>
 
-            {/* Bottom Stripe */}
-            <div className="h-2 w-full flex mt-auto">
-               <div className="flex-1 bg-neutral-900"></div>
-               <div className="w-16 bg-yellow-500"></div>
-               <div className="w-4 bg-red-600"></div>
+              {/* Back Content - Clean List */}
+              <div className="flex-1 p-6 flex flex-col gap-4 bg-white relative">
+                 {/* Background Pattern */}
+                 <div className="absolute inset-0 opacity-30" style={{ backgroundImage: bodyPattern }}></div>
+
+                 {/* Info Grid */}
+                 <div className="relative z-10 space-y-4">
+                    
+                    {/* Vagaiyara */}
+                    <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-100">
+                       <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Vagaiyara</span>
+                       <span className="text-xs font-bold text-gray-800 block tracking-wide">{vagaiyara}</span>
+                    </div>
+
+                    {/* Kuladeivam */}
+                    <div className="pl-2 border-l-4 border-yellow-500">
+                       <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest block mb-0.5">Kuladeivam</span>
+                       <span className="text-xs font-bold text-gray-800 block leading-relaxed">{kuladeivam}</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 pt-2">
+                       {/* DOB */}
+                       <div>
+                          <div className="flex items-center gap-1.5 mb-1 text-red-600">
+                             <Calendar size={12} />
+                             <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest text-black">DOB</span>
+                          </div>
+                          <span className="text-xs font-bold text-gray-800 pl-1">{dob}</span>
+                       </div>
+                       {/* Wedding */}
+                       <div>
+                          <div className="flex items-center gap-1.5 mb-1 text-red-600">
+                             <Calendar size={12} />
+                             <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest text-black">Wedding</span>
+                          </div>
+                          <span className="text-xs font-bold text-gray-800 pl-1">{weddingDate}</span>
+                       </div>
+                    </div>
+
+                    {/* Email */}
+                    <div className="pt-2 border-t border-dashed border-gray-200">
+                       <div className="flex items-center gap-1.5 mb-1">
+                          <Mail size={12} className="text-gray-400" />
+                          <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Email</span>
+                       </div>
+                       <span className="text-xs font-bold text-gray-800 break-all">{email}</span>
+                    </div>
+
+                    {/* Address */}
+                    <div>
+                       <div className="flex items-center gap-1.5 mb-2">
+                          <MapPin size={12} className="text-red-600" />
+                          <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Address</span>
+                       </div>
+                       <p className="text-[10px] text-gray-600 leading-relaxed font-medium bg-gray-50 p-2 rounded border border-gray-100 line-clamp-3">
+                          {address}
+                       </p>
+                    </div>
+                 </div>
+
+              </div>
+
+              {/* Back Footer */}
+              <div className="bg-neutral-900 py-2 px-6">
+                 <div className="flex items-center justify-center gap-2 text-white/60">
+                    <Globe size={10} />
+                    <span className="text-[8px] font-semibold tracking-wider uppercase">www.senguntharinbusiness.com</span>
+                 </div>
+              </div>
+
             </div>
 
           </div>
         </div>
 
-        {/* Modal Footer */}
+        {/* Modal Footer Actions */}
         <div className="p-4 border-t bg-gray-50 rounded-b-xl flex gap-3">
           <button 
             onClick={onClose}
@@ -258,7 +352,7 @@ const IdCardModal = ({ isOpen, onClose, profileData , idno }) => {
           >
             {downloading ? "Generating..." : (
               <>
-                <Download size={16} /> Download
+                <Download size={16} /> Download ID Card
               </>
             )}
           </button>
