@@ -48,12 +48,13 @@ const IdCardModal = ({ isOpen, onClose, profileData }) => {
         });
       }));
 
+      // --- CONFIGURATION FIX HERE ---
       const canvas = await window.html2canvas(cardRef.current, {
-        useCORS: true, // This requires the Firebase CORS config we just set
-        allowTaint: true,
+        useCORS: true,       // MUST be true
+        allowTaint: false,   // MUST be false (or removed) to allow downloading
         scale: 3, 
         backgroundColor: '#f3f4f6', 
-        logging: false,
+        logging: true,       // Kept true to see errors in console if it fails
       });
 
       const dataUrl = canvas.toDataURL('image/png', 1.0);
@@ -65,7 +66,8 @@ const IdCardModal = ({ isOpen, onClose, profileData }) => {
       document.body.removeChild(link);
     } catch (err) {
       console.error("Failed to download ID card:", err);
-      alert("Could not generate image. Please ensure Firebase CORS is configured.");
+      // More specific error message for you
+      alert("Download failed. Check the Console (F12) for 'Access to image' errors. If you are on localhost, you MUST add localhost to cors.json.");
     } finally {
       setDownloading(false);
     }
@@ -77,14 +79,21 @@ const IdCardModal = ({ isOpen, onClose, profileData }) => {
   const displayName = data?.display_name || data?.user?.username || "Member Name";
   const memberId = data?.membership?.idno || "SIB-MEM";
   
-  // 2. Image
+  // 2. Image Logic with CACHE BUSTER
   let avatarUrl = "https://via.placeholder.com/200?text=No+Image";
+  
   if (data?.profile_image_url) {
+    let rawUrl = "";
     if (data.profile_image_url.startsWith("http")) {
-      avatarUrl = data.profile_image_url;
+      rawUrl = data.profile_image_url;
     } else {
-      avatarUrl = `${import.meta.env.VITE_BACKEND_SERVER}${data.profile_image_url}`;
+      rawUrl = `${import.meta.env.VITE_BACKEND_SERVER}${data.profile_image_url}`;
     }
+
+    // APPEND TIMESTAMP to force browser to fetch new CORS headers
+    // We check if the URL already has a '?' query string
+    const separator = rawUrl.includes('?') ? '&' : '?';
+    avatarUrl = `${rawUrl}${separator}t=${new Date().getTime()}`;
   }
 
   // 3. Contact Info
@@ -171,7 +180,7 @@ const IdCardModal = ({ isOpen, onClose, profileData }) => {
                         src={avatarUrl} 
                         alt="Profile" 
                         className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
-                        // REQUIRED for Solution 2: This requests the CORS headers from Firebase
+                        // REQUIRED: This asks for the CORS permission from the server
                         crossOrigin="anonymous"
                         onError={() => setImgError(true)}
                       />
