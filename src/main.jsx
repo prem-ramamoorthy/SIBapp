@@ -28,6 +28,7 @@ import PublicMembers from './Members/PublicMembers';
 import './index.css'
 import MainPage from './src1/MainPage/MainPage';
 import Album from './src1/MainPage/Album/Album';
+import EventsMeetingsPage from './src1/MainPage/Eventsmeetings/Events';
 import ExistingSession from './hooks/ExistingSession';
 import Admin from './Admin/Admin';
 import AdminRoute from './hooks/AdminRoute';
@@ -81,6 +82,7 @@ const router = createBrowserRouter([
   { path: '/child-safety-standards', element: <CSAEPolicy /> },
   { path: '/', element: <MainPage /> },
   { path: '/album', element: <Album /> },
+  {path:'/events-meetings', element:<EventsMeetingsPage />},
   { path: '*', element: <NotFound404 /> },
 ]);
 
