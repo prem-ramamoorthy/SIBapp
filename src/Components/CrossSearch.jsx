@@ -139,7 +139,7 @@ function CrossChapterSearch({
                 {username || "Unnamed User"}
                 <div>
                   <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{names[idx] ? `${names[idx]}` : ""}</span> 
-                  {crosschapter && <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{chapters[idx] ? `: ${chapters[idx]}` : ""}</span>}
+                  {crosschapter && <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">{chapters[idx] ? `: ${chapters[idx].split(' ').map(word => word[0]).join('').toUpperCase()}` : ""}</span>}
                 </div>
               </li>
             ))}

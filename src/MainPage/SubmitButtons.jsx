@@ -5,22 +5,22 @@ function SubmitButtons() {
   const buttonData = [
     {
       label: "Submit Referral",
-      discription: "Create new referal slip",
+      discription: "Create new referral slip",
       component: "referral",
     },
     {
       label: "Submit TYB",
-      discription: "Create new referal slip",
+      discription: "Create new TYB slip",
       component: "tyftb",
     },
     {
       label: "Submit M to M",
-      discription: "Create new referal slip",
+      discription: "Create new M to M slip",
       component: "m2m",
     },
     {
       label: "Submit Visitor",
-      discription: "Create new referal slip",
+      discription: "Create new visitor slip",
       component: "visitors",
     },
   ];

@@ -1,14 +1,49 @@
 import React, { useState } from 'react';
-import EntryField from '../Components/EntryField';
-import RadioButtons from '../Components/RadioButtons';
-import SelectButtons from '../Components/SelectButtons';
-import FilterButton from '../Members/Components/FilterButton';
-import { getDate } from '../utils/getDate.mjs'
-import { X } from 'lucide-react';
-import CrossChapterSearch from "../Components/CrossSearch";
+import { Construction, ArrowLeft } from 'lucide-react';
 
-function ButtonPage({ onClose = () => { } }) {
+// --- ORIGINAL IMPORTS (Commented out to prevent errors while under construction) ---
+// import EntryField from '../Components/EntryField';
+// import RadioButtons from '../Components/RadioButtons';
+// import SelectButtons from '../Components/SelectButtons';
+// import FilterButton from '../Members/Components/FilterButton';
+// import { getDate } from '../utils/getDate.mjs'
+// import { X } from 'lucide-react';
+// import CrossChapterSearch from "../Components/CrossSearch";
 
+function ButtonPage({ onClose = () => console.log("Closing...") }) {
+
+  // --- NEW: UNDER CONSTRUCTION VIEW ---
+  return (
+    <div className="flex flex-1 items-center justify-center min-h-screen p-4 bg-gray-50 dark:bg-gray-900 font-sans">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl text-center border border-gray-200 dark:border-gray-700">
+        
+        <div className="flex justify-center mb-6">
+          <div className="p-4 bg-yellow-100 dark:bg-yellow-900/30 rounded-full animate-pulse">
+            <Construction className="w-16 h-16 text-yellow-600 dark:text-yellow-500" />
+          </div>
+        </div>
+
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+          Work in Progress
+        </h2>
+        
+        <p className="text-gray-600 dark:text-gray-400 mb-8">
+          The Visitor Slip backend is currently under construction. Please check back later.
+        </p>
+
+        <button
+          onClick={onClose}
+          className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-700 transition-colors w-full dark:bg-gray-700 dark:hover:bg-gray-600"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Go Back
+        </button>
+      </div>
+    </div>
+  );
+
+  /* --- ORIGINAL CODE (Commented out for preservation) ---
+  
   const todaysDate = getDate();
 
   const [registrationChapter, setRegistrationChapter] = useState('');
@@ -227,6 +262,9 @@ function ButtonPage({ onClose = () => { } }) {
       </div>
     </div>
   );
+  */
 }
 
-export default ButtonPage;
+export default function App() {
+  return <ButtonPage />;
+}
