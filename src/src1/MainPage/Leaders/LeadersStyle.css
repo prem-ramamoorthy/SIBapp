@@ -231,6 +231,7 @@
 }
 
 .led .new-business {
+    white-space: pre-line;
     font-size: 14px;
     font-weight: 400;
     color: rgba(255, 255, 255, 0.9);

@@ -55,5 +55,23 @@
         "business": "Shiva and Daughters",
         "phone": "+91 95242 33350",
         "website": "https://www.senguntharinbusiness.in/profile/6917e5eb464e43ce68ce4daa?user=69161e4bca6065dce8bda871"
+    },
+        
+        {
+        "img": "/assets/JPEG/15.jpg",
+        "name": "V.S.Sathish Kumar",
+        "position": "Coordinator",
+        "business": "Senior Developement officer\nShriram chits,Life and investments.",
+        "phone": "+91 98427 28323",
+        "website": ""
+    },
+        {
+        "img": "/assets/JPEG/144.jpg",
+        "name": "Kumaresavel S",
+        "position": "Coordinator",
+        "business": "The Vogue Apparel",
+        "phone": "+91 95242 33350",
+        "website": ""
     }
+
 ]
