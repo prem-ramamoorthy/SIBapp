@@ -1,36 +1,57 @@
 import React, { useState, useEffect } from "react";
-import { HiArrowUp, HiArrowDown } from "react-icons/hi";
+import { HiArrowUp, HiArrowDown, HiCheck, HiX } from "react-icons/hi";
 
-const MemberCard = ({ member, onSendReminder, loading, onrenewuser }) => (
-  <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 mb-3 shadow-sm transition-colors duration-200">
-    <div className="flex-1 mb-4 sm:mb-0">
-      <div className="font-bold text-lg text-gray-900 dark:text-gray-50">
-        {member.name}
+// MemberCard with Selection Checkbox
+const MemberCard = ({ member, onSendReminder, loading, onrenewuser, selected, onToggleSelect }) => (
+  <div 
+    className={`flex flex-col sm:flex-row sm:items-center justify-between rounded-lg border p-4 mb-3 shadow-sm transition-all duration-200 
+    ${selected 
+      ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-500/50' 
+      : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900'
+    }`}
+  >
+    <div className="flex items-start gap-4 flex-1 mb-4 sm:mb-0">
+      {/* Selection Checkbox */}
+      <div className="pt-1">
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={() => onToggleSelect(member.id)}
+          className="w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-400 cursor-pointer"
+        />
       </div>
-      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-        Email: {member.email}
-      </div>
-      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-        Due: {member.dueDate}
-      </div>
-      <div className="italic text-xs text-gray-500 dark:text-gray-500 mt-2">
-        Status: {member.status}
+
+      <div className="flex-1">
+        <div className="font-bold text-lg text-gray-900 dark:text-gray-50 flex items-center gap-2">
+          {member.name}
+          {selected && <span className="text-xs font-normal text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/40 px-2 py-0.5 rounded-full">Selected</span>}
+        </div>
+        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          Email: {member.email}
+        </div>
+        <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          Due: {member.dueDate}
+        </div>
+        <div className={`italic text-xs mt-2 ${member.status === 'Overdue' ? 'text-red-500 font-semibold' : 'text-gray-500 dark:text-gray-500'}`}>
+          Status: {member.status}
+        </div>
       </div>
     </div>
-    <div>
+
+    <div className="pl-9 sm:pl-0 flex flex-wrap gap-2">
       <button
         onClick={() => onSendReminder(member)}
         disabled={loading}
-        className="ml-4 px-4 py-2 rounded-lg font-medium text-sm border border-amber-300 bg-amber-300 text-gray-900 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+        className="px-4 py-2 rounded-lg font-medium text-sm border border-amber-300 bg-amber-300 text-gray-900 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex-grow sm:flex-grow-0"
       >
-        {loading ? 'Sending...' : 'Send Reminder'}
+        {loading ? 'Sending...' : 'Remind'}
       </button>
       <button
         onClick={() => onrenewuser(member)}
         disabled={loading}
-        className="ml-4 px-4 py-2 rounded-lg font-medium text-sm border border-amber-300 bg-amber-300 text-gray-900 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+        className="px-4 py-2 rounded-lg font-medium text-sm border border-gray-300 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex-grow sm:flex-grow-0"
       >
-        {loading ? 'Renewing...' : 'Renew user'}
+        {loading ? 'Renewing...' : 'Renew'}
       </button>
     </div>
   </div>
@@ -81,7 +102,6 @@ function getStartOfDay(date) {
   return d;
 }
 
-
 const MemberRenewalManagement = ({ refreshTrigger }) => {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -92,13 +112,25 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
   const [activeFilter, setActiveFilter] = useState(null);
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
+  
+  // Single Renewal State
   const [renewModalOpen, setRenewModalOpen] = useState(false);
   const [memberToRenew, setMemberToRenew] = useState(null);
   const [renewDate, setRenewDate] = useState("");
 
+  // Bulk Renewal State
+  const [selectedMembers, setSelectedMembers] = useState([]); // Array of IDs
+  const [bulkRenewModalOpen, setBulkRenewModalOpen] = useState(false);
+  const [bulkRenewDate, setBulkRenewDate] = useState("");
+
   useEffect(() => {
     fetchMembers();
   }, [refreshTrigger]);
+
+  // Clear selections when filter changes to avoid confusion
+  useEffect(() => {
+    setSelectedMembers([]);
+  }, [activeFilter]);
 
   const fetchMembers = async () => {
     setFetching(true);
@@ -188,6 +220,28 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
     return sorted;
   };
 
+  /* --- SELECTION LOGIC --- */
+  const handleToggleSelect = (id) => {
+    setSelectedMembers(prev => 
+      prev.includes(id) 
+        ? prev.filter(mid => mid !== id) 
+        : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    const currentList = getFilteredMembers();
+    if (selectedMembers.length === currentList.length && currentList.length > 0) {
+      // If all are selected, deselect all
+      setSelectedMembers([]);
+    } else {
+      // Select all visible members
+      setSelectedMembers(currentList.map(m => m.id));
+    }
+  };
+
+  /* --- ACTIONS --- */
+
   const handleSendReminder = async (member) => {
     setSelectedReminder(member.id);
     setLoading(true);
@@ -228,6 +282,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
     }
   };
 
+  // Single Renew
   const handleRenewUser = async (member) => {
     setRenewModalOpen(true);
     setMemberToRenew(member);
@@ -252,6 +307,8 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
           body: JSON.stringify(payload)
         }
       );
+      
+      // Notify (Only for single renewal based on existing code)
       await fetch(
         `${import.meta.env.VITE_BACKEND_SERVER}/notification/createnotificationwithoutsender`,
         {
@@ -259,17 +316,19 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
           credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-        receiver: memberToRenew.name,
-        header: "Membership Renewal Date Updated",
-        content: `Hello ${memberToRenew.name},\n\nGood news! Your membership renewal date has been successfully updated.\n\nNew Renewal Due Date: ${renewDate}\n\nChapter: ${memberToRenew.chapter}\n\nPlease ensure timely completion of your renewal to maintain your membership benefits.\n\nIf you have any questions, please contact your chapter administrator.\n\nThank you!`
+            receiver: memberToRenew.name,
+            header: "Membership Renewal Date Updated",
+            content: `Hello ${memberToRenew.name},\n\nGood news! Your membership renewal date has been successfully updated.\n\nNew Renewal Due Date: ${renewDate}\n\nChapter: ${memberToRenew.chapter}\n\nPlease ensure timely completion of your renewal to maintain your membership benefits.\n\nThank you!`
           })
         }
       );
+
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || "Failed to renew membership");
       }
       setSuccess(`Membership renewed for ${memberToRenew.name}`);
+      fetchMembers(); // Refresh list to show updated dates
     }
     catch (err) {
       setError(`Failed to renew membership for ${memberToRenew.name}: ${err.message}`);
@@ -279,6 +338,53 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
       setLoading(false);
       setMemberToRenew(null);
       setRenewDate("");
+    }
+  };
+
+  // Bulk Renew
+  const handleBulkRenewRequest = async () => {
+    if (!bulkRenewDate) {
+      setError("Please select a renewal date.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const payload = {
+        ids: selectedMembers,
+        renewal_date: bulkRenewDate,
+        membership_status: true
+      };
+
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_SERVER}/chapter/membership/updatemembershipbyids`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to update memberships");
+      }
+
+      setSuccess(`Successfully renewed ${selectedMembers.length} members.`);
+      setSelectedMembers([]); // Clear selection
+      setBulkRenewDate("");
+      setBulkRenewModalOpen(false);
+      fetchMembers(); // Refresh Data
+      
+    } catch (err) {
+      setError(`Bulk renewal failed: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -399,13 +505,15 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
   }).length;
 
   const filteredMembers = getFilteredMembers();
+  const allSelected = filteredMembers.length > 0 && selectedMembers.length === filteredMembers.length;
 
   return (
-    <div className="w-full rounded-2xl p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+    <div className="w-full rounded-2xl p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700 transition-colors duration-300 relative">
       <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-900 dark:text-gray-50">
         Member Renewal Management
       </h2>
 
+      {/* Stats / Filters */}
       <div className="flex flex-wrap gap-3 mb-6">
         <FilterButton
           label="Due This Month"
@@ -436,94 +544,182 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         />
       </div>
 
-      <div className="mb-6 flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            Sort By:
-          </label>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-amber-300 focus:ring-amber-300 dark:focus:border-amber-300 dark:focus:ring-amber-300 text-sm"
-          >
-            <option value="name">Name</option>
-            <option value="dueDate">Due Date</option>
-            <option value="status">Status</option>
-          </select>
-        </div>
+      {/* Toolbar */}
+      <div className="mb-6 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between flex-wrap p-2 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+        <div className="flex items-center gap-4 w-full sm:w-auto">
+          {/* Select All Checkbox */}
+          <div className="flex items-center gap-2 px-2">
+             <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={handleSelectAll}
+              disabled={filteredMembers.length === 0}
+              className="w-5 h-5 rounded border-gray-300 text-amber-500 focus:ring-amber-400 cursor-pointer disabled:opacity-50"
+            />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Select All {filteredMembers.length > 0 && `(${filteredMembers.length})`}
+            </span>
+          </div>
 
-        <button
-          onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-        >
-          {sortOrder === "asc" ? (
-            <>
-              <HiArrowUp className="h-4 w-4" />
-              <span className="text-sm font-medium">Ascending</span>
-            </>
-          ) : (
-            <>
-              <HiArrowDown className="h-4 w-4" />
-              <span className="text-sm font-medium">Descending</span>
-            </>
-          )}
-        </button>
+          <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-2 hidden sm:block"></div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-500 dark:text-gray-400">Sort:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-2 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 text-sm focus:ring-1 focus:ring-amber-300"
+            >
+              <option value="name">Name</option>
+              <option value="dueDate">Due Date</option>
+              <option value="status">Status</option>
+            </select>
+          </div>
+
+          <button
+            onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
+            className="p-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            title={sortOrder === "asc" ? "Ascending" : "Descending"}
+          >
+            {sortOrder === "asc" ? <HiArrowUp /> : <HiArrowDown />}
+          </button>
+        </div>
 
         {activeFilter && (
           <button
             onClick={() => setActiveFilter(null)}
-            className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 text-sm font-medium"
+            className="text-sm text-amber-600 hover:text-amber-700 dark:text-amber-400 underline decoration-dotted"
           >
             Clear Filter
           </button>
         )}
       </div>
 
+      {/* Bulk Action Bar - Sticky when items selected */}
+      {selectedMembers.length > 0 && (
+        <div className="sticky top-2 z-10 mb-4 p-4 rounded-xl bg-amber-100 dark:bg-amber-900/40 border border-amber-200 dark:border-amber-700 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-2">
+            <div className="bg-amber-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+              {selectedMembers.length}
+            </div>
+            <span className="font-medium text-gray-900 dark:text-gray-100">Members Selected</span>
+          </div>
+          <div className="flex gap-2 w-full sm:w-auto">
+             <button
+              onClick={() => setSelectedMembers([])}
+              className="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 text-sm font-medium border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => setBulkRenewModalOpen(true)}
+              className="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-bold shadow-sm hover:bg-amber-600 transition-colors flex items-center justify-center gap-2"
+            >
+              <HiCheck className="w-4 h-4" />
+              Renew Selected
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modals */}
+      
+      {/* Single Renew Modal */}
       {renewModalOpen && (
-        <div className="fixed inset-0 bg-black/20 bg-opacity-50 flex flex-row items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-900 rounded-lg p-6 w-full max-w-md shadow-lg">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md shadow-2xl border border-gray-200 dark:border-gray-700">
             <h3 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-50">Renew Membership</h3>
-            <input type="date" value={renewDate} onChange={(e) => setRenewDate(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:border-amber-300 focus:ring-amber-300 dark:focus:border-amber-300 dark:focus:ring-amber-300" />
-            <div className="flex flex-row justify-center items-center gap-10">
+            <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+              Updating renewal date for <span className="font-semibold text-gray-900 dark:text-white">{memberToRenew?.name}</span>.
+            </p>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Expiry Date</label>
+            <input type="date" value={renewDate} onChange={(e) => setRenewDate(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-amber-300 focus:ring-amber-300" />
+            <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setRenewModalOpen(false)}
-                className="mt-4 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                Close
+                Cancel
               </button>
-              <button onClick={handleRenewUserrequest} disabled={loading} className={`mt-4 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-amber-400 dark:bg-amber-400 text-gray-900 dark:text-gray-900 hover:bg-amber-700 dark:hover:bg-amber-700 transition-colors duration-200`}>
-                {loading ? "Renewing..." : "Renew"}
+              <button onClick={handleRenewUserrequest} disabled={loading} className="px-4 py-2 rounded-lg bg-amber-400 text-gray-900 font-medium hover:bg-amber-500 disabled:opacity-50">
+                {loading ? "Renewing..." : "Confirm Renewal"}
               </button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Bulk Renew Modal */}
+      {bulkRenewModalOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md shadow-2xl border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-50">Bulk Renewal</h3>
+              <button onClick={() => setBulkRenewModalOpen(false)} className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"><HiX className="w-5 h-5"/></button>
+            </div>
+            
+            <div className="p-3 mb-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-lg">
+              <p className="text-sm text-gray-800 dark:text-gray-200">
+                You are about to renew membership for <strong>{selectedMembers.length} users</strong>.
+              </p>
+            </div>
+
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select New Renewal Date</label>
+            <input 
+              type="date" 
+              value={bulkRenewDate} 
+              onChange={(e) => setBulkRenewDate(e.target.value)} 
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:border-amber-300 focus:ring-amber-300" 
+            />
+            
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setBulkRenewModalOpen(false)}
+                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleBulkRenewRequest} 
+                disabled={loading || !bulkRenewDate} 
+                className="px-4 py-2 rounded-lg bg-amber-400 text-gray-900 font-bold hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? "Processing..." : `Renew ${selectedMembers.length} Members`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Messages */}
       {fetching && (
-        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg animate-pulse">
           <p className="text-sm text-blue-700 dark:text-blue-200">Loading members...</p>
         </div>
       )}
 
       {error && (
         <div className="mb-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-sm text-red-700 dark:text-red-200">{error}</p>
+          <p className="text-sm text-red-700 dark:text-red-200 font-medium">{error}</p>
         </div>
       )}
 
       {success && (
         <div className="mb-4 p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
-          <p className="text-sm text-green-700 dark:text-green-200">{success}</p>
+          <p className="text-sm text-green-700 dark:text-green-200 font-medium">{success}</p>
         </div>
       )}
 
-      <div className="mb-6 max-h-[280px] overflow-auto">
+      {/* Member List */}
+      <div className="mb-6 max-h-[500px] overflow-auto pr-1 custom-scrollbar">
         {filteredMembers.length > 0 ? (
           <div>
             {filteredMembers.map((member) => (
               <MemberCard
                 key={member.id}
                 member={member}
+                selected={selectedMembers.includes(member.id)}
+                onToggleSelect={handleToggleSelect}
                 onSendReminder={handleSendReminder}
                 onrenewuser={handleRenewUser}
                 loading={loading && selectedReminder === member.id}
@@ -531,7 +727,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
+          <div className="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl">
             <p className="text-gray-600 dark:text-gray-400">
               {activeFilter ? "No members match this filter" : "No members found"}
             </p>
@@ -539,11 +735,12 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+      {/* Footer Actions */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 border-t border-gray-100 dark:border-gray-800 pt-6">
         <button
           onClick={handleAutoSendReminders}
           disabled={loading || filteredMembers.length === 0 || fetching}
-          className="w-full px-4 py-3 rounded-lg border border-amber-300 font-medium bg-amber-300 text-gray-900 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          className="w-full px-4 py-3 rounded-lg border border-amber-300 font-medium bg-amber-300 text-gray-900 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 shadow-sm"
         >
           {loading ? "Sending..." : `Auto-Send Reminders (${filteredMembers.length})`}
         </button>
@@ -551,7 +748,7 @@ const MemberRenewalManagement = ({ refreshTrigger }) => {
         <button
           onClick={handleExportList}
           disabled={loading || filteredMembers.length === 0 || fetching}
-          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 font-medium bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 font-medium bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 shadow-sm"
         >
           Export List ({filteredMembers.length})
         </button>

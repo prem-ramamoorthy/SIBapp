@@ -4,7 +4,60 @@ import EntryField from "../Components/EntryField";
 import TextArea from "../Components/TextArea";
 import FilterButton from "../Members/Components/FilterButton";
 import { getDate } from '../utils/getDate.mjs';
-import { X, Users, MapPin, Camera, MessageSquare, Calendar } from "lucide-react";
+import { X, Users, MapPin, Camera, MessageSquare, Calendar, Loader2 } from "lucide-react";
+
+// --- Utility: Client-Side Image Compression ---
+const compressImage = (file, maxWidth = 1200, quality = 0.7) => {
+  return new Promise((resolve, reject) => {
+    // If file is small (< 1MB), return as is
+    if (file.size < 1024 * 1024) {
+      resolve(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        // Calculate new dimensions
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error("Canvas is empty"));
+              return;
+            }
+            // Create a new File object with the compressed blob
+            const newFile = new File([blob], file.name, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+            resolve(newFile);
+          },
+          "image/jpeg",
+          quality
+        );
+      };
+      img.onerror = (error) => reject(error);
+    };
+    reader.onerror = (error) => reject(error);
+  });
+};
 
 function ButtonPage({ onClose = () => {} }) {
   const todaysDate = getDate();
@@ -14,6 +67,7 @@ function ButtonPage({ onClose = () => {} }) {
   const [location, setLocation] = useState("");
   const [conversationTopic, setConversationTopic] = useState("");
   const [loading, setLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false); // Separate loader for image
   const [error, setError] = useState(null);
   const [response, setResponse] = useState(null);
   const [member2Name, setMember2Name] = useState("");
@@ -50,13 +104,25 @@ function ButtonPage({ onClose = () => {} }) {
 
   const handleImageChange = async (e) => {
     setImageError(null);
-    const file = e.target.files[0];
-    if (!file) return;
-    const formData = new FormData();
-    formData.append("photo", file);
+    const originalFile = e.target.files[0];
+    if (!originalFile) return;
+
+    // Optional: Hard block really massive files (e.g., > 20MB) even before compression attempts
+    if (originalFile.size > 20 * 1024 * 1024) {
+        setImageError("File is too large. Please upload an image smaller than 20MB.");
+        return;
+    }
 
     try {
-      setLoading(true);
+      setImageUploading(true);
+      
+      // 1. Compress the image before uploading
+      // This reduces a 10MB photo to ~300KB usually, preventing server rejections
+      const processedFile = await compressImage(originalFile);
+
+      const formData = new FormData();
+      formData.append("photo", processedFile);
+
       const res = await fetch(
         `${import.meta.env.VITE_BACKEND_SERVER}/auth/upload/photo`,
         {
@@ -65,6 +131,12 @@ function ButtonPage({ onClose = () => {} }) {
           credentials: "include",
         }
       );
+
+      // Handle server responding with an error (e.g., 413 or 500)
+      if (!res.ok) {
+        throw new Error(`Upload failed with status: ${res.status}`);
+      }
+
       const data = await res.json();
       if (data?.url) {
         setImageUrl(data.url);
@@ -72,9 +144,17 @@ function ButtonPage({ onClose = () => {} }) {
         setImageError(data?.error || "Image upload failed.");
       }
     } catch (err) {
-      setImageError(err.message || "Image upload failed.");
+      console.error("Upload Error:", err);
+      // Friendly error message for fetch failures
+      if (err.message === "Failed to fetch") {
+        setImageError("Network error or file too large. Please try a smaller image.");
+      } else {
+        setImageError(err.message || "Image upload failed.");
+      }
     } finally {
-      setLoading(false);
+      setImageUploading(false);
+      // Reset input value to allow re-uploading same file if failed
+      e.target.value = null; 
     }
   };
 
@@ -254,11 +334,20 @@ function ButtonPage({ onClose = () => {} }) {
               <Camera size={16} className="text-amber-500" />
               Proof of Meeting
             </h3>
-            <div className="p-4 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-900/50 hover:bg-amber-50/50 dark:hover:bg-gray-800/50 transition-colors">
-              <label className="block w-full cursor-pointer">
+            <div className={`p-4 border-2 border-dashed rounded-xl transition-colors ${imageUploading ? "bg-amber-50 border-amber-300" : "border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 hover:bg-amber-50/50 dark:hover:bg-gray-800/50"}`}>
+              <label className="block w-full cursor-pointer relative">
                 <span className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                   Upload Photo *
                 </span>
+                
+                {imageUploading && (
+                  <div className="absolute inset-0 z-10 bg-white/50 dark:bg-black/50 flex items-center justify-center rounded-xl backdrop-blur-sm">
+                     <span className="flex items-center gap-2 text-amber-600 font-semibold text-sm">
+                       <Loader2 className="animate-spin" size={20} /> Optimizing & Uploading...
+                     </span>
+                  </div>
+                )}
+
                 <input
                   type="file"
                   accept="image/*"
@@ -269,8 +358,8 @@ function ButtonPage({ onClose = () => {} }) {
                     file:bg-amber-100 file:text-amber-700
                     hover:file:bg-amber-200
                     dark:file:bg-amber-900/30 dark:file:text-amber-400
-                    cursor-pointer"
-                  disabled={loading}
+                    cursor-pointer disabled:opacity-50"
+                  disabled={loading || imageUploading}
                   onChange={handleImageChange}
                 />
               </label>

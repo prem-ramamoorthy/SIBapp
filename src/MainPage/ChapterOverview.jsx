@@ -4,13 +4,60 @@ import useFetch from "../hooks/useFetch";
 import Loading from "../Components/Loading";
 
 function ChapterOverview() {
-  const { data, loading, error } = useFetch(
+  // 1. Fetch Overview Data (Stats)
+  const { 
+    data: overviewData, 
+    loading: overviewLoading, 
+    error: overviewError 
+  } = useFetch(
     `${import.meta.env.VITE_BACKEND_SERVER}/dashboard/getchapteroverview`,
     {
       method: "GET",
       credentials: "include",
     }
   );
+
+  // 2. Fetch Meetings Data (For Next Meeting Date)
+  const { 
+    data: meetingsData, 
+    loading: meetingsLoading, 
+    error: meetingsError 
+  } = useFetch(
+    `${import.meta.env.VITE_BACKEND_SERVER}/meeting/getmeetings`, 
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
+  // Helper: Find the next upcoming meeting from the list
+  const getNextMeeting = () => {
+    if (!meetingsData || !Array.isArray(meetingsData) || meetingsData.length === 0) {
+      return "Not Scheduled";
+    }
+
+    // Filter for future meetings
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // compare dates without time offset issues
+
+    const futureMeetings = meetingsData.filter((meeting) => {
+      const mDate = new Date(meeting.meeting_date);
+      return mDate >= today;
+    });
+
+    if (futureMeetings.length === 0) return "No Upcoming Meetings";
+
+    // Sort by date ascending (closest date first)
+    futureMeetings.sort((a, b) => new Date(a.meeting_date) - new Date(b.meeting_date));
+
+    // Return formatted date of the first one
+    const nextMeetingDate = new Date(futureMeetings[0].meeting_date);
+    return nextMeetingDate.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
 
   // Helper for currency formatting (Indian Rupee)
   const formatCurrency = (amount) => {
@@ -23,6 +70,10 @@ function ChapterOverview() {
     }
     return amount;
   };
+
+  // Combined Loading and Error states
+  const loading = overviewLoading || meetingsLoading;
+  const error = overviewError || meetingsError;
 
   return (
     <div className="w-full relative overflow-hidden bg-white dark:bg-gray-900 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-black/40 border border-gray-100 dark:border-gray-800 transition-all duration-300">
@@ -59,18 +110,18 @@ function ChapterOverview() {
           <div className="flex flex-col items-center justify-center py-12">
             <Loading />
           </div>
-        ) : data ? (
+        ) : overviewData ? (
           <div className="flex flex-col gap-8">
             
             {/* Main Header Section */}
             <div className="text-center sm:text-left space-y-4">
               <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight">
-                {data.chapterName}
+                {overviewData.chapterName}
               </h2>
               
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 text-amber-700 dark:text-amber-400 text-sm font-semibold shadow-sm">
                 <Calendar className="w-4 h-4" />
-                <span>Next Meeting: {data.nextMeeting}</span>
+                <span>Next Meeting: {getNextMeeting()}</span>
               </div>
             </div>
 
@@ -81,7 +132,7 @@ function ChapterOverview() {
               <div className="group flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
                 
                 <span className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
-                  {data.totalMembers}
+                  {overviewData.totalMembers}
                 </span>
                 <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 mt-1">
                   Members
@@ -92,7 +143,7 @@ function ChapterOverview() {
               <div className="group flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
                 
                 <span className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
-                  {formatCurrency(data.totalRevenue)}
+                  {formatCurrency(overviewData.totalRevenue)}
                 </span>
                 <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 mt-1">
                   Revenue
@@ -103,7 +154,7 @@ function ChapterOverview() {
               <div className="group flex flex-col items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800/50 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 border border-transparent hover:border-gray-200 dark:hover:border-gray-700">
                 
                 <span className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">
-                  {data.totalvisitors}
+                  {overviewData.totalvisitors}
                 </span>
                 <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 mt-1">
                   Visitors
