@@ -7,7 +7,7 @@ import IdCardModal from "./Components/IDcard";
 import useFetch from "../hooks/useFetch";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { CreditCard } from "lucide-react";
+import { CreditCard, RefreshCw } from "lucide-react";
 
 const isFilled = (val) => {
   if (val === null || val === undefined) return false;
@@ -163,15 +163,25 @@ function Profile() {
         </div>
 
         {/* Action Bar for Profile */}
-        {!id && (<div className="mt-4 flex justify-end">
+        <div className="mt-4 flex justify-end gap-3">
           <button
-            onClick={() => setShowIdCard(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 font-medium text-sm"
+            onClick={() => window.location.reload()}
+            className="flex items-center gap-2 px-5 py-2.5 bg-white text-gray-700 border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 transition-all duration-200 font-medium text-sm"
           >
-            <CreditCard size={18} />
-            View ID Card
+            <RefreshCw size={18} />
+            Refresh
           </button>
-        </div>)}
+          
+          {!id && (
+            <button
+              onClick={() => setShowIdCard(true)}
+              className="hidden md:flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 font-medium text-sm"
+            >
+              <CreditCard size={18} />
+              View ID Card
+            </button>
+          )}
+        </div>
 
         <section className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <div className="order-1">
