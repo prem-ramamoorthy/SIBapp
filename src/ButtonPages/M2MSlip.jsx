@@ -285,7 +285,7 @@ function ButtonPage({ onClose = () => {} }) {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                <CrossChapterSearch
                 label="Chapter"
-                placeholder="Chapter Name of the member met"
+                placeholder="(MEMBER 2)Chapter Name of the member met"
                 onChange={setChapterName}
                 offsubmit={true}
                 searchdomain="searchchapter"
@@ -413,7 +413,7 @@ function ButtonPage({ onClose = () => {} }) {
         </div>
       </div>
     </div>
-  );
+  );  
 }
 
 export default ButtonPage;
