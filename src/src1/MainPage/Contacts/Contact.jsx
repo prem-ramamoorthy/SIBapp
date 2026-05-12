@@ -464,7 +464,7 @@ function Contact() {
                 </div>
                 <div className="info-text">
                   <h4>Call Us</h4>
-                  <a href="tel:+919842775676" className="link-hover">+91 98427 75676</a>
+                  <a href="tel:+919842761144" className="link-hover">+91 9842761144</a>
                 </div>
               </div>
 
