@@ -171,7 +171,7 @@ function Footer({ margin = "auto", ismember = false }) {
                                     </div>
                                     <div className="contact-item">
                                         <Phone size={18} className="contact-icon" />
-                                        <p>+91 9842775676</p>
+                                        <p>+91 9842761144</p>
                                     </div>
                                     <div className="contact-item">
                                         <Mail size={18} className="contact-icon" />
