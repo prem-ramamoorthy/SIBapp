@@ -23,6 +23,7 @@ function formatTime(iso) {
 export default function NotificationsPage() {
   const [showDetail, setShowDetail] = useState(false);
   const [activeNotif, setActiveNotif] = useState(null);
+  const [isMarkingRead, setIsMarkingRead] = useState(false);
   const detailRef = useRef(null);
 
   const [url, setUrl] = useState(
@@ -64,12 +65,41 @@ export default function NotificationsPage() {
     }
   }, [showDetail]);
 
+  const handleMarkAllAsRead = async () => {
+    try {
+      setIsMarkingRead(true);
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_SERVER}/notification/readallnotifications`, {
+        method: "PATCH",
+        credentials: "include"
+      });
+      if (res.ok) {
+        // Force refetch to get updated read states
+        setUrl(url.split('?')[0] + '?t=' + Date.now());
+      }
+    } catch (err) {
+      console.error("Failed to mark notifications as read:", err);
+    } finally {
+      setIsMarkingRead(false);
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="absolute w-full left-0 top-1">
         <Header />
         </div>
-      <h1 className="text-2xl font-bold mb-6 mt-10 dark:text-amber-50">Notifications</h1>
+      <div className="flex items-center justify-between mb-6 mt-10">
+        <h1 className="text-2xl font-bold dark:text-amber-50">Notifications</h1>
+        {Array.isArray(data) && data.some(n => !n.read) && (
+          <button
+            onClick={handleMarkAllAsRead}
+            disabled={isMarkingRead}
+            className="rounded-md px-3 py-1.5 bg-blue-100 text-blue-700 hover:bg-blue-200 dark:bg-blue-900/50 dark:text-blue-200 text-sm font-medium transition-colors disabled:opacity-50"
+          >
+            {isMarkingRead ? "Marking..." : "Mark all as read"}
+          </button>
+        )}
+      </div>
       {loading && (
         <div className="text-gray-500 dark:text-gray-400 py-8 text-center">Loading notifications…</div>
       )}
@@ -88,43 +118,45 @@ export default function NotificationsPage() {
         <div className="text-black dark:text-gray-200 py-8 text-center">No notifications.</div>
       )}
       {!loading && !error && Array.isArray(data) && data.length > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
-          <table className="w-full min-w-[400px] border-collapse">
-            <thead>
-              <tr className="bg-indigo-50 dark:bg-indigo-900/30">
-                <th className="text-left px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200">New</th>
-                <th className="text-left px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200">Header</th>
-                <th className="text-left px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200">Content</th>
-                <th className="text-left px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-200">Time</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((n) => (
-                <tr key={n._id} className={n.read ? "" : "bg-indigo-50 dark:bg-indigo-900/10"}>
-                  <td className="px-3 py-2">
-                    {!n.read && (
-                      <span className="inline-block h-2 w-2 rounded-full bg-red-500" aria-label="Unread" />
-                    )}
-                  </td>
-                  <td className="px-3 py-2 font-medium truncate max-w-[120px] text-gray-900 dark:text-gray-200">{n.header}</td>
-                  <td className="px-3 py-2 truncate max-w-[220px] text-gray-700 dark:text-gray-400">{n.content}</td>
-                  <td className="px-3 py-2 text-gray-500 dark:text-gray-400 text-xs">{formatTime(n.createdAt)}</td>
-                  <td className="px-3 py-2">
-                    <button
-                      onClick={() => {
-                        setActiveNotif(n);
-                        setShowDetail(true);
-                      }}
-                      className="rounded-md px-2 py-1 bg-indigo-100 dark:bg-indigo-700 text-indigo-800 dark:text-indigo-200 hover:bg-indigo-200 dark:hover:bg-indigo-800 text-xs"
-                    >
-                      View
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-3">
+          {data.map((n) => (
+            <div
+              key={n._id}
+              onClick={() => {
+                setActiveNotif(n);
+                setShowDetail(true);
+              }}
+              className={`flex items-start gap-4 p-4 rounded-xl shadow-sm border cursor-pointer transition-all hover:shadow-md ${
+                n.read 
+                  ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-80" 
+                  : "bg-indigo-50/50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800"
+              }`}
+            >
+              {/* Unread indicator */}
+              <div className="flex-shrink-0 pt-1.5">
+                {!n.read ? (
+                  <span className="block h-3 w-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]" aria-label="Unread" />
+                ) : (
+                  <span className="block h-3 w-3 rounded-full bg-transparent" />
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start gap-2 mb-1">
+                  <h3 className={`text-base font-semibold truncate ${n.read ? "text-gray-700 dark:text-gray-300" : "text-gray-900 dark:text-gray-100"}`}>
+                    {n.header}
+                  </h3>
+                  <span className="text-xs whitespace-nowrap text-gray-500 dark:text-gray-400 font-medium">
+                    {formatTime(n.createdAt)}
+                  </span>
+                </div>
+                <p className={`text-sm line-clamp-2 ${n.read ? "text-gray-500 dark:text-gray-400" : "text-gray-700 dark:text-gray-300"}`}>
+                  {n.content}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       )}
       {showDetail && activeNotif && (

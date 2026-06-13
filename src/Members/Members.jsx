@@ -11,9 +11,10 @@ const getQueryString = filters => {
   if (filters.region && filters.region !== "All Regions") params.append("region", filters.region);
   if (filters.chapter && filters.chapter !== "All Chapters") params.append("chapter", filters.chapter);
   if (filters.vertical && filters.vertical !== "All Verticals") params.append("vertical", filters.vertical);
-  if (filters.sort) params.append("sort", filters.sort);
   if (filters.myChapterOnly) params.append("myChapterOnly", "true");
   if (filters.search) params.append("search", filters.search);
+  // Hinting to the backend to include services in the response
+  params.append("services", "true");
   return params.toString() ? `?${params.toString()}` : "";
 };
 
@@ -21,14 +22,14 @@ function Members() {
   const [region, setRegion] = useState("All Regions");
   const [chapter, setChapter] = useState("All Chapters");
   const [vertical, setVertical] = useState("All Verticals");
-  const [myChapterOnly, setMyChapterOnly] = useState(true);
+  const [myChapterOnly, setMyChapterOnly] = useState(false);
   const [sort, setSort] = useState("Name A-Z");
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({
     region: "All Regions",
     chapter: "All Chapters",
     vertical: "All Verticals",
-    myChapterOnly: true,
+    myChapterOnly: false,
     sort: "Name A-Z",
     search: "",
   });
@@ -51,6 +52,7 @@ function Members() {
   const regionnames = Array.isArray(regionnamesRaw) ? regionnamesRaw : [];
 
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -72,14 +74,74 @@ function Members() {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters.region, filters.chapter, filters.vertical, filters.myChapterOnly, filters.search]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  // Frontend Filtering and Sorting
+  useEffect(() => {
+    let result = [...data];
+
+    // Search filter
+    if (filters.search) {
+      const q = filters.search.trim().toLowerCase();
+      result = result.filter(m => {
+        const username = m.user?.username?.toLowerCase() || "";
+        const company = m.company_name?.toLowerCase() || "";
+        const vertical = Array.isArray(m.vertical_ids) 
+          ? m.vertical_ids.join(" ").toLowerCase() 
+          : Array.isArray(m.verticals) 
+            ? m.verticals.join(" ").toLowerCase()
+            : (m.verticals || "").toLowerCase();
+        
+        // Check both 'services' and 'services_offered'
+        const servicesArr = m.services || m.services_offered || [];
+        const services = Array.isArray(servicesArr) 
+          ? servicesArr.join(" ").toLowerCase() 
+          : servicesArr.toString().toLowerCase();
+          
+        const blood = m.blood_group?.toLowerCase() || "";
+        
+        return username.includes(q) || 
+               company.includes(q) || 
+               vertical.includes(q) || 
+               services.includes(q) || 
+               blood.includes(q);
+      });
+    }
+
+    // Sort filter
+    if (filters.sort) {
+      result.sort((a, b) => {
+        if (filters.sort === "Name A-Z") {
+          return (a.user?.username || "").localeCompare(b.user?.username || "");
+        } else if (filters.sort === "Name Z-A") {
+          return (b.user?.username || "").localeCompare(a.user?.username || "");
+        } else if (filters.sort === "Chapter") {
+          return (a.chapter || "").localeCompare(b.chapter || "");
+        } else if (filters.sort === "Region") {
+          return (a.region || "").localeCompare(b.region || "");
+        }
+        return 0;
+      });
+    }
+
+    setFilteredData(result);
+  }, [data, filters.search, filters.sort]);
+
   const handleFilterChange = filters => setFilters(filters);
-  const handleClear = resetFilters => setFilters(resetFilters);
+  const handleClear = resetFilters => {
+    setFilters(resetFilters);
+    // Reset individual states to keep them in sync
+    setRegion(resetFilters.region);
+    setChapter(resetFilters.chapter);
+    setVertical(resetFilters.vertical);
+    setSort(resetFilters.sort);
+    setMyChapterOnly(resetFilters.myChapterOnly);
+    setSearch(resetFilters.search);
+  };
 
   const regionOptions = ["All Regions", ...regionnames];
   const chapterOptions = ["All Chapters", ...chapternames];
@@ -91,12 +153,12 @@ function Members() {
         <Header />
       </div>
 
-      <main className="mt-[80px] w-full max-w-7xl px-3 sm:px-6 md:px-10">
-        <h1 className="pb-2 text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+      <main className="mt-[80px] w-full max-w-7xl px-4 sm:px-6 md:px-10 mx-auto">
+        <h1 className="mb-4 text-2xl font-black text-gray-900 dark:text-white tracking-tight">
           Members Directory
         </h1>
 
-        <section className="w-full mb-1">
+        <section className="w-full mb-6">
           <DirectoryFilters
             region={region} setRegion={setRegion}
             regions={regionOptions}
@@ -118,7 +180,7 @@ function Members() {
           ) : error ? (
             <ErrorComponent message={error} />
           ) : (
-            <MemberList members={data} />
+            <MemberList members={filteredData} />
           )}
         </section>
       </main>

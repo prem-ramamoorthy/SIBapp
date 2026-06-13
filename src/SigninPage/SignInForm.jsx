@@ -102,9 +102,13 @@ export default function SignInForm() {
       />
 
       <div className="flex items-center justify-end w-full">
-        <a href="/reset-password" className="text-sm text-red-600 hover:underline dark:text-red-400">
+        <button 
+          type="button" 
+          onClick={() => navigate('/reset-password')} 
+          className="text-sm text-red-600 hover:underline dark:text-red-400 bg-transparent border-none p-0 cursor-pointer"
+        >
           Forgot password?
-        </a>
+        </button>
       </div>
 
       <button
