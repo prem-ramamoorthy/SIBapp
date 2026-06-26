@@ -1,8 +1,13 @@
 import { Download, CalendarDays, Filter } from "lucide-react";
 import DateField from "./Components/DateField";
-import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
-import { Share } from '@capacitor/share';
-import { Capacitor } from '@capacitor/core';
+
+// Capacitor stubs for web — the native path is only used in the Android build
+const Capacitor = { isNativePlatform: () => false };
+const Filesystem = {};
+const Directory = {};
+const Encoding = {};
+const Share = {};
+
 
 async function exportActivity(jsonData, filename = "user_activities.csv") {
   if (!jsonData || !jsonData.length) {

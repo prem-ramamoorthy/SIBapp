@@ -12,6 +12,7 @@ export default function HeaderAvatar({
     // { name: "Chapter Info", icon: "building2", path: "/mychapter" },
     { name: "Referral Slips", icon: "fileText", path: "/slips" },
     { name: "Notifications", icon: "messageSquareDot", path: "/allnotifications" },
+    { name: "Wall of Wishes", icon: "gift", path: "/wall-of-wishes" },
     // { name: "Visitors", icon: "userPlus", path: "/visitors" },
     // { name: "Substitutes", icon: "clock4", path: "/substitutes" }
   ]

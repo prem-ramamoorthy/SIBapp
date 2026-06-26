@@ -1,8 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Phone, Mail, MapPin, User, Calendar, DollarSign, Tag, Users, MessageSquare, AlertCircle, FileText, X, Share2, ChevronUp, Clock } from "lucide-react";
-import { Share } from '@capacitor/share';
-import { Filesystem, Directory } from '@capacitor/filesystem';
-import { Capacitor } from '@capacitor/core';
+
+// Capacitor stubs for web — the native path is only used in the Android build
+const Capacitor = { isNativePlatform: () => false };
+const Share = {};
+const Filesystem = {};
+const Directory = {};
+
 
 /* ─── helpers ─────────────────────────────────────────── */
 const safeGet = (obj, path, def = "N/A") => {
