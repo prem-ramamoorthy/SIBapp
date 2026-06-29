@@ -4,6 +4,7 @@ import ProfileCard from "./Components/ProfileCard";
 import MyBioCard from "./Components/BioCard";
 import ProfessionalDetailsCard from "./Components/ProfessionalDetails";
 import IdCardModal from "./Components/IDcard";
+import ViewProfile from "./ViewProfile";
 import useFetch from "../hooks/useFetch";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
@@ -142,6 +143,11 @@ function Profile() {
         Failed to load profile.
       </div>
     );
+  }
+
+  // If we are viewing another user's profile via ID, render the ViewProfile component.
+  if (id) {
+    return <ViewProfile />;
   }
 
   return (
