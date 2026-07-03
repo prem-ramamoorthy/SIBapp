@@ -113,8 +113,8 @@ export default function WallOfWishes() {
         backgroundColor: '#030712' // fallback to gray-950
       }}
     >
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-gray-950/85 backdrop-blur-sm z-0"></div>
+      {/* Dark overlay for readability (Optimized for mobile scroll) */}
+      <div className="absolute inset-0 bg-[#030712]/95 z-0"></div>
 
       {/* ── Confetti layer (only when there are today's celebrants) ── */}
       {hasCelebrants && (
