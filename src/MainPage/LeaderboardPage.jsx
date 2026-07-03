@@ -587,7 +587,10 @@ export default function LeaderboardPage() {
   const runnersUp = isEmpty ? [] : leaderboard.slice(3, 10);
 
   return (
-    <div className="min-h-screen bg-[#030712] relative overflow-hidden flex flex-col">
+    <div 
+      className="min-h-screen bg-[#030712] relative overflow-hidden flex flex-col"
+      style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <AnimatedBackground />
 
       {/* HUGE FIXED BACKGROUND MONTH */}
@@ -597,7 +600,10 @@ export default function LeaderboardPage() {
         </span>
       </div>
 
-      <div className="fixed top-[10px] left-0 w-full z-40 bg-transparent">
+      <div 
+        className="fixed left-0 w-full z-40 bg-transparent transition-all duration-300"
+        style={{ top: 'calc(10px + env(safe-area-inset-top, 0px))' }}
+      >
         <Header />
       </div>
 
