@@ -13,8 +13,7 @@ export default function HeaderAvatar({
     { name: "Referral Slips", icon: "fileText", path: "/slips" },
     { name: "Notifications", icon: "messageSquareDot", path: "/allnotifications" },
     { name: "Wall of Wishes", icon: "gift", path: "/wall-of-wishes" },
-    // { name: "Visitors", icon: "userPlus", path: "/visitors" },
-    // { name: "Substitutes", icon: "clock4", path: "/substitutes" }
+    { name: "Leaderboard", icon: "award", path: "/leaderboard" }
   ]
 }) {
   const [open, setOpen] = useState(false);
@@ -32,38 +31,27 @@ export default function HeaderAvatar({
   );
 
   useEffect(() => {
-    if (coordinatorsAccess?.hasaccess) {
-      setItems(prev => {
-        const exists = prev.some(e => e.path === "/coordinatorsportal");
-        if (!exists) {
-          return [
-            ...prev,
-            { name: "Members Analytics", icon: "chartLine", path: "/memberdetailedanalytics" },
-            { name: "Coordinators Portal", icon: "users", path: "/coordinatorsportal" }
-          ];
+    setItems(prev => {
+      let next = [...initialItems];
+      
+      if (coordinatorsAccess?.hasaccess || access?.hasaccess) {
+        if (!next.some(e => e.path === "/memberdetailedanalytics")) {
+          next.push({ name: "Members Analytics", icon: "chartLine", path: "/memberdetailedanalytics" });
         }
-        return prev;
-      });
-    }
-  }, [coordinatorsAccess]);
-
-  useEffect(() => {
-    if (access?.hasaccess) {
-      setItems(prev => {
-        const existsPres = prev.some(e => e.path === "/presidentportal");
-        if (!existsPres) {
-         return [
-    ...prev,
-    { name: "Members Analytics", icon: "chartLine", path: "/memberdetailedanalytics" },
-    { name: "President Portal", icon: "users", path: "/presidentportal" },
-    { name: "Coordinators Portal", icon: "users", path: "/coordinatorsportal" }
-];
-
+        if (!next.some(e => e.path === "/coordinatorsportal")) {
+          next.push({ name: "Coordinators Portal", icon: "users", path: "/coordinatorsportal" });
         }
-        return prev;
-      });
-    }
-  }, [access]);
+      }
+
+      if (access?.hasaccess) {
+        if (!next.some(e => e.path === "/presidentportal")) {
+          next.push({ name: "President Portal", icon: "users", path: "/presidentportal" });
+        }
+      }
+
+      return next;
+    });
+  }, [coordinatorsAccess, access]);
 
   useEffect(() => {
     function onDocClick(e) {

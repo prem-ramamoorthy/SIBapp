@@ -7,6 +7,7 @@ import Graphs from './Graphs.jsx'
 import SubmitButtons from './SubmitButtons.jsx'
 import { User } from 'lucide-react'
 import UserInfo from './UserInfo.jsx'
+import LeaderboardTeaser from './LeaderboardTeaser.jsx'
 
 
 function Dashboard() {
@@ -42,6 +43,7 @@ function Dashboard() {
           <div className="hidden lg:block">
             <UserInfo />
           </div>
+          <LeaderboardTeaser />
           <div className="hidden lg:block">
             <SubmitButtons />
           </div>

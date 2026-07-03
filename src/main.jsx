@@ -35,6 +35,7 @@ import CoordinatorRoute from './hooks/CoordinatorRoute'
 import CSAEPolicy from './Notfound/CSAEPolicy'
 import PublicMembers from './Members/PublicMembers';
 import WallOfWishes from './WallOfWishes/WallOfWishes';
+import LeaderboardPage from './MainPage/LeaderboardPage';
 
 import './index.css'
 import MainPage from './src1/MainPage/MainPage';
@@ -67,6 +68,7 @@ const router = createBrowserRouter([
       { path: '/profile', element: <Profile /> },
       { path: '/allnotifications', element: <NotificationsPage /> },
       { path: '/wall-of-wishes', element: <WallOfWishes /> },
+      { path: '/leaderboard', element: <LeaderboardPage /> },
     ]
   },
   {

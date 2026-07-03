@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Phone, MessageCircle, Share2, Loader2,
   MapPin, Mail, Calendar, Heart, Briefcase, Globe, Award, Star, Building2,
-  User, Clock, DollarSign, Target, Quote, BookOpen
+  User, Clock, DollarSign, Target, Quote, BookOpen, Crown
 } from "lucide-react";
+import clsx from 'clsx';
 import useFetch from "../hooks/useFetch";
 
 // ── Helpers ──────────────────────────────────────────────────
@@ -109,19 +110,55 @@ export default function ViewProfile() {
   const queryParams = new URLSearchParams(window.location.search);
   const userId = queryParams.get("user");
 
-  const { data: profileData, loading, error } = useFetch(
-    `${import.meta.env.VITE_BACKEND_SERVER}/public/getprofilebyid/${id}?user=${userId}`,
+  const isDummyUser = id?.startsWith('dummy-');
+
+  const { data: profileDataResponse, loading: profileLoading, error: profileError } = useFetch(
+    isDummyUser ? null : `${import.meta.env.VITE_BACKEND_SERVER}/public/getprofilebyid/${id}?user=${userId}`,
     { method: "GET", credentials: "include" }
   );
 
-  const profile = useMemo(() => {
-    if (!profileData || profileData.message) return null;
-    return {
-      ...profileData,
-      dob: profileData.dob?.split("T")[0],
-      wedding_date: profileData.wedding_date?.split("T")[0],
-    };
-  }, [profileData]);
+  const { data: userBadgesDataResponse } = useFetch(
+    (isDummyUser || !profileDataResponse?.user?._id) ? null : `${import.meta.env.VITE_BACKEND_SERVER}/gamification/user-badges/${profileDataResponse.user._id}`,
+    { method: "GET", credentials: "include" }
+  );
+
+  const mockProfileData = useMemo(() => isDummyUser ? {
+    display_name: "Meenakshi S",
+    company_name: "KK Traders",
+    profile_image_url: "https://api.dicebear.com/7.x/avataaars/svg?seed=SIB3&backgroundColor=b6e3f4",
+    user: { _id: "dummy-user-3", username: "Meenakshi S", email: "meenakshi@kktraders.com" },
+    company_phone: "9876543210",
+    chaptername: "Mannar Chandramathy Chapter",
+    years_in_business: 8,
+    blood_group: "O+",
+    annual_turnover: 2500000,
+    services: ["Wholesale Trading", "Distribution", "Retail Supply"],
+    business_description: "Leading wholesale traders in the region with over 8 years of excellence. We provide high-quality goods at the best competitive prices with a massive network of distributors.",
+    business_address: "123 Market Street, Trading Hub, City",
+    website: "https://kktraders.example.com",
+    vertical_names: ["Trading", "Wholesale"]
+  } : null, [isDummyUser]);
+
+  const mockBadges = useMemo(() => isDummyUser ? [
+    { badge_type: 'month_winner', awarded_at: new Date().toISOString() },
+    { badge_type: 'runner_up', awarded_at: new Date().toISOString() },
+    { badge_type: 'highest_referral', awarded_at: new Date().toISOString() },
+    { badge_type: 'highest_m2m', awarded_at: new Date().toISOString() },
+    { badge_type: 'highest_tyb', awarded_at: new Date().toISOString() },
+    { badge_type: 'full_attendance', awarded_at: new Date().toISOString() }
+  ] : [], [isDummyUser]);
+
+  const profileData = isDummyUser ? mockProfileData : profileDataResponse;
+  const loading = isDummyUser ? false : profileLoading;
+  const error = isDummyUser ? null : profileError;
+  
+  console.log("DEBUG ViewProfile", { id, isDummyUser, profileData, mockProfileData, error });
+
+  const userBadges = useMemo(() => {
+    if (isDummyUser) return mockBadges;
+    if (!userBadgesDataResponse || userBadgesDataResponse.error) return [];
+    return userBadgesDataResponse;
+  }, [userBadgesDataResponse, isDummyUser, mockBadges]);
 
   // Share handler
   const handleShare = async () => {
@@ -168,7 +205,7 @@ export default function ViewProfile() {
   }
 
   // ── Error State ──
-  if (error || !profile) {
+  if (error || !profileData) {
     return (
       <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center gap-6 px-6" style={{ paddingTop: "env(safe-area-inset-top)" }}>
         <div className="w-24 h-24 rounded-full bg-red-500/10 flex items-center justify-center mb-2">
@@ -179,6 +216,8 @@ export default function ViewProfile() {
       </div>
     );
   }
+
+  const profile = profileData;
 
   const name = profile.display_name || profile.user?.username || "SIB Member";
   const email = profile.company_email || profile.user?.email || "";
@@ -406,6 +445,95 @@ export default function ViewProfile() {
                   )}
                 </div>
               </div>
+
+              {/* ── Achievements (Gamification) ── */}
+              {userBadges && userBadges.length > 0 && (
+                <CardSection title="Achievements" icon={Award} delay={750} className="w-full">
+                  <div className="flex flex-wrap gap-4 py-2">
+                    {(() => {
+                      const groupedBadgesMap = new Map();
+                      userBadges.forEach(badge => {
+                        if (!groupedBadgesMap.has(badge.badge_type)) {
+                          groupedBadgesMap.set(badge.badge_type, { count: 1, lastAwarded: badge.awarded_at, month: badge.month, year: badge.year });
+                        } else {
+                          const existing = groupedBadgesMap.get(badge.badge_type);
+                          existing.count += 1;
+                          if (new Date(badge.awarded_at) > new Date(existing.lastAwarded)) {
+                            existing.lastAwarded = badge.awarded_at;
+                            existing.month = badge.month;
+                            existing.year = badge.year;
+                          }
+                        }
+                      });
+
+                      const groupedBadges = Array.from(groupedBadgesMap.entries()).map(([type, data]) => ({ badge_type: type, ...data }));
+
+                      return groupedBadges.map((badge, idx) => {
+                        let colors, subtitle, label;
+                        if (badge.badge_type === 'highest_referral') {
+                          colors = "from-blue-500/10 to-indigo-500/10 border-blue-500/20";
+                          subtitle = "Top Referrer";
+                          label = "Highest Referrals";
+                        } else if (badge.badge_type === 'highest_m2m') {
+                          colors = "from-amber-500/10 to-orange-500/10 border-amber-500/20";
+                          subtitle = "Top Networker";
+                          label = "Highest M2M";
+                        } else if (badge.badge_type === 'highest_tyb') {
+                          colors = "from-green-500/10 to-emerald-500/10 border-green-500/20";
+                          subtitle = "Top Giver";
+                          label = "Highest TYB";
+                        } else if (badge.badge_type === 'perfect_attendance' || badge.badge_type === 'full_attendance') {
+                          colors = "from-purple-500/10 to-pink-500/10 border-purple-500/20";
+                          subtitle = "100%";
+                          label = "Full Attendance";
+                        } else if (badge.badge_type === 'month_winner') {
+                          colors = "from-yellow-500/10 to-amber-600/10 border-yellow-500/20";
+                          subtitle = "1st Place";
+                          label = "Month Winner";
+                        } else if (badge.badge_type === 'runner_up') {
+                          colors = "from-gray-400/10 to-gray-500/10 border-gray-400/20";
+                          subtitle = "2nd Place";
+                          label = "Runner Up";
+                        } else {
+                          colors = "from-gray-500/10 to-slate-500/10 border-gray-500/20";
+                          subtitle = "Achiever";
+                          label = badge.badge_type;
+                        }
+                        
+                        const monthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+                        const monthName = badge.month && badge.year 
+                          ? `${monthNames[badge.month - 1]} ${badge.year}` 
+                          : new Date(badge.lastAwarded).toLocaleString('default', { month: 'short', year: 'numeric' }).toUpperCase();
+                        
+                        let badgeTypeKey = badge.badge_type;
+                        if (badgeTypeKey === 'perfect_attendance') badgeTypeKey = 'full_attendance';
+
+                        return (
+                          <div key={idx} className={clsx("flex flex-col items-center text-center gap-3 border p-4 rounded-2xl shadow-lg hover:scale-105 transition-transform cursor-pointer group bg-gradient-to-br w-40", colors)}>
+                            <div className="relative">
+                              <img 
+                                src={`/assets/badges/${badgeTypeKey}.png`} 
+                                alt={label} 
+                                className="w-16 h-16 rounded-full object-cover shadow-lg drop-shadow-md border-[1.5px] border-gray-700/50 bg-gray-900 group-hover:border-amber-400/50 transition-colors duration-300"
+                              />
+                              {badge.count > 1 && (
+                                <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-red-500 text-white text-[11px] font-black min-w-[22px] h-[22px] flex items-center justify-center rounded-full border border-gray-900 shadow-sm px-1">
+                                  {badge.count}
+                                </div>
+                              )}
+                            </div>
+                            <div>
+                              <h4 className="text-white font-bold text-[13px] leading-tight mb-1">{label}</h4>
+                              <p className="text-white/50 text-[9px] font-black uppercase tracking-widest">{subtitle}</p>
+                              <p className="text-amber-500/80 text-[9px] font-black uppercase tracking-widest mt-0.5">{monthName}</p>
+                            </div>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                </CardSection>
+              )}
 
               {/* ── Bio Sections (Full Width) ── */}
               {(profile.bio || profile.elevator_pitch_30s || profile.why_sib) && (

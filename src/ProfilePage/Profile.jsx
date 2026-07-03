@@ -4,6 +4,7 @@ import ProfileCard from "./Components/ProfileCard";
 import MyBioCard from "./Components/BioCard";
 import ProfessionalDetailsCard from "./Components/ProfessionalDetails";
 import IdCardModal from "./Components/IDcard";
+import EarnedBadgesCard from "./Components/EarnedBadgesCard";
 import ViewProfile from "./ViewProfile";
 import useFetch from "../hooks/useFetch";
 import { useState, useEffect } from "react";
@@ -27,9 +28,13 @@ function Profile() {
   const queryParams = new URLSearchParams(window.location.search);
   const user = queryParams.get("user");
 
+  if (id) {
+    return <ViewProfile />;
+  }
+
   const { data: showProfileData, loading: loading1, error: error1 } = useFetch(
     id
-      ? `${import.meta.env.VITE_BACKEND_SERVER}/public/showprofile`
+      ? null
       : `${import.meta.env.VITE_BACKEND_SERVER}/profile/showprofile`,
     {
       method: "GET",
@@ -39,7 +44,7 @@ function Profile() {
 
   const { data: getProfileData, loading: loading2, error: error2 } = useFetch(
     id
-      ? `${import.meta.env.VITE_BACKEND_SERVER}/public/getprofilebyid/${id}?user=${user}`
+      ? null
       : `${import.meta.env.VITE_BACKEND_SERVER}/profile/getprofile`,
     {
       method: "GET",
@@ -222,7 +227,8 @@ function Profile() {
               editable={editable}
             />
           </div>
-          <div className="order-3 md:col-span-2 lg:col-span-1">
+          <div className="order-3 md:col-span-2 lg:col-span-1 flex flex-col gap-4">
+            <EarnedBadgesCard />
             <MyBioCard
               editable={editable}
               initialBioData={[
